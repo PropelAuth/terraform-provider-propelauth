@@ -19,7 +19,7 @@ import (
 	"terraform-provider-propelauth/internal/propelauth"
 )
 
-// Ensure ScaffoldingProvider satisfies various provider interfaces.
+// Ensure Provider satisfies various provider interfaces.
 var _ provider.Provider = &propelauthProvider{}
 var _ provider.ProviderWithFunctions = &propelauthProvider{}
 
