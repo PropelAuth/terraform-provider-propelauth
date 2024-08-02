@@ -11,7 +11,7 @@ import (
 
 const BaseURLTemplate string = "https://api.propelauth.localhost/iac/%s/project/%s"
 
-// PropelAuthClient -
+// PropelAuthClient - Client for the PropelAuth API to manage an existing project and all its resources
 type PropelAuthClient struct {
 	BaseURL    string
 	HTTPClient *http.Client
@@ -44,28 +44,28 @@ func (c *PropelAuthClient) get(urlPostfix string, queryParams url.Values) (*Stan
 	return c.requestHelper("GET", url, nil)
 }
 
-func (c *PropelAuthClient) patch(urlPostfix string, bodyParams []byte) (*StandardResponse, error) {
+func (c *PropelAuthClient) patch(urlPostfix string, body []byte) (*StandardResponse, error) {
 	url := c.assembleURL(urlPostfix, nil)
 
-	return c.requestHelper("PATCH", url, bodyParams)
+	return c.requestHelper("PATCH", url, body)
 }
 
-func (c *PropelAuthClient) post(urlPostfix string, bodyParams []byte) (*StandardResponse, error) {
+func (c *PropelAuthClient) post(urlPostfix string, body []byte) (*StandardResponse, error) {
 	url := c.assembleURL(urlPostfix, nil)
 
-	return c.requestHelper("POST", url, bodyParams)
+	return c.requestHelper("POST", url, body)
 }
 
-func (c *PropelAuthClient) put(urlPostfix string, bodyParams []byte) (*StandardResponse, error) {
+func (c *PropelAuthClient) put(urlPostfix string, body []byte) (*StandardResponse, error) {
 	url := c.assembleURL(urlPostfix, nil)
 
-	return c.requestHelper("PUT", url, bodyParams)
+	return c.requestHelper("PUT", url, body)
 }
 
-func (c *PropelAuthClient) delete(urlPostfix string, bodyParams []byte) (*StandardResponse, error) {
+func (c *PropelAuthClient) delete(urlPostfix string, body []byte) (*StandardResponse, error) {
 	url := c.assembleURL(urlPostfix, nil)
 
-	return c.requestHelper("DELETE", url, bodyParams)
+	return c.requestHelper("DELETE", url, body)
 }
 
 

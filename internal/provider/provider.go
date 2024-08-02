@@ -1,6 +1,3 @@
-// Copyright (c) HashiCorp, Inc.
-// SPDX-License-Identifier: MPL-2.0
-
 package provider
 
 import (
@@ -113,26 +110,26 @@ func (p *propelauthProvider) Configure(ctx context.Context, req provider.Configu
     // Default values to environment variables, but override
     // with Terraform configuration value if set.
 
-    tenant_id := os.Getenv("PROPELAUTH_TENANT_ID")
-    project_id := os.Getenv("PROPELAUTH_PROJECT_ID")
-    api_key := os.Getenv("PROPELAUTH_API_KEY")
+    tenantId := os.Getenv("PROPELAUTH_TENANT_ID")
+    projectId := os.Getenv("PROPELAUTH_PROJECT_ID")
+    apiKey := os.Getenv("PROPELAUTH_API_KEY")
 
     if !config.TenantId.IsNull() {
-        tenant_id = config.TenantId.ValueString()
+        tenantId = config.TenantId.ValueString()
     }
 
     if !config.ProjectId.IsNull() {
-        project_id = config.ProjectId.ValueString()
+        projectId = config.ProjectId.ValueString()
     }
 
     if !config.ApiKey.IsNull() {
-        api_key = config.ApiKey.ValueString()
+        apiKey = config.ApiKey.ValueString()
     }
 
     // If any of the expected configurations are missing, return
     // errors with provider-specific guidance.
 
-    if tenant_id == "" {
+    if tenantId == "" {
         resp.Diagnostics.AddAttributeError(
             path.Root("tenant_id"),
             "Missing PropelAuth API TenantId",
@@ -142,7 +139,7 @@ func (p *propelauthProvider) Configure(ctx context.Context, req provider.Configu
         )
     }
 
-    if project_id == "" {
+    if projectId == "" {
         resp.Diagnostics.AddAttributeError(
             path.Root("project_id"),
             "Missing PropelAuth API ProjectId",
@@ -152,7 +149,7 @@ func (p *propelauthProvider) Configure(ctx context.Context, req provider.Configu
         )
     }
 
-    if api_key == "" {
+    if apiKey == "" {
         resp.Diagnostics.AddAttributeError(
             path.Root("api_key"),
             "Missing PropelAuth API ApiKey",
@@ -166,15 +163,15 @@ func (p *propelauthProvider) Configure(ctx context.Context, req provider.Configu
         return
     }
 
-	ctx = tflog.SetField(ctx, "propelauth_tenant_id", tenant_id)
-    ctx = tflog.SetField(ctx, "propelauth_project_id", project_id)
-    ctx = tflog.SetField(ctx, "propelauth_api_key", api_key)
+	ctx = tflog.SetField(ctx, "propelauth_tenant_id", tenantId)
+    ctx = tflog.SetField(ctx, "propelauth_project_id", projectId)
+    ctx = tflog.SetField(ctx, "propelauth_api_key", apiKey)
     ctx = tflog.MaskFieldValuesWithFieldKeys(ctx, "propelauth_api_key")
 
     tflog.Debug(ctx, "Creating PropelAuth API client")
 
     // Create a new PropelAuth client using the configuration values
-    client, err := propelauth.NewClient(&tenant_id, &project_id, &api_key)
+    client, err := propelauth.NewClient(&tenantId, &projectId, &apiKey)
     if err != nil {
         resp.Diagnostics.AddError(
             "Unable to Create PropelAuth API Client",
@@ -194,6 +191,7 @@ func (p *propelauthProvider) Configure(ctx context.Context, req provider.Configu
 func (p *propelauthProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		NewProjectInfoResource,
+        NewBasicAuthConfigurationResource,
 	}
 }
 

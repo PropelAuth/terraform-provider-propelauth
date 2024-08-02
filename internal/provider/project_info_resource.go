@@ -1,6 +1,3 @@
-// Copyright (c) HashiCorp, Inc.
-// SPDX-License-Identifier: MPL-2.0
-
 package provider
 
 import (
@@ -9,7 +6,6 @@ import (
 
 	"terraform-provider-propelauth/internal/propelauth"
 
-	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -19,7 +15,6 @@ import (
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &projectInfoResource{}
 var _ resource.ResourceWithConfigure   = &projectInfoResource{}
-var _ resource.ResourceWithImportState = &projectInfoResource{}
 
 func NewProjectInfoResource() resource.Resource {
 	return &projectInfoResource{}
@@ -83,17 +78,9 @@ func (r *projectInfoResource) Create(ctx context.Context, req resource.CreateReq
         return
     }
 
-	// If applicable, this is a great opportunity to initialize any necessary
-	// provider client data and make a call using it.
-	// httpResp, err := r.client.Do(httpReq)
-	// if err != nil {
-	//     resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to create example, got error: %s", err))
-	//     return
-	// }
-
 	// Update the project info
 	name := plan.Name.ValueString()
-    project_info_res, err := r.client.UpsertProjectInfo(&name)
+    projectInfoResponse, err := r.client.UpdateProjectInfo(&name)
     if err != nil {
         resp.Diagnostics.AddError(
             "Error setting project info",
@@ -104,7 +91,7 @@ func (r *projectInfoResource) Create(ctx context.Context, req resource.CreateReq
 
 
 	// save into the Terraform state.
-	plan.Name = types.StringValue(project_info_res.Name)
+	plan.Name = types.StringValue(projectInfoResponse.Name)
 
 	// Write logs using the tflog package
 	// Documentation: https://terraform.io/plugin/log
@@ -148,7 +135,7 @@ func (r *projectInfoResource) Update(ctx context.Context, req resource.UpdateReq
 
 	// Update the project info
 	name := plan.Name.ValueString()
-    project_info_res, err := r.client.UpsertProjectInfo(&name)
+    projectInfoResponse, err := r.client.UpdateProjectInfo(&name)
     if err != nil {
         resp.Diagnostics.AddError(
             "Error setting project info",
@@ -157,23 +144,19 @@ func (r *projectInfoResource) Update(ctx context.Context, req resource.UpdateReq
         return
     }
 
-	if name != project_info_res.Name {
+	if name != projectInfoResponse.Name {
 		resp.Diagnostics.AddError(
 			"Error updating project info",
-			"Project name failed to update. The `name` is instead " + project_info_res.Name,
+			"Project name failed to update. The `name` is instead " + projectInfoResponse.Name,
 		)
 		return
 	}
 
-	plan.Name = types.StringValue(project_info_res.Name)
+	plan.Name = types.StringValue(projectInfoResponse.Name)
 	tflog.Trace(ctx, "updated a propelauth_project_info resource")
 	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
 }
 
 func (r *projectInfoResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	tflog.Trace(ctx, "deleted a propelauth_project_info resource")
-}
-
-func (r *projectInfoResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }

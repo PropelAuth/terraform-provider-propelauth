@@ -20,8 +20,8 @@ func (c *PropelAuthClient) GetProjectInfo() (*ProjectInfoResponse, error) {
 	return &projectInfo, nil
 }
 
-// GetAllOrders - Returns all user's order
-func (c *PropelAuthClient) UpsertProjectInfo(name *string) (*ProjectInfoResponse, error) {
+// UpdateProjectInfo - Updates the project's metadata -- principally the name
+func (c *PropelAuthClient) UpdateProjectInfo(name *string) (*ProjectInfoResponse, error) {
 	projectInfo := ProjectInfoUpdateRequest{
 		Name: *name,
 	}
