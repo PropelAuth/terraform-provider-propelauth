@@ -89,7 +89,7 @@ func (r *basicAuthConfigurationResource) Schema(ctx context.Context, req resourc
 			},
 			"include_login_method": schema.BoolAttribute{
 				Optional:            true,
-				Description: "If true, , the login method will be included in the access token. The default setting is false." +
+				Description: "If true, the login method will be included in the access token. The default setting is false." +
 					"See `https://docs.propelauth.com/overview/user-management/user-properties#login-method-property` for more information.",
 			},
 		},
