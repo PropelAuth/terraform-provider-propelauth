@@ -42,7 +42,7 @@ func testAccThemeResourceConfig(backgroundGradientEndColor string) string {
 	return providerConfig + fmt.Sprintf(`
 resource "propelauth_theme" "test" {
   header_font = "Fraunces"
-  body_font = "Fraunces"
+  body_font = "PlusJakartaSans"
   login_page_theme = {
     layout = "Frameless"
     background_type = "Gradient"

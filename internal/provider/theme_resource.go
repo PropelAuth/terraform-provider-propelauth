@@ -120,11 +120,14 @@ func (r *themeResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 				Computed: true,
 				Default: 		   stringdefault.StaticString("Inter"),
 				Validators: []validator.String{
-					stringvalidator.OneOf("Roboto", "Inter", "Open Sans", "Montserrat", "Lato", "Poppins", "Raleway", "Jost", "Fraunces", "Caveat", "Plus Jakarta Sans"),
+					stringvalidator.OneOf(
+						"Roboto", "Inter", "OpenSans", "Montserrat", "Lato", "Poppins", "Raleway", "Jost",
+						"Fraunces", "Caveat", "PlusJakartaSans",
+					),
 				},
-				Description: "The font used for all headings in your hosted pages. This includes both login and management pages. " +
-					"Options include `Roboto`, `Inter`, `Open Sans`, `Montserrat`, `Lato`, `Poppins`, `Raleway`, `Jost`, " +
-					"`Fraunces`, `Caveat`, `Plus Jakarta Sans`, etc." +
+				Description: "The font used for all headings in your hosted pages written in PascalCase. This includes both login and management pages. " +
+					"Options include `Roboto`, `Inter`, `OpenSans`, `Montserrat`, `Lato`, `Poppins`, `Raleway`, `Jost`, " +
+					"`Fraunces`, `Caveat`, `PlusJakartaSans`, etc." +
 					"The default value is `Inter`.",
 			},
 			"body_font": schema.StringAttribute{
