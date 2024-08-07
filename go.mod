@@ -10,6 +10,7 @@ require (
 	github.com/hashicorp/terraform-plugin-go v0.23.0
 	github.com/hashicorp/terraform-plugin-log v0.9.0
 	github.com/hashicorp/terraform-plugin-testing v1.9.0
+	github.com/reiver/go-hexcolor v0.0.0-20240223052843-febc2a9ad310
 )
 
 require (

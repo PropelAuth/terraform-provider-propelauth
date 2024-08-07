@@ -36,6 +36,7 @@ type EnvironmentConfigUpdate struct {
 	UseOrgNameForSaml *bool `json:"use_org_name_for_saml,omitempty"`
 	DefaultToSamlLogin *bool `json:"default_to_saml_login,omitempty"`
 	OrgsCanRequire2fa *bool `json:"orgs_can_require_2fa,omitempty"`
+	Theme *Theme `json:"theme,omitempty"`
 }
 
 type EnvironmentConfigResponse struct {
@@ -58,4 +59,53 @@ type EnvironmentConfigResponse struct {
 	UseOrgNameForSaml bool `json:"use_org_name_for_saml"`
 	DefaultToSamlLogin bool `json:"default_to_saml_login"`
 	OrgsCanRequire2fa bool `json:"orgs_can_require_2fa"`
+	Theme Theme `json:"theme"`
+}
+
+type Theme struct {
+	ThemeType string `json:"theme_type"` // always "CustomV2" for now
+	BodyFont string `json:"font_family"`
+	HeaderFont string `json:"secondary_font_family"`
+	DisplayProjectName bool `json:"display_project_name"`
+	LoginLayout string `json:"login_ui_theme"`
+	BackgroundType string `json:"background_type"`
+	BackgroundColor RgbColor `json:"background_color"`
+	SecondaryBackgroundColor RgbColor `json:"secondary_background_color"` // secondary background color in gradient
+	GradientAngle int32 `json:"gradient_angle"` // angle of gradient in degrees
+	BackgroundTextColor RgbColor `json:"background_text_color"` // header text color in split layout
+	SecondaryBackgroundTextColor RgbColor `json:"secondary_background_text_color"` // subheader text color in split layout
+	BorderColor RgbColor `json:"border_color"`
+	FrameBackgroundColor RgbColor `json:"foreground_color"` // input/frame background color
+	FrameTextColor RgbColor `json:"foreground_text_color"` // frame/input text color
+	FrameSecondaryTextColor RgbColor `json:"foreground_secondary_text_color"` // currently always same as ForegroundTextColor
+	PrimaryColor RgbColor `json:"success_button_color"`
+	PrimaryTextColor RgbColor `json:"success_button_text_color"`
+	ErrorButtonColor RgbColor `json:"error_button_color"`
+	ErrorButtonTextColor RgbColor `json:"error_button_text_color"`
+	Splitscreen *SplitscreenParams `json:"splitscreen,omitempty"`
+	ManagementPagesTheme ManagementPagesTheme `json:"management_pages_theme"`
+}
+
+type RgbColor struct {
+	Red uint8 `json:"red"`
+	Green uint8 `json:"green"`
+	Blue uint8 `json:"blue"`
+}
+
+type SplitscreenParams struct {
+	Direction string `json:"direction"`
+	ContentType string `json:"content_type"`
+	Header string `json:"header"`
+	Subheader string `json:"subheader"`
+}
+
+type ManagementPagesTheme struct {
+	DisplayNavbar bool `json:"display_sidebar"`
+	MainBackgroundColor RgbColor `json:"main_background_color"`
+	MainTextColor RgbColor `json:"main_text_color"`
+	NavbarBackgroundColor RgbColor `json:"sidebar_background_color"`
+	NavbarTextColor RgbColor `json:"sidebar_text_color"`
+	BorderColor RgbColor `json:"border_color"`
+	ActionButtonColor RgbColor `json:"action_button_color"`
+	ActionButtonTextColor RgbColor `json:"action_button_text_color"`
 }

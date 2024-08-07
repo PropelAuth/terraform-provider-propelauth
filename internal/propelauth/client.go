@@ -9,6 +9,7 @@ import (
 	"time"
 )
 
+// TODO: FOR THE LOVE OF GOD, DON'T FORGET TO CHANGE THIS TO THE REAL URL
 const BaseURLTemplate string = "https://api.propelauth.localhost/iac/%s/project/%s"
 
 // PropelAuthClient - Client for the PropelAuth API to manage an existing project and all its resources
