@@ -38,8 +38,6 @@ type themeResource struct {
 
 // themeResourceModel describes the resource data model.
 type themeResourceModel struct {
-	// LogoImage image `tfsdk:"logo_image"`
-	// FaviconImage image `tfsdk:"favicon_image"`
 	HeaderFont types.String `tfsdk:"header_font"`
 	BodyFont types.String `tfsdk:"body_font"`
 	LoginPageTheme loginPageTheme  `tfsdk:"login_page_theme"`
@@ -84,7 +82,6 @@ type gradientBackgroundParameters struct {
 }
 
 type imageBackgroundParameters struct {
-	BackgroundImage image `tfsdk:"background_image"`
 	DefaultBackgroundColor types.String `tfsdk:"default_background_color"`
 	BackgroundTextColor types.String `tfsdk:"background_text_color"`
 }
@@ -100,11 +97,6 @@ type managementPagesTheme struct {
 	DisplayNavbar types.Bool `tfsdk:"display_navbar"`
 }
 
-type image struct {
-	Content types.String `tfsdk:"content"`
-	ContentSha1 types.String `tfsdk:"content_sha1"`
-}
-
 func (r *themeResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_theme"
 }
@@ -113,7 +105,7 @@ func (r *themeResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 	hexcode_regex := regexp.MustCompile(`^#(?:[0-9a-f]{3}){1,2}$`)
 
 	resp.Schema = schema.Schema{
-		Description: "Hosted Pages Look & Feel. This is for configuring the look and feel of your PropelAuth hosted pages.",
+		Description: "Hosted Pages Look & Feel. This is for configuring the look and feel of your PropelAuth hosted pages",
 		Attributes: map[string]schema.Attribute{
 			"header_font": schema.StringAttribute{
 				Optional: true,
@@ -127,25 +119,25 @@ func (r *themeResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 				},
 				Description: "The font used for all headings in your hosted pages written in PascalCase. This includes both login and management pages. " +
 					"Options include `Roboto`, `Inter`, `OpenSans`, `Montserrat`, `Lato`, `Poppins`, `Raleway`, `Jost`, " +
-					"`Fraunces`, `Caveat`, `PlusJakartaSans`, etc." +
-					"The default value is `Inter`.",
+					"`Fraunces`, `Caveat`, `PlusJakartaSans`, etc" +
+					"The default value is `Inter`",
 			},
 			"body_font": schema.StringAttribute{
 				Optional: true,
 				Computed: true,
 				Default: 		   stringdefault.StaticString("Inter"),
 				Description: "The font used for all body text in your hosted pages. This includes both login and management pages. " +
-					"The available options are the same as for `header_font`. The default value is `Inter`.",
+					"The available options are the same as for `header_font`. The default value is `Inter`",
 			},
 			"display_project_name": schema.BoolAttribute{
 				Optional: 		  true,
 				Computed: true,
 				Default: 		   booldefault.StaticBool(true),
 				Description: "If true, the project name is displayed in the header of the login page. " +
-					"The default value is `true`.",
+					"The default value is `true`",
 			},
 			"login_page_theme": schema.SingleNestedAttribute{
-				Description: "The theme for the login page.",
+				Description: "The theme for the login page",
 				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"layout": schema.StringAttribute{
@@ -156,7 +148,7 @@ func (r *themeResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 							stringvalidator.OneOf("Frame", "Frameless", "Split"),
 						},
 						Description: "The layout of the login page. Options include `Frame`, `Frameless`, and `Split`. " +
-							"The default value is `Frame`.",
+							"The default value is `Frame`",
 					},
 					"background_type": schema.StringAttribute{
 						Optional: true,
@@ -166,109 +158,92 @@ func (r *themeResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 							stringvalidator.OneOf("Solid", "Gradient", "Image"),
 						},
 						Description: "The type of background for the login page. Options include `Solid`, `Gradient`, and `Image`. " +
-							"The default value is `Solid`.",
+							"The default value is `Solid`",
 					},
 					"solid_background_parameters": schema.SingleNestedAttribute{
 						Optional: true,
-						Description: "The parameters required for a solid background in the login page.",
+						Description: "The parameters required for a solid background in the login page",
 						Attributes: map[string]schema.Attribute{
 							"background_color": schema.StringAttribute{
 								Optional: true,
 								Computed: true,
 								Default: 		   stringdefault.StaticString("#f7f7f7"),
 								Validators: []validator.String{
-									stringvalidator.RegexMatches(hexcode_regex, "background_color must be a valid hex color code with lowercase characters."),
+									stringvalidator.RegexMatches(hexcode_regex, "background_color must be a valid hex color code with lowercase characters"),
 								},
-								Description: "The color of a solid background in the login page. The default value is `#f7f7f7`.",
+								Description: "The color of a solid background in the login page. The default value is `#f7f7f7`",
 							},
 							"background_text_color": schema.StringAttribute{
 								Optional: true,
 								Computed: true,
 								Default: 		   stringdefault.StaticString("#363636"),
 								Validators: []validator.String{
-									stringvalidator.RegexMatches(hexcode_regex, "background_text_color must be a valid hex color code with lowercase characters."),
+									stringvalidator.RegexMatches(hexcode_regex, "background_text_color must be a valid hex color code with lowercase characters"),
 								},
-								Description: "The color of the text on a solid background in the login page. The default value is `#363636`.",
+								Description: "The color of the text on a solid background in the login page. The default value is `#363636`",
 							},
 						},
 					},
 					"gradient_background_parameters": schema.SingleNestedAttribute{
 						Optional: true,
-						Description: "The parameters required for a gradient background in the login page.",
+						Description: "The parameters required for a gradient background in the login page",
 						Attributes: map[string]schema.Attribute{
 							"background_gradient_start_color": schema.StringAttribute{
 								Optional: true,
 								Computed: true,
 								Default: 		   stringdefault.StaticString("#f7f7f7"),
 								Validators: []validator.String{
-									stringvalidator.RegexMatches(hexcode_regex, "background_gradient_start_color must be a valid hex color code with lowercase characters."),
+									stringvalidator.RegexMatches(hexcode_regex, "background_gradient_start_color must be a valid hex color code with lowercase characters"),
 								},
-								Description: "The start color of a gradient background in the login page. The default value is `#f7f7f7`.",
+								Description: "The start color of a gradient background in the login page. The default value is `#f7f7f7`",
 							},
 							"background_gradient_end_color": schema.StringAttribute{
 								Optional: true,
 								Computed: true,
 								Default: 		   stringdefault.StaticString("#f7f7f7"),
 								Validators: []validator.String{
-									stringvalidator.RegexMatches(hexcode_regex, "background_gradient_end_color must be a valid hex color code with lowercase characters."),
+									stringvalidator.RegexMatches(hexcode_regex, "background_gradient_end_color must be a valid hex color code with lowercase characters"),
 								},
-								Description: "The end color of a gradient background in the login page. The default value is `#f7f7f7`.",
+								Description: "The end color of a gradient background in the login page. The default value is `#f7f7f7`",
 							},
 							"background_gradient_angle": schema.Int32Attribute{
 								Optional: true,
 								Computed: true,
 								Default: 		   int32default.StaticInt32(135),
-								Description: "The angle of the gradient background in the login page. The default value is `135`.",
+								Description: "The angle of the gradient background in the login page. The default value is `135`",
 							},
 							"background_text_color": schema.StringAttribute{
 								Optional: true,
 								Computed: true,
 								Default: 		   stringdefault.StaticString("#363636"),
 								Validators: []validator.String{
-									stringvalidator.RegexMatches(hexcode_regex, "background_text_color must be a valid hex color code with lowercase characters."),
+									stringvalidator.RegexMatches(hexcode_regex, "background_text_color must be a valid hex color code with lowercase characters"),
 								},
-								Description: "The color of the text on a gradient background in the login page. The default value is `#363636`.",
+								Description: "The color of the text on a gradient background in the login page. The default value is `#363636`",
 							},
 						},
 					},
 					"image_background_parameters": schema.SingleNestedAttribute{
 						Optional: true,
-						Description: "The parameters required for an image background in the login page.",
+						Description: "The parameters required for an image background in the login page",
 						Attributes: map[string]schema.Attribute{
-							"background_image": schema.SingleNestedAttribute{
-								Optional: true,
-								Computed: true,
-								Description: "The image used as the background in the login page.",
-								Attributes: map[string]schema.Attribute{
-									"content": schema.StringAttribute{
-										Optional: true,
-										Computed: true,
-										Description: "The content of the image.",
-									},
-									"content_sha1": schema.StringAttribute{
-										Optional: true,
-										Computed: true,
-										Description: "The SHA1 hash of the image content.",
-									},
-								},
-							},
 							"default_background_color": schema.StringAttribute{
 								Optional: true,
 								Computed: true,
 								Default: 		   stringdefault.StaticString("#f7f7f7"),
 								Validators: []validator.String{
-									stringvalidator.RegexMatches(hexcode_regex, "default_background_color must be a valid hex color code with lowercase characters."),
+									stringvalidator.RegexMatches(hexcode_regex, "default_background_color must be a valid hex color code with lowercase characters"),
 								},
-								Description: "The default color behind the background image in the login page. The default value is `#f7f7f7`.",
+								Description: "The default color behind the background image in the login page. The default value is `#f7f7f7`",
 							},
 							"background_text_color": schema.StringAttribute{
 								Optional: true,
 								Computed: true,
 								Default: 		   stringdefault.StaticString("#363636"),
 								Validators: []validator.String{
-									stringvalidator.RegexMatches(hexcode_regex, "background_text_color must be a valid hex color code with lowercase characters."),
+									stringvalidator.RegexMatches(hexcode_regex, "background_text_color must be a valid hex color code with lowercase characters"),
 								},
-								Description: "The color of the text on an image background in the login page. The default value is `#363636`.",
+								Description: "The color of the text on an image background in the login page. The default value is `#363636`",
 							},
 						},
 					},
@@ -277,72 +252,72 @@ func (r *themeResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 						Computed: true,
 						Default: 		   stringdefault.StaticString("#ffffff"),
 						Validators: []validator.String{
-							stringvalidator.RegexMatches(hexcode_regex, "frame_background_color must be a valid hex color code with lowercase characters."),
+							stringvalidator.RegexMatches(hexcode_regex, "frame_background_color must be a valid hex color code with lowercase characters"),
 						},
 						Description: "The background color within the frame in the login page. If the the `layout` is `Frameless`, " +
-							"this color is applied to the background of the input components on the page. The default value is `#ffffff`.",
+							"this color is applied to the background of the input components on the page. The default value is `#ffffff`",
 					},
 					"frame_text_color": schema.StringAttribute{
 						Optional: true,
 						Computed: true,
 						Default: 		   stringdefault.StaticString("#0f0f0f"),
 						Validators: []validator.String{
-							stringvalidator.RegexMatches(hexcode_regex, "frame_text_color must be a valid hex color code with lowercase characters."),
+							stringvalidator.RegexMatches(hexcode_regex, "frame_text_color must be a valid hex color code with lowercase characters"),
 						},
 						Description: "The color of the text within the frame in the login page.  If the the `layout` is `Frameless`, " +
-							"this color is applied to text within input components on the page. The default value is `#0f0f0f`.",
+							"this color is applied to text within input components on the page. The default value is `#0f0f0f`",
 					},
 					"primary_color": schema.StringAttribute{
 						Optional: true,
 						Computed: true,
 						Default: 		   stringdefault.StaticString("#50c878"),
 						Validators: []validator.String{
-							stringvalidator.RegexMatches(hexcode_regex, "primary_color must be a valid hex color code with lowercase characters."),
+							stringvalidator.RegexMatches(hexcode_regex, "primary_color must be a valid hex color code with lowercase characters"),
 						},
 						Description: "The primary color of action buttons and links in the login page. " +
-							"The default value is `#50c878`.",
+							"The default value is `#50c878`",
 					},
 					"primary_text_color": schema.StringAttribute{
 						Optional: true,
 						Computed: true,
 						Default: 		   stringdefault.StaticString("#f7f7f7"),
 						Validators: []validator.String{
-							stringvalidator.RegexMatches(hexcode_regex, "primary_text_color must be a valid hex color code with lowercase characters."),
+							stringvalidator.RegexMatches(hexcode_regex, "primary_text_color must be a valid hex color code with lowercase characters"),
 						},
-						Description: "The color of the text on action buttons in the login page. The default value is `#f7f7f7`.",
+						Description: "The color of the text on action buttons in the login page. The default value is `#f7f7f7`",
 					},
 					"error_color": schema.StringAttribute{
 						Optional: true,
 						Computed: true,
 						Default: 		   stringdefault.StaticString("#cf222e"),
 						Validators: []validator.String{
-							stringvalidator.RegexMatches(hexcode_regex, "error_color must be a valid hex color code with lowercase characters."),
+							stringvalidator.RegexMatches(hexcode_regex, "error_color must be a valid hex color code with lowercase characters"),
 						},
 						Description: "The color for error messages and cancel button in the login page. " +
-							"The default value is `#cf222e`.",
+							"The default value is `#cf222e`",
 					},
 					"error_button_text_color": schema.StringAttribute{
 						Optional: true,
 						Computed: true,
 						Default: 		   stringdefault.StaticString("#ffffff"),
 						Validators: []validator.String{
-							stringvalidator.RegexMatches(hexcode_regex, "error_button_text_color must be a valid hex color code with lowercase characters."),
+							stringvalidator.RegexMatches(hexcode_regex, "error_button_text_color must be a valid hex color code with lowercase characters"),
 						},
 						Description: "The color of the text on error messages and cancel button in the login page. " +
-							"The default value is `#ffffff`.",
+							"The default value is `#ffffff`",
 					},
 					"border_color": schema.StringAttribute{
 						Optional: true,
 						Computed: true,
 						Default: 		   stringdefault.StaticString("#e4e4e4"),
 						Validators: []validator.String{
-							stringvalidator.RegexMatches(hexcode_regex, "border_color must be a valid hex color code with lowercase characters."),
+							stringvalidator.RegexMatches(hexcode_regex, "border_color must be a valid hex color code with lowercase characters"),
 						},
-						Description: "The color of the borders in the login page. The default value is `#e4e4e4`.",
+						Description: "The color of the borders in the login page. The default value is `#e4e4e4`",
 					},
 					"split_login_page_parameters": schema.SingleNestedAttribute{
 						Optional: true,
-						Description: "The extra parameters required to configure a split login page.",
+						Description: "The extra parameters required to configure a split login page",
 						Attributes: map[string]schema.Attribute{
 							"direction": schema.StringAttribute{
 								Optional: true,
@@ -352,7 +327,7 @@ func (r *themeResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 									stringvalidator.OneOf("Left", "Right"),
 								},
 								Description: "The side of the screen where all the login components are placed. " +
-									"Options include `Left` and `Right`. The default value is `Left`.",
+									"Options include `Left` and `Right`. The default value is `Left`",
 							},
 							"content_type": schema.StringAttribute{
 								Optional: true,
@@ -362,35 +337,35 @@ func (r *themeResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 									stringvalidator.OneOf("None", "Text"),
 								},
 								Description: "The type of content displayed on the side of the screen opposite the login components. " +
-									"Currently, options include `None` and `Text`. The default value is `None`.",
+									"Currently, options include `None` and `Text`. The default value is `None`",
 							},
 							"header": schema.StringAttribute{
 								Optional: true,
 								Description: "The header text displayed on the side of the screen opposite the login components. " +
-									"This is only displayed if `content_type` is `Text`.",
+									"This is only displayed if `content_type` is `Text`",
 							},
 							"subheader": schema.StringAttribute{
 								Optional: true,
 								Description: "The subheader text displayed on the side of the screen opposite the login components. " +
-									"This is only displayed if `content_type` is `Text`.",
+									"This is only displayed if `content_type` is `Text`",
 							},
 							"secondary_background_text_color": schema.StringAttribute{
 								Optional: true,
 								Computed: true,
 								Default: 		   stringdefault.StaticString("#363636"),
 								Validators: []validator.String{
-									stringvalidator.RegexMatches(hexcode_regex, "secondary_background_text_color must be a valid hex color code with lowercase characters."),
+									stringvalidator.RegexMatches(hexcode_regex, "secondary_background_text_color must be a valid hex color code with lowercase characters"),
 								},
 								Description: "The color of the subheader on the side of the screen opposite the login components. " +
 									"The header text in the same area uses the `background_text_color`. " +
-									"The default value is `#363636`.",
+									"The default value is `#363636`",
 							},
 						},
 					},
 				},
 			},
 			"management_pages_theme": schema.SingleNestedAttribute{
-				Description: "The theme for the account and organization management pages.",
+				Description: "The theme for the account and organization management pages",
 				Required: true,
 				Attributes: map[string]schema.Attribute{
 					"main_background_color": schema.StringAttribute{
@@ -398,70 +373,70 @@ func (r *themeResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 						Computed: true,
 						Default: 		   stringdefault.StaticString("#f7f7f7"),
 						Validators: []validator.String{
-							stringvalidator.RegexMatches(hexcode_regex, "main_background_color must be a valid hex color code with lowercase characters."),
+							stringvalidator.RegexMatches(hexcode_regex, "main_background_color must be a valid hex color code with lowercase characters"),
 						},
-						Description: "The background color of the main content area in the management pages. The default value is `#f7f7f7`.",
+						Description: "The background color of the main content area in the management pages. The default value is `#f7f7f7`",
 					},
 					"main_text_color": schema.StringAttribute{
 						Optional: true,
 						Computed: true,
 						Default: 		   stringdefault.StaticString("#363636"),
 						Validators: []validator.String{
-							stringvalidator.RegexMatches(hexcode_regex, "main_text_color must be a valid hex color code with lowercase characters."),
+							stringvalidator.RegexMatches(hexcode_regex, "main_text_color must be a valid hex color code with lowercase characters"),
 						},
-						Description: "The color of the text in the main content area of the management pages. The default value is `#363636`.",
+						Description: "The color of the text in the main content area of the management pages. The default value is `#363636`",
 					},
 					"navbar_background_color": schema.StringAttribute{
 						Optional: true,
 						Computed: true,
 						Default: 		   stringdefault.StaticString("#ffffff"),
 						Validators: []validator.String{
-							stringvalidator.RegexMatches(hexcode_regex, "navbar_background_color must be a valid hex color code with lowercase characters."),
+							stringvalidator.RegexMatches(hexcode_regex, "navbar_background_color must be a valid hex color code with lowercase characters"),
 						},
-						Description: "The background color of the navigation bar in the management pages. The default value is `#ffffff`.",
+						Description: "The background color of the navigation bar in the management pages. The default value is `#ffffff`",
 					},
 					"navbar_text_color": schema.StringAttribute{
 						Optional: true,
 						Computed: true,
 						Default: 		   stringdefault.StaticString("#0f0f0f"),
 						Validators: []validator.String{
-							stringvalidator.RegexMatches(hexcode_regex, "navbar_text_color must be a valid hex color code with lowercase characters."),
+							stringvalidator.RegexMatches(hexcode_regex, "navbar_text_color must be a valid hex color code with lowercase characters"),
 						},
-						Description: "The color of the text in the navigation bar in the management pages. The default value is `#0f0f0f`.",
+						Description: "The color of the text in the navigation bar in the management pages. The default value is `#0f0f0f`",
 					},
 					"action_button_color": schema.StringAttribute{
 						Optional: true,
 						Computed: true,
 						Default: 		   stringdefault.StaticString("#50c878"),
 						Validators: []validator.String{
-							stringvalidator.RegexMatches(hexcode_regex, "action_button_color must be a valid hex color code with lowercase characters."),
+							stringvalidator.RegexMatches(hexcode_regex, "action_button_color must be a valid hex color code with lowercase characters"),
 						},
-						Description: "The color of action buttons in the management pages. The default value is `#50c878`.",
+						Description: "The color of action buttons in the management pages. The default value is `#50c878`",
 					},
 					"action_button_text_color": schema.StringAttribute{
 						Optional: true,
 						Computed: true,
 						Default: 		   stringdefault.StaticString("#f7f7f7"),
 						Validators: []validator.String{
-							stringvalidator.RegexMatches(hexcode_regex, "action_button_text_color must be a valid hex color code with lowercase characters."),
+							stringvalidator.RegexMatches(hexcode_regex, "action_button_text_color must be a valid hex color code with lowercase characters"),
 						},
-						Description: "The color of the text on action buttons in the management pages. The default value is `#f7f7f7`.",
+						Description: "The color of the text on action buttons in the management pages. The default value is `#f7f7f7`",
 					},
 					"border_color": schema.StringAttribute{
 						Optional: true,
 						Computed: true,
 						Default: 		   stringdefault.StaticString("#e4e4e4"),
 						Validators: []validator.String{
-							stringvalidator.RegexMatches(hexcode_regex, "border_color must be a valid hex color code with lowercase characters."),
+							stringvalidator.RegexMatches(hexcode_regex, "border_color must be a valid hex color code with lowercase characters"),
 						},
 						Description: "The color of the border between the navbar and the main content area in the management pages. " +
-							"The default value is `#e4e4e4`.",
+							"The default value is `#e4e4e4`",
 					},
 					"display_navbar": schema.BoolAttribute{
 						Optional: 		  true,
 						Computed: true,
 						Default: 		   booldefault.StaticBool(true),
-						Description: "If true, the sidebar is displayed in the management pages. The default value is `true`.",
+						Description: "If true, the sidebar is displayed in the management pages. The default value is `true`",
 					},
 				},
 			},
@@ -480,7 +455,7 @@ func (r *themeResource) Configure(ctx context.Context, req resource.ConfigureReq
 	if !ok {
 		resp.Diagnostics.AddError(
 			"Unexpected Resource Configure Type",
-			fmt.Sprintf("Expected *propelauth.PropelAuthClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *propelauth.PropelAuthClient, got: %T. Please report this issue to the provider developers", req.ProviderData),
 		)
 
 		return
@@ -506,7 +481,7 @@ func (r *themeResource) ValidateConfig(ctx context.Context, req resource.Validat
 			resp.Diagnostics.AddAttributeError(
 				path.Root("login_page_theme"),
 				"Missing solid_background_parameters",
-				"`Solid` `background_type` requires `solid_background_parameters` to be set.",
+				"`Solid` `background_type` requires `solid_background_parameters` to be set",
 			)
 			return
 		}
@@ -514,7 +489,7 @@ func (r *themeResource) ValidateConfig(ctx context.Context, req resource.Validat
 			resp.Diagnostics.AddAttributeError(
 				path.Root("login_page_theme"),
 				"Invalid background parameters",
-				"`Solid` `background_type` should not have gradient or image background parameters set.",
+				"`Solid` `background_type` should not have gradient or image background parameters set",
 			)
 			return
 		}
@@ -525,7 +500,7 @@ func (r *themeResource) ValidateConfig(ctx context.Context, req resource.Validat
 			resp.Diagnostics.AddAttributeError(
 				path.Root("login_page_theme"),
 				"Missing gradient_background_parameters",
-				"`Gradient` `background_type` requires `gradient_background_parameters` to be set.",
+				"`Gradient` `background_type` requires `gradient_background_parameters` to be set",
 			)
 			return
 		}
@@ -534,7 +509,7 @@ func (r *themeResource) ValidateConfig(ctx context.Context, req resource.Validat
 			resp.Diagnostics.AddAttributeError(
 				path.Root("login_page_theme"),
 				"Invalid background parameters",
-				"`Gradient` `background_type` should not have solid or image background parameters set.",
+				"`Gradient` `background_type` should not have solid or image background parameters set",
 			)
 			return
 		}
@@ -545,7 +520,7 @@ func (r *themeResource) ValidateConfig(ctx context.Context, req resource.Validat
 			resp.Diagnostics.AddAttributeError(
 				path.Root("login_page_theme"),
 				"Missing `image_background_parameters`",
-				"`Image` `background_type` requires `image_background_parameters` to be set.",
+				"`Image` `background_type` requires `image_background_parameters` to be set",
 			)
 			return
 		}
@@ -554,7 +529,7 @@ func (r *themeResource) ValidateConfig(ctx context.Context, req resource.Validat
 			resp.Diagnostics.AddAttributeError(
 				path.Root("login_page_theme"),
 				"Invalid background parameters",
-				"`Image` `background_type` should not have solid or gradient background parameters set.",
+				"`Image` `background_type` should not have solid or gradient background parameters set",
 			)
 			return
 		}
@@ -564,7 +539,7 @@ func (r *themeResource) ValidateConfig(ctx context.Context, req resource.Validat
 		resp.Diagnostics.AddAttributeError(
 			path.Root("login_page_theme"),
 			"Missing `split_login_page_parameters`",
-			"`Split` login page layout requires `split_login_page_parameters` to be set.",
+			"`Split` login page layout requires `split_login_page_parameters` to be set",
 		)
 		return
 	}
@@ -579,20 +554,22 @@ func (r *themeResource) Create(ctx context.Context, req resource.CreateRequest, 
     if resp.Diagnostics.HasError() {
         return
     }
-
+	
 	// Update the configuration in PropelAuth
 	environmentConfigUpdate := propelauth.EnvironmentConfigUpdate{
 		Theme: convertPlanToTheme(&plan),
 	}
-
-    _, err := r.client.UpdateEnvironmentConfig(&environmentConfigUpdate)
+    environmentConfig, err := r.client.UpdateEnvironmentConfig(&environmentConfigUpdate)
     if err != nil {
         resp.Diagnostics.AddError(
             "Error setting propelauth theme",
-            "Could not set propelauth theme, unexpected error: "+err.Error(),
+            "Could not set propelauth theme, unexpected error: " + err.Error(),
         )
         return
     }
+
+	// overwrite the computed state with the retrieved data
+	updateStateFromTheme(environmentConfig.Theme, &plan)
 
 	// Write logs using the tflog package
 	// Documentation: https://terraform.io/plugin/log
@@ -641,8 +618,7 @@ func (r *themeResource) Update(ctx context.Context, req resource.UpdateRequest, 
 	environmentConfigUpdate := propelauth.EnvironmentConfigUpdate{
 		Theme: convertPlanToTheme(&plan),
 	}
-
-    _, err := r.client.UpdateEnvironmentConfig(&environmentConfigUpdate)
+    environmentConfig, err := r.client.UpdateEnvironmentConfig(&environmentConfigUpdate)
     if err != nil {
         resp.Diagnostics.AddError(
             "Error setting propelauth theme",
@@ -650,6 +626,9 @@ func (r *themeResource) Update(ctx context.Context, req resource.UpdateRequest, 
         )
         return
     }
+
+	// overwrite the computed state with the retrieved data
+	updateStateFromTheme(environmentConfig.Theme, &plan)
 
 	// Write logs using the tflog package
 	// Documentation: https://terraform.io/plugin/log

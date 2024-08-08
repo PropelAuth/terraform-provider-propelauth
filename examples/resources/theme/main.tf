@@ -12,6 +12,18 @@ provider "propelauth" {
 #   api_key    = "<PROPELAUTH_API_KEY>"    # or PROPELAUTH_API_KEY environment variable
 }
 
+resource "propelauth_image" "logo" {
+  source = "${path.module}/git-merge.png"
+  version = "0.0.0"
+  image_type = "logo"
+}
+
+resource "propelauth_image" "favicon" {
+  source = "${path.module}/git-merge.png"
+  version = "0.0.0"
+  image_type = "favicon"
+}
+
 resource "propelauth_theme" "my_theme" {
   header_font = "Fraunces"
   body_font = "PlusJakartaSans"

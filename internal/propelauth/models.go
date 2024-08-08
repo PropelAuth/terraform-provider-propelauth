@@ -37,6 +37,9 @@ type EnvironmentConfigUpdate struct {
 	DefaultToSamlLogin *bool `json:"default_to_saml_login,omitempty"`
 	OrgsCanRequire2fa *bool `json:"orgs_can_require_2fa,omitempty"`
 	Theme *Theme `json:"theme,omitempty"`
+	LogoImageId string `json:"logo_image_id,omitempty"`
+	FaviconImageId string `json:"favicon_image_id,omitempty"`
+	BackgroundImageId string `json:"background_image_id,omitempty"`
 }
 
 type EnvironmentConfigResponse struct {
@@ -60,6 +63,9 @@ type EnvironmentConfigResponse struct {
 	DefaultToSamlLogin bool `json:"default_to_saml_login"`
 	OrgsCanRequire2fa bool `json:"orgs_can_require_2fa"`
 	Theme Theme `json:"theme"`
+	LogoUrl string `json:"logo_url"`
+	FaviconUrl string `json:"favicon_url"`
+	BackgroundUrl string `json:"background_url"`
 }
 
 type Theme struct {
@@ -108,4 +114,8 @@ type ManagementPagesTheme struct {
 	BorderColor RgbColor `json:"border_color"`
 	ActionButtonColor RgbColor `json:"action_button_color"`
 	ActionButtonTextColor RgbColor `json:"action_button_text_color"`
+}
+
+type ImageUploadResponse struct {
+	ImageId string `json:"image_id"`
 }

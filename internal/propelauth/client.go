@@ -51,23 +51,23 @@ func (c *PropelAuthClient) patch(urlPostfix string, body []byte) (*StandardRespo
 	return c.requestHelper("PATCH", url, body)
 }
 
-func (c *PropelAuthClient) post(urlPostfix string, body []byte) (*StandardResponse, error) {
-	url := c.assembleURL(urlPostfix, nil)
+// func (c *PropelAuthClient) post(urlPostfix string, body []byte) (*StandardResponse, error) {
+// 	url := c.assembleURL(urlPostfix, nil)
 
-	return c.requestHelper("POST", url, body)
-}
+// 	return c.requestHelper("POST", url, body)
+// }
 
-func (c *PropelAuthClient) put(urlPostfix string, body []byte) (*StandardResponse, error) {
-	url := c.assembleURL(urlPostfix, nil)
+// func (c *PropelAuthClient) put(urlPostfix string, body []byte) (*StandardResponse, error) {
+// 	url := c.assembleURL(urlPostfix, nil)
 
-	return c.requestHelper("PUT", url, body)
-}
+// 	return c.requestHelper("PUT", url, body)
+// }
 
-func (c *PropelAuthClient) delete(urlPostfix string, body []byte) (*StandardResponse, error) {
-	url := c.assembleURL(urlPostfix, nil)
+// func (c *PropelAuthClient) delete(urlPostfix string, body []byte) (*StandardResponse, error) {
+// 	url := c.assembleURL(urlPostfix, nil)
 
-	return c.requestHelper("DELETE", url, body)
-}
+// 	return c.requestHelper("DELETE", url, body)
+// }
 
 
 func (c *PropelAuthClient) requestHelper(method string, url string, body []byte) (*StandardResponse, error) {
@@ -87,7 +87,7 @@ func (c *PropelAuthClient) requestHelper(method string, url string, body []byte)
 	// send request
 	resp, err := c.HTTPClient.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("error on response: %w", err)
+		return nil, fmt.Errorf("error making http request: %w", err)
 	}
 	defer resp.Body.Close()
 
@@ -99,6 +99,10 @@ func (c *PropelAuthClient) requestHelper(method string, url string, body []byte)
 	}
 
 	respBytes := buf.Bytes()
+
+	if resp.StatusCode >= 400 {
+		return nil, fmt.Errorf("error on response: %s", string(respBytes[:]))
+	}
 
 	// return the response
 	queryResponse := StandardResponse{
