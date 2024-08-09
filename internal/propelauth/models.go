@@ -119,3 +119,33 @@ type ManagementPagesTheme struct {
 type ImageUploadResponse struct {
 	ImageId string `json:"image_id"`
 }
+
+type UserProperties struct {
+	Fields []UserProperty `json:"fields"`
+}
+
+type UserProperty struct {
+	Name string `json:"name"`
+	DisplayName string `json:"display_name"`
+	FieldType string `json:"field_type"`
+	Required bool `json:"required"`
+	RequiredBy int64 `json:"required_by"`
+	InJwt bool `json:"in_jwt"`
+	IsEnabled bool `json:"is_enabled"`
+	IsUserFacing bool `json:"is_user_facing"`
+	CollectOnSignup bool `json:"collect_on_signup"`
+	CollectViaSaml bool `json:"collect_via_saml"`
+	ShowInAccount bool `json:"show_in_account"`
+	UserWritable string `json:"user_writable"`
+	Metadata userPropertyMetadata `json:"metadata"`
+}
+
+type userPropertyMetadata struct {
+	TosLinks []TosLink `json:"tos_links,omitempty"`
+	EnumValues []string `json:"enum_values,omitempty"`
+}
+
+type TosLink struct {
+	Url string `json:"url"`
+	Name string `json:"name"`
+}
