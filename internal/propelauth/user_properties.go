@@ -377,6 +377,32 @@ type CustomPropertySettings struct {
 	EnumValues []string
 }
 
+func (c *CustomPropertySettings) IsEqual(other CustomPropertySettings) bool {
+	if c.Name != other.Name ||
+		c.DisplayName != other.DisplayName ||
+		c.FieldType != other.FieldType ||
+		c.Required != other.Required ||
+		c.RequiredBy != other.RequiredBy ||
+		c.InJwt != other.InJwt ||
+		c.IsUserFacing != other.IsUserFacing ||
+		c.CollectOnSignup != other.CollectOnSignup ||
+		c.CollectViaSaml != other.CollectViaSaml ||
+		c.ShowInAccount != other.ShowInAccount ||
+		c.UserWritable != other.UserWritable {
+		return false
+	}
+	if len(c.EnumValues) != len(other.EnumValues) {
+		return false
+	}
+	for i := range c.EnumValues {
+		if c.EnumValues[i] != other.EnumValues[i] {
+			return false
+		}
+	}
+	return true
+}
+
+
 // UpsertCustomProperty - Upserts a custom property
 func (up *UserProperties) UpsertCustomProperty(customProperty CustomPropertySettings) {
 	for i := range up.Fields {
@@ -477,10 +503,10 @@ func (up *UserProperties) GetEnabledCustomProperty(propertyName string) (CustomP
 }
 
 // GetHangingCustomProperties - Returns a list of custom properties that are enabled but not in the provided list
-func (up *UserProperties) GetHangingCustomProperties(customProperties []CustomPropertySettings) []CustomPropertySettings {
+func (up *UserProperties) GetHangingCustomProperties(customPropertiesInState []string) []CustomPropertySettings {
 	var hangingCustomProperties []CustomPropertySettings
 	for i := range up.Fields {
-		if !containsName(customProperties, up.Fields[i].Name) && !IsDefaultPropertyName(up.Fields[i].Name) && up.Fields[i].IsEnabled {
+		if !Contains(customPropertiesInState, up.Fields[i].Name) && !IsDefaultPropertyName(up.Fields[i].Name) && up.Fields[i].IsEnabled {
 			hangingCustomProperties = append(hangingCustomProperties, CustomPropertySettings{
 				Name: up.Fields[i].Name,
 				DisplayName: up.Fields[i].DisplayName,

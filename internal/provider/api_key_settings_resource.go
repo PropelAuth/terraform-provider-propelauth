@@ -312,19 +312,10 @@ func diffInOptions(stateOptions []types.String, remoteOptions []string) bool {
 	}
 
 	for _, option := range stateOptions {
-		if !contains(remoteOptions, option.ValueString()) {
+		if !propelauth.Contains(remoteOptions, option.ValueString()) {
 			return true
 		}
 	}
 
 	return false
-}
-
-func contains(slice []string, target string) bool {
-    for _, s := range slice {
-        if s == target {
-            return true
-        }
-    }
-    return false
 }

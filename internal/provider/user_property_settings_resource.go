@@ -613,45 +613,84 @@ func UpdateCustomPropertiesFromPlan(plan *userPropertySettingsResourceModel, use
 }
 
 func reconcileCustomProperties(state *userPropertySettingsResourceModel, userPropertySettings *propelauth.UserProperties) {
-	var reconciledCustomProperties []propelauth.CustomPropertySettings
-	for _, customPropertyInState := range state.CustomProperties {
+	for i, customPropertyInState := range state.CustomProperties {
 		activeCustomProperty, ok := userPropertySettings.GetEnabledCustomProperty(customPropertyInState.Name.ValueString())
 		if !ok {
-			continue
+			customPropertyInState = customPropertyModel{}
 		}
-		reconciledCustomProperties = append(reconciledCustomProperties, activeCustomProperty)
+		convertedCustomPropertyInState := convertCustomPropertyFromModel(customPropertyInState)
+
+		if !convertedCustomPropertyInState.IsEqual(activeCustomProperty) {
+			state.CustomProperties[i] = convertCustomPropertyToModel(&activeCustomProperty)
+		}
 	}
 
-	hangingCustomProperties := userPropertySettings.GetHangingCustomProperties(reconciledCustomProperties)
-	reconciledCustomProperties = append(reconciledCustomProperties, hangingCustomProperties...)
-
-	convertedCustomProperties := make([]customPropertyModel, len(reconciledCustomProperties))
-	for _, reconciledCustomProperty := range reconciledCustomProperties {
-		convertedCustomProperty := customPropertyModel{
-			Name: types.StringValue(reconciledCustomProperty.Name),
-			DisplayName: types.StringValue(reconciledCustomProperty.DisplayName),
-			FieldType: types.StringValue(reconciledCustomProperty.FieldType),
-			Required: types.BoolValue(reconciledCustomProperty.Required),
-			RequiredBy: types.Int64Value(reconciledCustomProperty.RequiredBy),
-			InJwt: types.BoolValue(reconciledCustomProperty.InJwt),
-			IsUserFacing: types.BoolValue(reconciledCustomProperty.IsUserFacing),
-			CollectOnSignup: types.BoolValue(reconciledCustomProperty.CollectOnSignup),
-			CollectViaSaml: types.BoolValue(reconciledCustomProperty.CollectViaSaml),
-			ShowInAccount: types.BoolValue(reconciledCustomProperty.ShowInAccount),
-			UserWritable: types.StringValue(reconciledCustomProperty.UserWritable),
-		}
-
-		if reconciledCustomProperty.FieldType == "Enum" {
-			enumValues := make([]types.String, len(reconciledCustomProperty.EnumValues))
-			for j, enumValue := range reconciledCustomProperty.EnumValues {
-				enumValues[j] = types.StringValue(enumValue)
-			}
-			convertedCustomProperty.EnumValues = enumValues
-		}
-		convertedCustomProperties = append(convertedCustomProperties, convertedCustomProperty)
+	customPropertyNamesInState := make([]string, len(state.CustomProperties))
+	for i, customProperty := range state.CustomProperties {
+		customPropertyNamesInState[i] = customProperty.Name.ValueString()
 	}
 
-	state.CustomProperties = convertedCustomProperties
+	hangingCustomProperties := userPropertySettings.GetHangingCustomProperties(customPropertyNamesInState)
+	convertedCustomPropertiesFromHanging := make([]customPropertyModel, len(hangingCustomProperties))
+
+	for _, hangingCustomProperty := range hangingCustomProperties {
+		convertedCustomProperty := convertCustomPropertyToModel(&hangingCustomProperty)
+		convertedCustomPropertiesFromHanging = append(convertedCustomPropertiesFromHanging, convertedCustomProperty)
+	}
+
+	state.CustomProperties = append(state.CustomProperties, convertedCustomPropertiesFromHanging...)
+}
+
+func convertCustomPropertyToModel(customProperty *propelauth.CustomPropertySettings) customPropertyModel {
+	customPropertyModel := customPropertyModel{
+		Name: types.StringValue(customProperty.Name),
+		DisplayName: types.StringValue(customProperty.DisplayName),
+		FieldType: types.StringValue(customProperty.FieldType),
+		Required: types.BoolValue(customProperty.Required),
+		RequiredBy: types.Int64Value(customProperty.RequiredBy),
+		InJwt: types.BoolValue(customProperty.InJwt),
+		IsUserFacing: types.BoolValue(customProperty.IsUserFacing),
+		CollectOnSignup: types.BoolValue(customProperty.CollectOnSignup),
+		CollectViaSaml: types.BoolValue(customProperty.CollectViaSaml),
+		ShowInAccount: types.BoolValue(customProperty.ShowInAccount),
+		UserWritable: types.StringValue(customProperty.UserWritable),
+	}
+
+	if customProperty.FieldType == "Enum" {
+		enumValues := make([]types.String, len(customProperty.EnumValues))
+		for i, enumValue := range customProperty.EnumValues {
+			enumValues[i] = types.StringValue(enumValue)
+		}
+		customPropertyModel.EnumValues = enumValues
+	}
+
+	return customPropertyModel
+}
+
+func convertCustomPropertyFromModel(customPropertyModel customPropertyModel) propelauth.CustomPropertySettings {
+	customProperty := propelauth.CustomPropertySettings{
+		Name: customPropertyModel.Name.ValueString(),
+		DisplayName: customPropertyModel.DisplayName.ValueString(),
+		FieldType: customPropertyModel.FieldType.ValueString(),
+		Required: customPropertyModel.Required.ValueBool(),
+		RequiredBy: customPropertyModel.RequiredBy.ValueInt64(),
+		InJwt: customPropertyModel.InJwt.ValueBool(),
+		IsUserFacing: customPropertyModel.IsUserFacing.ValueBool(),
+		CollectOnSignup: customPropertyModel.CollectOnSignup.ValueBool(),
+		CollectViaSaml: customPropertyModel.CollectViaSaml.ValueBool(),
+		ShowInAccount: customPropertyModel.ShowInAccount.ValueBool(),
+		UserWritable: customPropertyModel.UserWritable.ValueString(),
+	}
+
+	if customPropertyModel.FieldType.ValueString() == "Enum" {
+		enumValues := make([]string, len(customPropertyModel.EnumValues))
+		for i, enumValue := range customPropertyModel.EnumValues {
+			enumValues[i] = enumValue.ValueString()
+		}
+		customProperty.EnumValues = enumValues
+	}
+
+	return customProperty
 }
 
 func inJwtAttribute(defaultValue bool) schema.Attribute {
