@@ -62,4 +62,45 @@ resource "propelauth_user_property_settings" "my_user_property_settings" {
         "Other"
     ]
   }
+  custom_properties = [
+    {
+      name = "birthday"
+      display_name = "Birthday"
+      field_type = "Date"
+      in_jwt = true
+      required = false
+      user_writable = "Write"
+    },
+    {
+      name = "favorite_ice_cream_flavor"
+      display_name = "Favorite Ice Cream Flavor"
+      field_type = "Enum"
+      enum_values = [
+        "Vanilla",
+        "Chocolate",
+        "Strawberry",
+        "Mint Chocolate Chip",
+        "Other"
+      ]
+      in_jwt = true
+      required = true
+      required_by = 0
+      user_writable = "Write"
+    },
+    {
+      name = "favorite_color"
+      display_name = "Favorite Color"
+      field_type = "Text"
+      in_jwt = false
+      required = false
+      user_writable = "Write"
+    },
+    {
+      name = "receive_newsletter"
+      display_name = "I want to receive the newsletter"
+      field_type = "Toggle"
+      user_writable = "Write"
+      show_in_account = false
+    }
+  ]
 }

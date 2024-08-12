@@ -41,6 +41,7 @@ type userPropertySettingsResourceModel struct {
 	TosProperty *tosPropertyModel `tfsdk:"tos_property"`
 	ReferralSourceProperty *referralSourcePropertyModel `tfsdk:"referral_source_property"`
 	PhoneNumberProperty *phoneNumberPropertyModel `tfsdk:"phone_number_property"`
+	CustomProperties []customPropertyModel `tfsdk:"custom_properties"`
 }
 
 type namePropertyModel struct {
@@ -92,6 +93,21 @@ type phoneNumberPropertyModel struct {
 	RequiredBy types.Int64 `tfsdk:"required_by"`
 	UserWritable types.String `tfsdk:"user_writable"`
 	InJwt types.Bool `tfsdk:"in_jwt"`
+}
+
+type customPropertyModel struct {
+	Name types.String `tfsdk:"name"`
+	DisplayName types.String `tfsdk:"display_name"`
+	FieldType types.String `tfsdk:"field_type"`
+	Required types.Bool `tfsdk:"required"`
+	RequiredBy types.Int64 `tfsdk:"required_by"`
+	InJwt types.Bool `tfsdk:"in_jwt"`
+	IsUserFacing types.Bool `tfsdk:"is_user_facing"`
+	CollectOnSignup types.Bool `tfsdk:"collect_on_signup"`
+	CollectViaSaml types.Bool `tfsdk:"collect_via_saml"`
+	ShowInAccount types.Bool `tfsdk:"show_in_account"`
+	UserWritable types.String `tfsdk:"user_writable"`
+	EnumValues []types.String `tfsdk:"enum_values"`
 }
 
 func (r *userPropertySettingsResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -203,6 +219,56 @@ func (r *userPropertySettingsResource) Schema(ctx context.Context, req resource.
 					"in_jwt": inJwtAttribute(false),
 				},
 			},
+			"custom_properties": schema.ListNestedAttribute{
+				Optional: true,
+				Description: "Custom properties for the user. If no blocks are provided, no custom properties will be enabled.",
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"name": schema.StringAttribute{
+							Required: true,
+							Description: "The field name used to identify the property in the API and SDKs (e.g. external_id). " +
+								"It cannot be changed after creation.",
+						},
+						"display_name": schema.StringAttribute{
+							Required: true,
+							Description: "The field name users see in the UI for the property.",
+						},
+						"field_type": schema.StringAttribute{
+							Required: true,
+							Description: "The type of the field. Accepted values are `Checkbox`, `Date`, `Enum`, " +
+								"`Integer`, `Json`, `LongText`, `Text`, `Toggle`, and `Url`. Once set, this cannot be changed.",
+							Validators: []validator.String{
+								stringvalidator.OneOf("Checkbox", "Date", "Enum", "Integer", "Json", "LongText", "Text", "Toggle", "Url"),
+							},
+						},
+						"required": requiredAttribute(true),
+						"required_by": requiredByAttribute(0),
+						"in_jwt": inJwtAttribute(true),
+						"is_user_facing": schema.BoolAttribute{
+							Optional: true,
+							Computed: true,
+							Default: booldefault.StaticBool(true),
+							Description: "Whether the property should be displayed in the user's account page hosted by PropelAuth. " +
+								"The default value is `false`.",
+						},
+						"collect_on_signup": schema.BoolAttribute{
+							Optional: true,
+							Computed: true,
+							Default: booldefault.StaticBool(true),
+							Description: "Whether the property should be collected from new users during the sign up flow. " +
+								"The default value is `true`.",
+						},
+						"collect_via_saml": collectViaSamlAttribute(false),
+						"show_in_account": showInAccountAttribute(true),
+						"user_writable": userWriteableAttribute("Write"),
+						"enum_values": schema.ListAttribute{
+							Optional: true,
+							Description: "A list of possible values for the property. This is only required for the `Enum` field type.",
+							ElementType: types.StringType,
+						},
+					},
+				},
+			},
 		},
 	}
 }
@@ -249,6 +315,7 @@ func (r *userPropertySettingsResource) Create(ctx context.Context, req resource.
 
 	// Update the configuration in PropelAuth
 	UpdateDefaultPropertiesFromPlan(&plan, userPropertySettings)
+	UpdateCustomPropertiesFromPlan(&plan, userPropertySettings)
 
     _, err = r.client.UpdateUserProperties(userPropertySettings)
 	if err != nil {
@@ -378,6 +445,8 @@ func (r *userPropertySettingsResource) Read(ctx context.Context, req resource.Re
 		state.ReferralSourceProperty = nil
 	}
 
+	reconcileCustomProperties(&state, userPropertySettings)
+
 	// Save updated state into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 }
@@ -404,6 +473,7 @@ func (r *userPropertySettingsResource) Update(ctx context.Context, req resource.
 
 	// Update the configuration in PropelAuth
 	UpdateDefaultPropertiesFromPlan(&plan, userPropertySettings)
+	UpdateCustomPropertiesFromPlan(&plan, userPropertySettings)
 
     _, err = r.client.UpdateUserProperties(userPropertySettings)
 	if err != nil {
@@ -513,6 +583,76 @@ func UpdateDefaultPropertiesFromPlan(plan *userPropertySettingsResourceModel, us
 	}
 }
 
+func UpdateCustomPropertiesFromPlan(plan *userPropertySettingsResourceModel, userPropertySettings *propelauth.UserProperties) {
+	customPropertyUpdates := make([]propelauth.CustomPropertySettings, len(plan.CustomProperties))
+	for i, customProperty := range plan.CustomProperties {
+		customPropertyUpdate := propelauth.CustomPropertySettings{
+			Name: customProperty.Name.ValueString(),
+			DisplayName: customProperty.DisplayName.ValueString(),
+			FieldType: customProperty.FieldType.ValueString(),
+			Required: customProperty.Required.ValueBool(),
+			RequiredBy: customProperty.RequiredBy.ValueInt64(),
+			InJwt: customProperty.InJwt.ValueBool(),
+			IsUserFacing: customProperty.IsUserFacing.ValueBool(),
+			CollectOnSignup: customProperty.CollectOnSignup.ValueBool(),
+			CollectViaSaml: customProperty.CollectViaSaml.ValueBool(),
+			ShowInAccount: customProperty.ShowInAccount.ValueBool(),
+			UserWritable: customProperty.UserWritable.ValueString(),
+			EnumValues: make([]string, len(customProperty.EnumValues)),
+		}
+		for j, enumValue := range customProperty.EnumValues {
+			customPropertyUpdate.EnumValues[j] = enumValue.ValueString()
+		}
+		customPropertyUpdates[i] = customPropertyUpdate
+	}
+	
+	for _, customPropertyUpdate := range customPropertyUpdates {
+		userPropertySettings.UpsertCustomProperty(customPropertyUpdate)
+	}
+	userPropertySettings.DisableDroppedCustomProperties(customPropertyUpdates)
+}
+
+func reconcileCustomProperties(state *userPropertySettingsResourceModel, userPropertySettings *propelauth.UserProperties) {
+	reconciledCustomProperties := make([]propelauth.CustomPropertySettings, 0)
+	for _, customPropertyInState := range state.CustomProperties {
+		activeCustomProperty, ok := userPropertySettings.GetEnabledCustomProperty(customPropertyInState.Name.ValueString())
+		if !ok {
+			continue
+		}
+		reconciledCustomProperties = append(reconciledCustomProperties, activeCustomProperty)
+	}
+
+	hangingCustomProperties := userPropertySettings.GetHangingCustomProperties(reconciledCustomProperties)
+	reconciledCustomProperties = append(reconciledCustomProperties, hangingCustomProperties...)
+
+	convertedCustomProperties := make([]customPropertyModel, len(reconciledCustomProperties))
+	for _, reconciledCustomProperty := range reconciledCustomProperties {
+		convertedCustomProperty := customPropertyModel{
+			Name: types.StringValue(reconciledCustomProperty.Name),
+			DisplayName: types.StringValue(reconciledCustomProperty.DisplayName),
+			FieldType: types.StringValue(reconciledCustomProperty.FieldType),
+			Required: types.BoolValue(reconciledCustomProperty.Required),
+			RequiredBy: types.Int64Value(reconciledCustomProperty.RequiredBy),
+			InJwt: types.BoolValue(reconciledCustomProperty.InJwt),
+			IsUserFacing: types.BoolValue(reconciledCustomProperty.IsUserFacing),
+			CollectOnSignup: types.BoolValue(reconciledCustomProperty.CollectOnSignup),
+			CollectViaSaml: types.BoolValue(reconciledCustomProperty.CollectViaSaml),
+			ShowInAccount: types.BoolValue(reconciledCustomProperty.ShowInAccount),
+			UserWritable: types.StringValue(reconciledCustomProperty.UserWritable),
+		}
+
+		if reconciledCustomProperty.FieldType == "Enum" {
+			enumValues := make([]types.String, len(reconciledCustomProperty.EnumValues))
+			for j, enumValue := range reconciledCustomProperty.EnumValues {
+				enumValues[j] = types.StringValue(enumValue)
+			}
+			convertedCustomProperty.EnumValues = enumValues
+		}
+		convertedCustomProperties = append(convertedCustomProperties, convertedCustomProperty)
+	}
+
+	state.CustomProperties = convertedCustomProperties
+}
 
 func inJwtAttribute(defaultValue bool) schema.Attribute {
 	return schema.BoolAttribute{

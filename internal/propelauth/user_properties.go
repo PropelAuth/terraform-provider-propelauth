@@ -361,3 +361,171 @@ func (up *UserProperties) GetReferralSourcePropertySettings() ReferralSourceProp
 	}
 	return ReferralSourcePropertySettings{}
 }
+
+type CustomPropertySettings struct {
+	Name string
+	DisplayName string
+	FieldType string
+	Required bool
+	RequiredBy int64
+	InJwt bool
+	IsUserFacing bool
+	CollectOnSignup bool
+	CollectViaSaml bool
+	ShowInAccount bool
+	UserWritable string
+	EnumValues []string
+}
+
+// UpsertCustomProperty - Upserts a custom property
+func (up *UserProperties) UpsertCustomProperty(customProperty CustomPropertySettings) {
+	for i := range up.Fields {
+		if up.Fields[i].Name == customProperty.Name {
+			up.Fields[i].DisplayName = customProperty.DisplayName
+			up.Fields[i].FieldType = customProperty.FieldType
+			up.Fields[i].Required = customProperty.Required
+			up.Fields[i].RequiredBy = customProperty.RequiredBy
+			up.Fields[i].InJwt = customProperty.InJwt
+			up.Fields[i].IsUserFacing = customProperty.IsUserFacing
+			up.Fields[i].CollectOnSignup = customProperty.CollectOnSignup
+			up.Fields[i].CollectViaSaml = customProperty.CollectViaSaml
+			up.Fields[i].ShowInAccount = customProperty.ShowInAccount
+			up.Fields[i].UserWritable = customProperty.UserWritable
+			up.Fields[i].Metadata = userPropertyMetadata{
+				EnumValues: customProperty.EnumValues,
+			}
+			up.Fields[i].IsEnabled = true
+			return
+		}
+	}
+	up.Fields = append(up.Fields, UserProperty{
+		Name: customProperty.Name,
+		DisplayName: customProperty.DisplayName,
+		FieldType: customProperty.FieldType,
+		Required: customProperty.Required,
+		RequiredBy: customProperty.RequiredBy,
+		InJwt: customProperty.InJwt,
+		IsUserFacing: customProperty.IsUserFacing,
+		CollectOnSignup: customProperty.CollectOnSignup,
+		CollectViaSaml: customProperty.CollectViaSaml,
+		ShowInAccount: customProperty.ShowInAccount,
+		UserWritable: customProperty.UserWritable,
+		Metadata: userPropertyMetadata{
+			EnumValues: customProperty.EnumValues,
+		},
+		IsEnabled: true,
+	})
+}
+
+// DisableDroppedCustomProperties - Disables custom properties that are not in the provided list and are not one of the default properties
+func (up *UserProperties) DisableDroppedCustomProperties(customProperties []CustomPropertySettings) {
+	for i := range up.Fields {
+		if !containsName(customProperties, up.Fields[i].Name) && !IsDefaultPropertyName(up.Fields[i].Name) {
+			up.Fields[i].IsEnabled = false
+		}
+	}
+}
+
+// GetEnabledCustomProperties - Returns a list of enabled custom properties
+func (up *UserProperties) GetEnabledCustomProperties() []CustomPropertySettings {
+	var enabledCustomProperties []CustomPropertySettings
+	for i := range up.Fields {
+		if !IsDefaultPropertyName(up.Fields[i].Name) && up.Fields[i].IsEnabled {
+			enabledCustomProperties = append(enabledCustomProperties, CustomPropertySettings{
+				Name: up.Fields[i].Name,
+				DisplayName: up.Fields[i].DisplayName,
+				FieldType: up.Fields[i].FieldType,
+				Required: up.Fields[i].Required,
+				RequiredBy: up.Fields[i].RequiredBy,
+				InJwt: up.Fields[i].InJwt,
+				IsUserFacing: up.Fields[i].IsUserFacing,
+				CollectOnSignup: up.Fields[i].CollectOnSignup,
+				CollectViaSaml: up.Fields[i].CollectViaSaml,
+				ShowInAccount: up.Fields[i].ShowInAccount,
+				UserWritable: up.Fields[i].UserWritable,
+				EnumValues: up.Fields[i].Metadata.EnumValues,
+			})
+		}
+	}
+	return enabledCustomProperties
+}
+
+// GetCustomPropertySettings - Returns the settings for a custom property
+func (up *UserProperties) GetEnabledCustomProperty(propertyName string) (CustomPropertySettings, bool) {
+	if IsDefaultPropertyName(propertyName) {
+		return CustomPropertySettings{}, false
+	}
+	for i := range up.Fields {
+		if up.Fields[i].Name == propertyName {
+			return CustomPropertySettings{
+				Name: up.Fields[i].Name,
+				DisplayName: up.Fields[i].DisplayName,
+				FieldType: up.Fields[i].FieldType,
+				Required: up.Fields[i].Required,
+				RequiredBy: up.Fields[i].RequiredBy,
+				InJwt: up.Fields[i].InJwt,
+				IsUserFacing: up.Fields[i].IsUserFacing,
+				CollectOnSignup: up.Fields[i].CollectOnSignup,
+				CollectViaSaml: up.Fields[i].CollectViaSaml,
+				ShowInAccount: up.Fields[i].ShowInAccount,
+				UserWritable: up.Fields[i].UserWritable,
+				EnumValues: up.Fields[i].Metadata.EnumValues,
+			}, true
+		}
+	}
+	return CustomPropertySettings{}, false
+}
+
+// GetHangingCustomProperties - Returns a list of custom properties that are enabled but not in the provided list
+func (up *UserProperties) GetHangingCustomProperties(customProperties []CustomPropertySettings) []CustomPropertySettings {
+	var hangingCustomProperties []CustomPropertySettings
+	for i := range up.Fields {
+		if !containsName(customProperties, up.Fields[i].Name) && !IsDefaultPropertyName(up.Fields[i].Name) && up.Fields[i].IsEnabled {
+			hangingCustomProperties = append(hangingCustomProperties, CustomPropertySettings{
+				Name: up.Fields[i].Name,
+				DisplayName: up.Fields[i].DisplayName,
+				FieldType: up.Fields[i].FieldType,
+				Required: up.Fields[i].Required,
+				RequiredBy: up.Fields[i].RequiredBy,
+				InJwt: up.Fields[i].InJwt,
+				IsUserFacing: up.Fields[i].IsUserFacing,
+				CollectOnSignup: up.Fields[i].CollectOnSignup,
+				CollectViaSaml: up.Fields[i].CollectViaSaml,
+				ShowInAccount: up.Fields[i].ShowInAccount,
+				UserWritable: up.Fields[i].UserWritable,
+				EnumValues: up.Fields[i].Metadata.EnumValues,
+			})
+		}
+	}
+	return hangingCustomProperties
+}
+
+
+// internal helper functions
+
+func containsName(slice []CustomPropertySettings, target string) bool {
+    for _, s := range slice {
+        if s.Name == target {
+            return true
+        }
+    }
+    return false
+}
+
+func IsDefaultPropertyName(name string) bool {
+	defaultProperties := []string{
+		"legacy__name",
+		"metadata",
+		"legacy__username",
+		"legacy__picture_url",
+		"phone_number",
+		"tos",
+		"referral_source",
+	}
+	for _, s := range defaultProperties {
+		if s == name {
+			return true
+		}
+	}
+	return false
+}
