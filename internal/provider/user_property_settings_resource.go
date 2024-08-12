@@ -613,7 +613,7 @@ func UpdateCustomPropertiesFromPlan(plan *userPropertySettingsResourceModel, use
 }
 
 func reconcileCustomProperties(state *userPropertySettingsResourceModel, userPropertySettings *propelauth.UserProperties) {
-	reconciledCustomProperties := make([]propelauth.CustomPropertySettings, 0)
+	var reconciledCustomProperties []propelauth.CustomPropertySettings
 	for _, customPropertyInState := range state.CustomProperties {
 		activeCustomProperty, ok := userPropertySettings.GetEnabledCustomProperty(customPropertyInState.Name.ValueString())
 		if !ok {

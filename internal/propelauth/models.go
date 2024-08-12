@@ -40,6 +40,10 @@ type EnvironmentConfigUpdate struct {
 	LogoImageId string `json:"logo_image_id,omitempty"`
 	FaviconImageId string `json:"favicon_image_id,omitempty"`
 	BackgroundImageId string `json:"background_image_id,omitempty"`
+	PersonalApiKeysEnabled *bool `json:"personal_api_keys_enabled,omitempty"`
+	OrgApiKeysEnabled *bool `json:"org_api_keys_enabled,omitempty"`
+	InvalidateOrgApiKeysUponUserRemoval *bool `json:"invalidate_org_api_key_upon_user_removal,omitempty"`
+	ApiKeyConfig *ApiKeyConfig `json:"api_key_config,omitempty"`
 }
 
 type EnvironmentConfigResponse struct {
@@ -66,6 +70,10 @@ type EnvironmentConfigResponse struct {
 	LogoUrl string `json:"logo_url"`
 	FaviconUrl string `json:"favicon_url"`
 	BackgroundUrl string `json:"background_url"`
+	PersonalApiKeysEnabled bool `json:"personal_api_keys_enabled"`
+	OrgApiKeysEnabled bool `json:"org_api_keys_enabled"`
+	InvalidateOrgApiKeyUponUserRemoval bool `json:"invalidate_org_api_key_upon_user_removal"`
+	ApiKeyConfig ApiKeyConfig `json:"api_key_config"`
 }
 
 type Theme struct {
@@ -118,6 +126,24 @@ type ManagementPagesTheme struct {
 
 type ImageUploadResponse struct {
 	ImageId string `json:"image_id"`
+}
+
+type ApiKeyConfig struct {
+	ExpirationOptions ApiKeyExpirationOptionSettings `json:"expiration_options"`
+}
+
+type ApiKeyExpirationOptionSettings struct {
+	Options ApiKeyExpirationOptions `json:"options"`
+	Default string `json:"default"`
+}
+
+type ApiKeyExpirationOptions struct {
+	TwoWeeks bool `json:"TwoWeeks"`
+	OneMonth bool `json:"OneMonth"`
+	ThreeMonths bool `json:"ThreeMonths"`
+	SixMonths bool `json:"SixMonths"`
+	OneYear bool `json:"OneYear"`
+	Never bool `json:"Never"`
 }
 
 type UserProperties struct {

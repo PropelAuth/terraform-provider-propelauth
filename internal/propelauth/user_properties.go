@@ -456,7 +456,7 @@ func (up *UserProperties) GetEnabledCustomProperty(propertyName string) (CustomP
 		return CustomPropertySettings{}, false
 	}
 	for i := range up.Fields {
-		if up.Fields[i].Name == propertyName {
+		if up.Fields[i].Name == propertyName && up.Fields[i].IsEnabled {
 			return CustomPropertySettings{
 				Name: up.Fields[i].Name,
 				DisplayName: up.Fields[i].DisplayName,
