@@ -232,3 +232,15 @@ type BeIntegrationInfo struct {
 	VerifierKey string `json:"verifier_key"`
 	Issuer string `json:"issuer"`
 }
+
+type BeApiKeyCreateRequest struct {
+	Name string `json:"name"`
+	IsReadOnly bool `json:"readonly"`
+}
+
+type BeApiKey struct {
+	ApiKey string `json:"api_key"`
+	ApiKeyId string `json:"api_key_id"`
+	Name string `json:"name"`
+	IsReadOnly bool `json:"readonly"`
+}

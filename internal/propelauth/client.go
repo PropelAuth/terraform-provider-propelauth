@@ -51,11 +51,11 @@ func (c *PropelAuthClient) patch(urlPostfix string, body []byte) (*StandardRespo
 	return c.requestHelper("PATCH", url, body)
 }
 
-// func (c *PropelAuthClient) post(urlPostfix string, body []byte) (*StandardResponse, error) {
-// 	url := c.assembleURL(urlPostfix, nil)
+func (c *PropelAuthClient) post(urlPostfix string, body []byte) (*StandardResponse, error) {
+	url := c.assembleURL(urlPostfix, nil)
 
-// 	return c.requestHelper("POST", url, body)
-// }
+	return c.requestHelper("POST", url, body)
+}
 
 func (c *PropelAuthClient) put(urlPostfix string, body []byte) (*StandardResponse, error) {
 	url := c.assembleURL(urlPostfix, nil)
