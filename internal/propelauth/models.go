@@ -220,3 +220,15 @@ type testEnvFeIntegrationApplicationUrl struct {
 	ApplicationUrl string `json:"scheme_and_domain"`
 	Type string `json:"type"`
 }
+
+type BeIntegrationInfoResponse struct {
+	Test BeIntegrationInfo `json:"test"`
+	Staging BeIntegrationInfo `json:"stage"`
+	Prod BeIntegrationInfo `json:"prod"`
+}
+
+type BeIntegrationInfo struct {
+	AuthUrl string `json:"auth_url_origin"`
+	VerifierKey string `json:"verifier_key"`
+	Issuer string `json:"issuer"`
+}
