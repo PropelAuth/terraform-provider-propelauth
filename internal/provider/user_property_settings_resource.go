@@ -314,8 +314,8 @@ func (r *userPropertySettingsResource) Create(ctx context.Context, req resource.
 	}
 
 	// Update the configuration in PropelAuth
-	UpdateDefaultPropertiesFromPlan(&plan, userPropertySettings)
-	UpdateCustomPropertiesFromPlan(&plan, userPropertySettings)
+	updateDefaultPropertiesFromPlan(&plan, userPropertySettings)
+	updateCustomPropertiesFromPlan(&plan, userPropertySettings)
 
     _, err = r.client.UpdateUserProperties(userPropertySettings)
 	if err != nil {
@@ -472,8 +472,8 @@ func (r *userPropertySettingsResource) Update(ctx context.Context, req resource.
 	}
 
 	// Update the configuration in PropelAuth
-	UpdateDefaultPropertiesFromPlan(&plan, userPropertySettings)
-	UpdateCustomPropertiesFromPlan(&plan, userPropertySettings)
+	updateDefaultPropertiesFromPlan(&plan, userPropertySettings)
+	updateCustomPropertiesFromPlan(&plan, userPropertySettings)
 
     _, err = r.client.UpdateUserProperties(userPropertySettings)
 	if err != nil {
@@ -496,7 +496,7 @@ func (r *userPropertySettingsResource) Delete(ctx context.Context, req resource.
 	tflog.Trace(ctx, "deleted a propelauth_user_properties_settings resource")
 }
 
-func UpdateDefaultPropertiesFromPlan(plan *userPropertySettingsResourceModel, userPropertySettings *propelauth.UserProperties) {
+func updateDefaultPropertiesFromPlan(plan *userPropertySettingsResourceModel, userPropertySettings *propelauth.UserProperties) {
 	if plan.NameProperty != nil {
 		userPropertySettings.UpdateAndEnableNameProperty(propelauth.NamePropertySettings{
 			InJwt: plan.NameProperty.InJwt.ValueBool(),
@@ -583,7 +583,7 @@ func UpdateDefaultPropertiesFromPlan(plan *userPropertySettingsResourceModel, us
 	}
 }
 
-func UpdateCustomPropertiesFromPlan(plan *userPropertySettingsResourceModel, userPropertySettings *propelauth.UserProperties) {
+func updateCustomPropertiesFromPlan(plan *userPropertySettingsResourceModel, userPropertySettings *propelauth.UserProperties) {
 	customPropertyUpdates := make([]propelauth.CustomPropertySettings, len(plan.CustomProperties))
 	for i, customProperty := range plan.CustomProperties {
 		customPropertyUpdate := propelauth.CustomPropertySettings{

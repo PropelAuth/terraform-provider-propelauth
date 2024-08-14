@@ -175,3 +175,48 @@ type TosLink struct {
 	Url string `json:"url"`
 	Name string `json:"name"`
 }
+
+type FeIntegrationInfoResponse struct {
+	Test TestFeIntegrationInfo `json:"test"`
+	Staging FeIntegrationInfoForEnv `json:"staging"`
+	Prod FeIntegrationInfoForEnv `json:"prod"`
+}
+
+type TestFeIntegrationInfo struct {
+	AuthUrl string `json:"auth_url_origin"`
+	LoginRedirectPath string `json:"login_redirect_path"`
+	LogoutRedirectPath string `json:"logout_redirect_path"`
+	AdditionalFeLocations AdditionalFeLocations `json:"allowed_urls"`
+	TestEnvFeIntegrationApplicationUrl testEnvFeIntegrationApplicationUrl `json:"test_env"`
+}
+
+type FeIntegrationInfoForEnv struct {
+	AuthUrl string `json:"auth_url_origin"`
+	ApplicationUrl string `json:"application_hostname_with_scheme"`
+	LoginRedirectPath string `json:"login_redirect_path"`
+	LogoutRedirectPath string `json:"logout_redirect_path"`
+	AdditonalFeLocations AdditionalFeLocations `json:"allowed_urls"`
+	VerifiedDomain string `json:"verified_domain"`
+}
+
+type AdditionalFeLocations struct {
+	AdditionalFeLocations []AdditionalFeLocation `json:"allowed_urls"`
+}
+
+type AdditionalFeLocation struct {
+	Domain string `json:"base_domain"`
+	AllowAnySubdomain bool `json:"allow_any_subdomain_match"`
+}
+
+type feIntegrationUpdateRequest struct {
+	AdditionalFeLocations AdditionalFeLocations `json:"allowed_urls"`
+	LogoutRedirectPath string `json:"logout_redirect_path"`
+	LoginRedirectPath string `json:"login_redirect_path"`
+	ApplicationHostnameWithScheme string `json:"application_hostname_with_scheme,omitempty"`
+	TestEnvFeIntegrationApplicationUrl *testEnvFeIntegrationApplicationUrl `json:"test_env,omitempty"`
+}
+
+type testEnvFeIntegrationApplicationUrl struct {
+	ApplicationUrl string `json:"scheme_and_domain"`
+	Type string `json:"type"`
+}

@@ -197,6 +197,7 @@ func (p *propelauthProvider) Resources(ctx context.Context) []func() resource.Re
         NewImageResource,
         NewUserPropertySettingsResource,
         NewApiKeySettingsResource,
+        NewFeIntegrationResource,
 	}
 }
 

@@ -12,9 +12,9 @@ const (
     // such as updating the Makefile and running the testing through that tool.
     providerConfig = `
 provider "propelauth" {
-  tenant_id = "<PROPELAUTH_TENANT_ID>"
-  project_id = "<PROPELAUTH_PROJECT_ID>"
-  api_key = "<PROPELAUTH_API_KEY>"
+#   tenant_id = "<PROPELAUTH_TENANT_ID>"
+#   project_id = "<PROPELAUTH_PROJECT_ID>"
+#   api_key = "<PROPELAUTH_API_KEY>"
 }
 `
 )
