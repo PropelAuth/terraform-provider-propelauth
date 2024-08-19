@@ -16,7 +16,7 @@ const BaseURLTemplate string = "https://api.propelauth.localhost/iac/%s/project/
 type PropelAuthClient struct {
 	BaseURL    string
 	HTTPClient *http.Client
-	ApiKey      string
+	ApiKey     string
 }
 
 type StandardResponse struct {
@@ -31,7 +31,7 @@ func NewClient(tenant_id, project_id, api_key *string) (*PropelAuthClient, error
 		HTTPClient: &http.Client{Timeout: 10 * time.Second},
 		// Default Hashicups URL
 		BaseURL: fmt.Sprintf(BaseURLTemplate, *tenant_id, *project_id),
-		ApiKey: *api_key,
+		ApiKey:  *api_key,
 	}
 
 	return &c, nil
@@ -63,12 +63,17 @@ func (c *PropelAuthClient) put(urlPostfix string, body []byte) (*StandardRespons
 	return c.requestHelper("PUT", url, body)
 }
 
+func (c *PropelAuthClient) delete(urlPostfix string, body []byte) (*StandardResponse, error) {
+	url := c.assembleURL(urlPostfix, nil)
+
+	return c.requestHelper("DELETE", url, body)
+}
+
 // func (c *PropelAuthClient) delete(urlPostfix string, body []byte) (*StandardResponse, error) {
 // 	url := c.assembleURL(urlPostfix, nil)
 
 // 	return c.requestHelper("DELETE", url, body)
 // }
-
 
 func (c *PropelAuthClient) requestHelper(method string, url string, body []byte) (*StandardResponse, error) {
 	requestBody := bytes.NewBuffer(body)
@@ -81,8 +86,8 @@ func (c *PropelAuthClient) requestHelper(method string, url string, body []byte)
 
 	// add headers
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer " + c.ApiKey)
-	req.Header.Set("User-Agent", "terraform-provider-propelauth/0.0 go/" + runtime.Version() + " " + runtime.GOOS + "/" + runtime.GOARCH)
+	req.Header.Set("Authorization", "Bearer "+c.ApiKey)
+	req.Header.Set("User-Agent", "terraform-provider-propelauth/0.0 go/"+runtime.Version()+" "+runtime.GOOS+"/"+runtime.GOARCH)
 
 	// send request
 	resp, err := c.HTTPClient.Do(req)

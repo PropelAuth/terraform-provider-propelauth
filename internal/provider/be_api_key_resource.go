@@ -18,7 +18,7 @@ import (
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &beApiKeyResource{}
-var _ resource.ResourceWithConfigure   = &beApiKeyResource{}
+var _ resource.ResourceWithConfigure = &beApiKeyResource{}
 
 func NewBeApiKeyResource() resource.Resource {
 	return &beApiKeyResource{}
@@ -32,10 +32,10 @@ type beApiKeyResource struct {
 // beApiKeyResourceModel describes the resource data model.
 type beApiKeyResourceModel struct {
 	Environment types.String `tfsdk:"environment"`
-	Name types.String `tfsdk:"name"`
-	ReadOnly types.Bool `tfsdk:"read_only"`
-	ApiKey types.String `tfsdk:"api_key"`
-	ApiKeyId types.String `tfsdk:"api_key_id"`
+	Name        types.String `tfsdk:"name"`
+	ReadOnly    types.Bool   `tfsdk:"read_only"`
+	ApiKey      types.String `tfsdk:"api_key"`
+	ApiKeyId    types.String `tfsdk:"api_key_id"`
 }
 
 func (r *beApiKeyResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -58,7 +58,7 @@ func (r *beApiKeyResource) Schema(ctx context.Context, req resource.SchemaReques
 				Description: "The environment for which you are configuring the backend integration. Accepted values are `Test`, `Staging`, and `Prod`.",
 			},
 			"name": schema.StringAttribute{
-				Required:            true,
+				Required:    true,
 				Description: "The API key's name. This is only for internal dislay purposes.",
 			},
 			"read_only": schema.BoolAttribute{
@@ -67,12 +67,12 @@ func (r *beApiKeyResource) Schema(ctx context.Context, req resource.SchemaReques
 					"creating, editing, or deleting users/orgs.",
 			},
 			"api_key": schema.StringAttribute{
-				Computed: true,
-				Sensitive: true,
+				Computed:    true,
+				Sensitive:   true,
 				Description: "The API key value. This is the secret value that is used to authenticate requests to PropelAuth.",
 			},
 			"api_key_id": schema.StringAttribute{
-				Computed: true,
+				Computed:    true,
 				Description: "The API key ID. This is a unique identifier for the API key.",
 			},
 		},
@@ -104,21 +104,20 @@ func (r *beApiKeyResource) Create(ctx context.Context, req resource.CreateReques
 
 	// Read Terraform plan data into the model
 	diags := req.Plan.Get(ctx, &plan)
-    resp.Diagnostics.Append(diags...)
-    if resp.Diagnostics.HasError() {
-        return
-    }
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// create the be api key
-    beApiKey, err := r.client.CreateBeApiKey(plan.Name.ValueString(), plan.ReadOnly.ValueBool())
-    if err != nil {
-        resp.Diagnostics.AddError(
-            "Error creating PropelAuth Backend API Key",
-            "Could not create be api key, unexpected error: "+err.Error(),
-        )
-        return
-    }
-
+	beApiKey, err := r.client.CreateBeApiKey(plan.Name.ValueString(), plan.ReadOnly.ValueBool())
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error creating PropelAuth Backend API Key",
+			"Could not create be api key, unexpected error: "+err.Error(),
+		)
+		return
+	}
 
 	// set the Terraform state.
 	// TKTK
@@ -140,14 +139,14 @@ func (r *beApiKeyResource) Read(ctx context.Context, req resource.ReadRequest, r
 	}
 
 	// retrieve the be api key from PropelAuth
-	beApiKeyInfo, err := r.client.GetBeApiKeyInfo(state.Environment, state.ApiKey)
+	_, err := r.client.GetBeApiKeyInfo(state.Environment.ValueString(), state.ApiKey.ValueString())
 	if err != nil {
-        resp.Diagnostics.AddError(
-            "Error Reading PropelAuth Backend API Key",
-            "Could not read PropelAuth Backend API Key: " + err.Error(),
-        )
-        return
-    }
+		resp.Diagnostics.AddError(
+			"Error Reading PropelAuth Backend API Key",
+			"Could not read PropelAuth Backend API Key: "+err.Error(),
+		)
+		return
+	}
 
 	// update the state for the be api key
 	// state.Name = types.StringValue(beApiKeyInfo.Name)
@@ -166,14 +165,14 @@ func (r *beApiKeyResource) Update(ctx context.Context, req resource.UpdateReques
 	}
 
 	// Update the be api key
-    beApiKeyResponse, err := r.client.UpdateBeApiKey(...)
-    if err != nil {
-        resp.Diagnostics.AddError(
-            "Error updating be api key",
-            "Could not update the be api key, unexpected error: "+err.Error(),
-        )
-        return
-    }
+	beApiKeyResponse, err := r.client.UpdateBeApiKey(plan.Environment.ValueString(), plan.ApiKeyId.ValueString(), plan.Name.ValueString())
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error updating be api key",
+			"Could not update the be api key, unexpected error: "+err.Error(),
+		)
+		return
+	}
 
 	// Save updated state from the response into Terraform state
 	plan.Name = types.StringValue(beApiKeyResponse.Name)
@@ -184,21 +183,21 @@ func (r *beApiKeyResource) Update(ctx context.Context, req resource.UpdateReques
 
 func (r *beApiKeyResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	var state beApiKeyResourceModel
-    diags := req.State.Get(ctx, &state)
-    resp.Diagnostics.Append(diags...)
-    if resp.Diagnostics.HasError() {
-        return
-    }
+	diags := req.State.Get(ctx, &state)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
-    // Delete existing order
-    err := r.client.DeleteBeApiKey(state.Environment.ValueString(), state.ApiKeyId.ValueString())
-    if err != nil {
-        resp.Diagnostics.AddError(
-            "Error Deleting PropelAuth Backend API Key",
-            "Could not delete be api key, unexpected error: "+err.Error(),
-        )
-        return
-    }
+	// Delete existing order
+	err := r.client.DeleteBeApiKey(state.Environment.ValueString(), state.ApiKeyId.ValueString())
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error Deleting PropelAuth Backend API Key",
+			"Could not delete be api key, unexpected error: "+err.Error(),
+		)
+		return
+	}
 
 	tflog.Trace(ctx, "deleted a propelauth_be_api_key resource")
 }
