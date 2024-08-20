@@ -41,7 +41,6 @@ func (c *PropelAuthClient) GetBeApiKeyInfo(environment string, apiKeyID string) 
 		return nil, err
 	}
 
-	// TODO: Implement in the BE to return the requested API key
 	beApiKey := BeApiKey{}
 	err = json.Unmarshal(res.BodyBytes, &beApiKey)
 	if err != nil {
@@ -71,7 +70,6 @@ func (c *PropelAuthClient) CreateBeApiKey(environment string, name string, isRea
 		return nil, err
 	}
 
-	// TODO: Implement in the BE to return the created API key
 	beApiKey := BeApiKey{}
 	err = json.Unmarshal(res.BodyBytes, &beApiKey)
 	if err != nil {
@@ -102,7 +100,6 @@ func (c *PropelAuthClient) UpdateBeApiKey(environment string, apiKeyID string, n
 		return nil, err
 	}
 
-	// TODO: In the BE, return the updated API key
 	beApiKey := BeApiKey{}
 	err = json.Unmarshal(res.BodyBytes, &beApiKey)
 	if err != nil {
@@ -121,8 +118,6 @@ func (c *PropelAuthClient) DeleteBeApiKey(environment string, apiKeyID string) e
 	if err != nil {
 		return err
 	}
-
-	// TODO: Implement in the BE to delete the requested API key
-
+	
 	return nil
 }

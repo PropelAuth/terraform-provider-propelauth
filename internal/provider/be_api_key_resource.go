@@ -110,7 +110,7 @@ func (r *beApiKeyResource) Create(ctx context.Context, req resource.CreateReques
 	}
 
 	// create the be api key
-	beApiKey, err := r.client.CreateBeApiKey(plan.Name.ValueString(), plan.ReadOnly.ValueBool())
+	beApiKeyInfo, err := r.client.CreateBeApiKey(plan.Environment.ValueString(), plan.Name.ValueString(), plan.ReadOnly.ValueBool())
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error creating PropelAuth Backend API Key",
@@ -120,7 +120,11 @@ func (r *beApiKeyResource) Create(ctx context.Context, req resource.CreateReques
 	}
 
 	// set the Terraform state.
-	// TKTK
+	plan.Name = types.StringValue(beApiKeyInfo.Name)
+	plan.ApiKey = types.StringValue(beApiKeyInfo.ApiKey)
+	plan.ApiKeyId = types.StringValue(beApiKeyInfo.ApiKeyId)
+	plan.ReadOnly = types.BoolValue(beApiKeyInfo.IsReadOnly)
+
 
 	// Write logs using the tflog package
 	// Documentation: https://terraform.io/plugin/log
@@ -139,7 +143,7 @@ func (r *beApiKeyResource) Read(ctx context.Context, req resource.ReadRequest, r
 	}
 
 	// retrieve the be api key from PropelAuth
-	_, err := r.client.GetBeApiKeyInfo(state.Environment.ValueString(), state.ApiKey.ValueString())
+	beApiKeyInfo, err := r.client.GetBeApiKeyInfo(state.Environment.ValueString(), state.ApiKey.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error Reading PropelAuth Backend API Key",
@@ -149,8 +153,10 @@ func (r *beApiKeyResource) Read(ctx context.Context, req resource.ReadRequest, r
 	}
 
 	// update the state for the be api key
-	// state.Name = types.StringValue(beApiKeyInfo.Name)
-	// TKTK...
+	state.Name = types.StringValue(beApiKeyInfo.Name)
+	state.ApiKey = types.StringValue(beApiKeyInfo.ApiKey)
+	state.ApiKeyId = types.StringValue(beApiKeyInfo.ApiKeyId)
+	state.ReadOnly = types.BoolValue(beApiKeyInfo.IsReadOnly)
 
 	// Save updated state into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
