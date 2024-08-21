@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-// GetBeIntegrationInfo - Returns the BE integration info for the requested environment
+// GetBeIntegrationInfo - Returns the BE integration info for the requested environment.
 func (c *PropelAuthClient) GetBeIntegrationInfo(environment string) (*BeIntegrationInfo, error) {
 	res, err := c.get("be_integration", nil)
 	if err != nil {
@@ -31,7 +31,7 @@ func (c *PropelAuthClient) GetBeIntegrationInfo(environment string) (*BeIntegrat
 	}
 }
 
-// GetBeApiKeyInfo - Returns the BE API key info for the requested environment
+// GetBeApiKeyInfo - Returns the BE API key info for the requested environment.
 func (c *PropelAuthClient) GetBeApiKeyInfo(environment string, apiKeyID string) (*BeApiKey, error) {
 	res, err := c.get(
 		fmt.Sprintf("%v/be_integration/api_key/%v", strings.ToLower(environment), apiKeyID),
@@ -50,7 +50,7 @@ func (c *PropelAuthClient) GetBeApiKeyInfo(environment string, apiKeyID string) 
 	return &beApiKey, nil
 }
 
-// CreateBeApiKey - Creates a new BE API key and returns the result
+// CreateBeApiKey - Creates a new BE API key and returns the result.
 func (c *PropelAuthClient) CreateBeApiKey(environment string, name string, isReadOnly bool) (*BeApiKey, error) {
 	request := BeApiKeyCreateRequest{
 		Name:       name,
@@ -79,7 +79,7 @@ func (c *PropelAuthClient) CreateBeApiKey(environment string, name string, isRea
 	return &beApiKey, nil
 }
 
-// // UpdateBeApiKey - Updates an existing BE API key and returns the result
+// // UpdateBeApiKey - Updates an existing BE API key and returns the result.
 func (c *PropelAuthClient) UpdateBeApiKey(environment string, apiKeyID string, name string) (*BeApiKey, error) {
 	request := BeApiKeyUpdateRequest{
 		ApiKeyId: apiKeyID,
@@ -109,7 +109,7 @@ func (c *PropelAuthClient) UpdateBeApiKey(environment string, apiKeyID string, n
 	return &beApiKey, nil
 }
 
-// DeleteBeApiKey - Deletes an existing BE API key
+// DeleteBeApiKey - Deletes an existing BE API key.
 func (c *PropelAuthClient) DeleteBeApiKey(environment string, apiKeyID string) error {
 	_, err := c.delete(
 		fmt.Sprintf("%v/be_integration/api_key/%v", strings.ToLower(environment), apiKeyID),
