@@ -9,6 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -65,6 +66,9 @@ func (r *beApiKeyResource) Schema(ctx context.Context, req resource.SchemaReques
 				Required: true,
 				Description: "If true, the API key has read-only privileges. For example, it cannot be used for " +
 					"creating, editing, or deleting users/orgs. This value can only be set during the creation of the API key.",
+				PlanModifiers: []planmodifier.Bool{
+					boolplanmodifier.RequiresReplace(),
+				},
 			},
 			"api_key": schema.StringAttribute{
 				Computed:    true,
@@ -160,9 +164,11 @@ func (r *beApiKeyResource) Read(ctx context.Context, req resource.ReadRequest, r
 
 	// update the state for the be api key
 	state.Name = types.StringValue(beApiKeyInfo.Name)
-	state.ApiKey = types.StringValue(beApiKeyInfo.ApiKey)
 	state.ApiKeyId = types.StringValue(beApiKeyInfo.ApiKeyId)
 	state.ReadOnly = types.BoolValue(beApiKeyInfo.IsReadOnly)
+	// state.ApiKey is omitted, as it is stripped due to containing sensitive data.
+	// When created, it contains the full API Key, but when read, it is stripped.
+	// Thus, it is not necessary to update the state with the API Key.
 
 	// Save updated state into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
@@ -188,6 +194,7 @@ func (r *beApiKeyResource) Update(ctx context.Context, req resource.UpdateReques
 
 	// Save updated state from the response into Terraform state
 	plan.Name = types.StringValue(beApiKeyResponse.Name)
+	plan.ReadOnly = types.BoolValue(beApiKeyResponse.IsReadOnly)
 
 	tflog.Trace(ctx, "updated a propelauth_be_api_key resource")
 	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
