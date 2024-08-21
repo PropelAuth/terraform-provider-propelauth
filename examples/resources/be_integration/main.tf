@@ -14,8 +14,8 @@ provider "propelauth" {
 
 resource "propelauth_be_api_key" "my_be_api_key" {
   environment = "Test"
-  name        = "be"
-  read_only   = false
+  name        = "My API Key Updated"
+  read_only   = true
 }
 
 output "be_api_key_result" {

@@ -45,7 +45,7 @@ func (r *beApiKeyResource) Metadata(ctx context.Context, req resource.MetadataRe
 func (r *beApiKeyResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the language server.
-		Description: "Backend API Key resource. This is for configuring the basic be api keyrmation in PropelAuth.",
+		Description: "Backend API Key resource. This is for configuring the basic BE API key information in PropelAuth.",
 		Attributes: map[string]schema.Attribute{
 			"environment": schema.StringAttribute{
 				Required: true,
@@ -64,16 +64,22 @@ func (r *beApiKeyResource) Schema(ctx context.Context, req resource.SchemaReques
 			"read_only": schema.BoolAttribute{
 				Required: true,
 				Description: "If true, the API key has read-only privileges. For example, it cannot be used for " +
-					"creating, editing, or deleting users/orgs.",
+					"creating, editing, or deleting users/orgs. This value can only be set during the creation of the API key.",
 			},
 			"api_key": schema.StringAttribute{
 				Computed:    true,
 				Sensitive:   true,
 				Description: "The API key value. This is the secret value that is used to authenticate requests to PropelAuth.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"api_key_id": schema.StringAttribute{
 				Computed:    true,
 				Description: "The API key ID. This is a unique identifier for the API key.",
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 		},
 	}
@@ -143,7 +149,7 @@ func (r *beApiKeyResource) Read(ctx context.Context, req resource.ReadRequest, r
 	}
 
 	// retrieve the be api key from PropelAuth
-	beApiKeyInfo, err := r.client.GetBeApiKeyInfo(state.Environment.ValueString(), state.ApiKey.ValueString())
+	beApiKeyInfo, err := r.client.GetBeApiKeyInfo(state.Environment.ValueString(), state.ApiKeyId.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error Reading PropelAuth Backend API Key",
