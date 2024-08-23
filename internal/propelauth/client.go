@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"net/url"
 	"runtime"
-	"strings"
 	"time"
 )
 
@@ -24,18 +23,26 @@ type PropelAuthClient struct {
 type PropelAuthApiError struct {
 	ErrorCode string `json:"error_code"`
 	UserFacingError string `json:"user_facing_error"`
+	FieldErrors map[string][]string `json:"field_errors"`
+	UserFacingErrors map[string][]string `json:"user_facing_errors"`
 }
 
-func ConvertStringErrorToPropelAuthError (err error) (*PropelAuthApiError, error) {
+func convertStringErrorToPropelAuthError (errBytes []byte) (*PropelAuthApiError, error) {
 	propelAuthApiError := PropelAuthApiError{}
-	subString := strings.Replace(err.Error(), "error on response: ", "", 1)
-	
-	unmarshalError := json.Unmarshal([]byte(subString), &propelAuthApiError)
+	unmarshalError := json.Unmarshal(errBytes, &propelAuthApiError)
 	if unmarshalError != nil {
 		return nil, unmarshalError
 	}
 
 	return &propelAuthApiError, nil
+}
+
+func IsPropelAuthNotFoundError(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	return err.Error() == "not_found"
 }
 
 type StandardResponse struct {
@@ -119,6 +126,10 @@ func (c *PropelAuthClient) requestHelper(method string, url string, body []byte)
 	respBytes := buf.Bytes()
 
 	if resp.StatusCode >= 400 {
+		propelauthApiError, _ := convertStringErrorToPropelAuthError(respBytes)
+		if propelauthApiError != nil {
+			return nil, fmt.Errorf(propelauthApiError.ErrorCode)
+		}
 		return nil, fmt.Errorf("error on response: %s", string(respBytes[:]))
 	}
 
