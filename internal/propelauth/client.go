@@ -2,10 +2,12 @@ package propelauth
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
 	"runtime"
+	"strings"
 	"time"
 )
 
@@ -17,6 +19,23 @@ type PropelAuthClient struct {
 	BaseURL    string
 	HTTPClient *http.Client
 	ApiKey     string
+}
+
+type PropelAuthApiError struct {
+	ErrorCode string `json:"error_code"`
+	UserFacingError string `json:"user_facing_error"`
+}
+
+func ConvertStringErrorToPropelAuthError (err error) (*PropelAuthApiError, error) {
+	propelAuthApiError := PropelAuthApiError{}
+	subString := strings.Replace(err.Error(), "error on response: ", "", 1)
+	
+	unmarshalError := json.Unmarshal([]byte(subString), &propelAuthApiError)
+	if unmarshalError != nil {
+		return nil, unmarshalError
+	}
+
+	return &propelAuthApiError, nil
 }
 
 type StandardResponse struct {

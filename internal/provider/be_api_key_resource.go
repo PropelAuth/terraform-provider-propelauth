@@ -3,7 +3,6 @@ package provider
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"terraform-provider-propelauth/internal/propelauth"
 
@@ -156,14 +155,15 @@ func (r *beApiKeyResource) Read(ctx context.Context, req resource.ReadRequest, r
 	// retrieve the be api key from PropelAuth
 	beApiKeyInfo, err := r.client.GetBeApiKeyInfo(state.Environment.ValueString(), state.ApiKeyId.ValueString())
 	if err != nil {
-		// If error is not found, it indicates that the resource should be deleted.
-		// It is expected that the error response will be in this exact string when not found.
-		if strings.Contains(err.Error(), "{\"error_code\":\"not_found\",\"user_facing_error\":\"Not found.\"}") {
-			tflog.Trace(ctx, "deleting a propelauth_be_api_key resource because it was not found in PropelAuth")
-			resp.State.RemoveResource(ctx)
-			return
+		// If error is "not_found", it indicates that the resource should be deleted.
+		propelAuthError, err := propelauth.ConvertStringErrorToPropelAuthError(err)
+		if propelAuthError != nil {
+			if propelAuthError.ErrorCode == "not_found" {
+				tflog.Trace(ctx, "deleting a propelauth_be_api_key resource because it was not found in PropelAuth")
+				resp.State.RemoveResource(ctx)
+				return
+			}
 		}
-
 		resp.Diagnostics.AddError(
 			"Error Reading PropelAuth Backend API Key",
 			"Could not read PropelAuth Backend API Key: "+err.Error(),
