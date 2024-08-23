@@ -69,12 +69,6 @@ func (c *PropelAuthClient) delete(urlPostfix string, body []byte) (*StandardResp
 	return c.requestHelper("DELETE", url, body)
 }
 
-// func (c *PropelAuthClient) delete(urlPostfix string, body []byte) (*StandardResponse, error) {
-// 	url := c.assembleURL(urlPostfix, nil)
-
-// 	return c.requestHelper("DELETE", url, body)
-// }
-
 func (c *PropelAuthClient) requestHelper(method string, url string, body []byte) (*StandardResponse, error) {
 	requestBody := bytes.NewBuffer(body)
 
