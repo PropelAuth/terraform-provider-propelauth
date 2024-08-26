@@ -200,6 +200,7 @@ func (p *propelauthProvider) Resources(ctx context.Context) []func() resource.Re
         NewFeIntegrationResource,
         NewBeApiKeyResource,
         NewCustomDomainResource,
+        NewCustomDomainVerificationResource,
 	}
 }
 

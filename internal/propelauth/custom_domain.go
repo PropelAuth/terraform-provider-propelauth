@@ -47,3 +47,20 @@ func (c *PropelAuthClient) UpdateCustomDomainInfo(environment string, domain str
 
 	return &customDomainInfo, nil
 }
+
+// VerifyCustomDomainInfo - Verifies the custom domain info for the requested environment
+func (c *PropelAuthClient) VerifyCustomDomainInfo(environment string) error {
+	request := customDomainVerifyRequest{
+		Environment: environment,
+	}
+	body, err := json.Marshal(request)
+	if err != nil {
+		return err
+	}
+
+	_, err = c.post("custom_domain/verify", body)
+	if err != nil {
+		return err
+	}
+	return nil
+}

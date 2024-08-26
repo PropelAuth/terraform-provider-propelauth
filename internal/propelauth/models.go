@@ -254,7 +254,6 @@ type CustomDomainInfo struct {
 	Domain string `json:"domain"`
 	Subdomain *string `json:"subdomain"`
 	IsVerified bool `json:"is_verified"`
-	IsPending bool `json:"is_pending"`
 	TxtRecordKey string `json:"txt_record_key"`
 	TxtRecordValue string `json:"txt_record_value"`
 	CnameRecordKey string `json:"cname_record_key"`
@@ -264,5 +263,9 @@ type CustomDomainInfo struct {
 type customDomainUpdateRequest struct {
 	Domain string `json:"domain"`
 	Subdomain *string `json:"subdomain,omitempty"`
+	Environment string `json:"environment"`
+}
+
+type customDomainVerifyRequest struct {
 	Environment string `json:"environment"`
 }
