@@ -26,6 +26,7 @@ func (c *PropelAuthClient) UpdateCustomDomainInfo(environment string, domain str
 	request := customDomainUpdateRequest{
 		Domain: domain,
 		Subdomain: subdomain,
+		Environment: environment,
 	}
 
 	body, err := json.Marshal(request)
@@ -33,7 +34,7 @@ func (c *PropelAuthClient) UpdateCustomDomainInfo(environment string, domain str
 		return nil, err
 	}
 
-	res, err := c.put(fmt.Sprintf("%v/custom_domain", environment), body)
+	res, err := c.put("custom_domain", body)
 	if err != nil {
 		return nil, err
 	}

@@ -34,6 +34,10 @@ type customDomainResourceModel struct {
 	Environment types.String `tfsdk:"environment"`
 	Domain types.String `tfsdk:"domain"`
 	Subdomain types.String `tfsdk:"subdomain"`
+	TxtRecordKey types.String `tfsdk:"txt_record_key"`
+	TxtRecordValue types.String `tfsdk:"txt_record_value"`
+	CnameRecordKey types.String `tfsdk:"cname_record_key"`
+	CnameRecordValue types.String `tfsdk:"cname_record_value"`
 }
 
 func (r *customDomainResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -62,6 +66,22 @@ func (r *customDomainResource) Schema(ctx context.Context, req resource.SchemaRe
 			"subdomain": schema.StringAttribute{
 				Optional: true,
 				Description: "The subdomain for the custom domain. This is optional.",
+			},
+			"txt_record_key": schema.StringAttribute{
+				Computed: true,
+				Description: "The TXT record key for the custom domain.",
+			},
+			"txt_record_value": schema.StringAttribute{
+				Computed: true,
+				Description: "The TXT record value for the custom domain.",
+			},
+			"cname_record_key": schema.StringAttribute{
+				Computed: true,
+				Description: "The CNAME record key for the custom domain.",
+			},
+			"cname_record_value": schema.StringAttribute{
+				Computed: true,
+				Description: "The CNAME record value for the custom domain.",
 			},
 		},
 	}
@@ -100,8 +120,8 @@ func (r *customDomainResource) Create(ctx context.Context, req resource.CreateRe
 	// Update the custom domain info
 	environment := plan.Environment.ValueString()
 	domain := plan.Domain.ValueString()
-	subdomain := plan.Subdomain.ValueString()
-	customDomainInfo, err := r.client.UpdateCustomDomainInfo(environment, domain, &subdomain)
+	subdomain := plan.Subdomain.ValueStringPointer()
+	customDomainInfo, err := r.client.UpdateCustomDomainInfo(environment, domain, subdomain)
     if err != nil {
         resp.Diagnostics.AddError(
 			"Error setting custom domain info",
@@ -111,15 +131,15 @@ func (r *customDomainResource) Create(ctx context.Context, req resource.CreateRe
     }
 
 
-	// save into the Terraform state.
-	plan.Domain = types.StringValue(customDomainInfo.Domain)
-	plan.Subdomain = types.StringValue(customDomainInfo.Subdomain)
-
 	// Write logs using the tflog package
 	// Documentation: https://terraform.io/plugin/log
 	tflog.Trace(ctx, "created a propelauth_project_info resource")
 
 	// Save data into Terraform state
+	plan.CnameRecordKey = types.StringValue(customDomainInfo.CnameRecordKey)
+	plan.CnameRecordValue = types.StringValue(customDomainInfo.CnameRecordValue)
+	plan.TxtRecordKey = types.StringValue(customDomainInfo.TxtRecordKey)
+	plan.TxtRecordValue = types.StringValue(customDomainInfo.TxtRecordValue)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
 }
 
@@ -148,12 +168,47 @@ func (r *customDomainResource) Read(ctx context.Context, req resource.ReadReques
 
 	// Set the data from the state into the response
 	state.Domain = types.StringValue(customDomainInfo.Domain)
-	state.Subdomain = types.StringValue(customDomainInfo.Subdomain)
+	state.Subdomain = types.StringPointerValue(customDomainInfo.Subdomain)
+	state.TxtRecordKey = types.StringValue(customDomainInfo.TxtRecordKey)
+	state.TxtRecordValue = types.StringValue(customDomainInfo.TxtRecordValue)
+	state.CnameRecordKey = types.StringValue(customDomainInfo.CnameRecordKey)
+	state.CnameRecordValue = types.StringValue(customDomainInfo.CnameRecordValue)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 }
 
 func (r *customDomainResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	// TODO
+	var plan customDomainResourceModel
+
+	// Read Terraform plan data into the model
+	diags := req.Plan.Get(ctx, &plan)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// Update the custom domain info
+	environment := plan.Environment.ValueString()
+	domain := plan.Domain.ValueString()
+	subdomain := plan.Subdomain.ValueStringPointer()
+	customDomainInfo, err := r.client.UpdateCustomDomainInfo(environment, domain, subdomain)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error setting custom domain info",
+			"Could not set custom domain info, unexpected error: " + err.Error(),
+		)
+		return
+	}
+
+	// Write logs using the tflog package
+	// Documentation: https://terraform.io/plugin/log
+	tflog.Trace(ctx, "updated a custom_domain resource")
+
+	// Save data into Terraform state
+	plan.CnameRecordKey = types.StringValue(customDomainInfo.CnameRecordKey)
+	plan.CnameRecordValue = types.StringValue(customDomainInfo.CnameRecordValue)
+	plan.TxtRecordKey = types.StringValue(customDomainInfo.TxtRecordKey)
+	plan.TxtRecordValue = types.StringValue(customDomainInfo.TxtRecordValue)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
 }
 
 func (r *customDomainResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {

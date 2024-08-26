@@ -252,11 +252,11 @@ type BeApiKey struct {
 
 type CustomDomainInfo struct {
 	Domain string `json:"domain"`
-	Subdomain string `json:"subdomain"`
+	Subdomain *string `json:"subdomain"`
 	IsVerified bool `json:"is_verified"`
 	IsPending bool `json:"is_pending"`
 	TxtRecordKey string `json:"txt_record_key"`
-	TxtRecord string `json:"txt_record"`
+	TxtRecordValue string `json:"txt_record_value"`
 	CnameRecordKey string `json:"cname_record_key"`
 	CnameRecordValue string `json:"cname_record_value"`
 }
@@ -264,4 +264,5 @@ type CustomDomainInfo struct {
 type customDomainUpdateRequest struct {
 	Domain string `json:"domain"`
 	Subdomain *string `json:"subdomain,omitempty"`
+	Environment string `json:"environment"`
 }
