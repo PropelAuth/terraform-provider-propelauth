@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 )
 
-// GetEnvironmentConfig - Returns a project metadata
+// GetEnvironmentConfig - Returns a project metadata.
 func (c *PropelAuthClient) GetEnvironmentConfig() (*EnvironmentConfigResponse, error) {
 	res, err := c.get("config", nil)
 	if err != nil {
@@ -20,7 +20,7 @@ func (c *PropelAuthClient) GetEnvironmentConfig() (*EnvironmentConfigResponse, e
 	return &environmentConfig, nil
 }
 
-// UpdateEnvironmentConfig - Updates the environment configuration ignoring the null values
+// UpdateEnvironmentConfig - Updates the environment configuration ignoring the null values.
 func (c *PropelAuthClient) UpdateEnvironmentConfig(environmentConfig *EnvironmentConfigUpdate) (*EnvironmentConfigResponse, error) {
 	body, err := json.Marshal(environmentConfig)
 	if err != nil {

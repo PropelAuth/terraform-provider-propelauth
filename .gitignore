@@ -24,6 +24,10 @@ website/node_modules
 *.iml
 *.test
 *.iml
+.env
+
+# Build file
+terraform-provider-propelauth
 
 website/vendor
 
