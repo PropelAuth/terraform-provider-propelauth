@@ -32,7 +32,7 @@ type customDomainVerificationResource struct {
 // projectInfoResourceModel describes the resource data model.
 type customDomainVerificationResourceModel struct {
 	Environment types.String `tfsdk:"environment"`
-	IsVerified types.Bool `tfsdk:"is_verified"`
+	Domain types.String `tfsdk:"domain"`
 }
 
 func (r *customDomainVerificationResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -47,16 +47,16 @@ func (r *customDomainVerificationResource) Schema(ctx context.Context, req resou
 			"environment": schema.StringAttribute{
 				Required: true,
 				Validators: []validator.String{
-					stringvalidator.OneOf("Staging", "Prod", "PendingStaging", "PendingProd"),
+					stringvalidator.OneOf("Staging", "Prod"),
 				},
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},
-				Description: "The environment for which you are configuring the custom domain. Accepted values are `Staging`, `Prod`, `PendingStaging`, and `PendingProd`. Use the `Pending` environments for switching.",
+				Description: "The environment for which you are configuring the custom domain. Accepted values are `Staging`, `Prod`.",
 			},
-			"is_verified": schema.BoolAttribute{
-				Computed: true,
-				Description: "Whether the custom domain has been verified.",
+			"domain": schema.StringAttribute{
+				Required: true,
+				Description: "The domain to verify.",
 			},
 		},
 	}
@@ -94,7 +94,7 @@ func (r *customDomainVerificationResource) Create(ctx context.Context, req resou
 
 	// Verify the custom domain
 	environment := plan.Environment.ValueString()
-	err := r.client.VerifyCustomDomainInfo(environment)
+	err := r.client.VerifyCustomDomainInfo(environment, false)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error verifying custom domain",
@@ -103,18 +103,7 @@ func (r *customDomainVerificationResource) Create(ctx context.Context, req resou
 		return
 	}
 
-	// Call the read method to get the updated state
-	customDomainInfo, err := r.client.GetCustomDomainInfo(environment)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Error getting custom domain info",
-			"Could not get custom domain info, unexpected error: " + err.Error(),
-		)
-		return
-	}
-
 	// Set the data from the state into the response
-	plan.IsVerified = types.BoolValue(customDomainInfo.IsVerified)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
 }
 
@@ -126,27 +115,14 @@ func (r *customDomainVerificationResource) Read(ctx context.Context, req resourc
 		return
 	}
 
-	// Get the custom domain info
-	environment := state.Environment.ValueString()
-	customDomainInfo, err := r.client.GetCustomDomainInfo(environment)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Error getting custom domain info",
-			"Could not get custom domain info, unexpected error: " + err.Error(),
-		)
-		return
-	}
-
 	// Write logs using the tflog package
 	// Documentation: https://terraform.io/plugin/log
 	tflog.Trace(ctx, "read a custom_domain resource")
 
-	// Set the data from the state into the response
-	state.IsVerified = types.BoolValue(customDomainInfo.IsVerified)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 }
 
-func (r *customDomainVerificationResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+func (r *customDomainVerificationResource) Update(ctx context.Context,  req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	var plan customDomainVerificationResourceModel
 
 	// Read Terraform plan data into the model
@@ -156,9 +132,16 @@ func (r *customDomainVerificationResource) Update(ctx context.Context, req resou
 		return
 	}
 
+	var state customDomainVerificationResourceModel
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
 	// Verify the custom domain
 	environment := plan.Environment.ValueString()
-	err := r.client.VerifyCustomDomainInfo(environment)
+	isSwitching := plan.Domain.ValueString() != state.Domain.ValueString()
+	err := r.client.VerifyCustomDomainInfo(environment, isSwitching)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error verifying custom domain",
@@ -167,18 +150,7 @@ func (r *customDomainVerificationResource) Update(ctx context.Context, req resou
 		return
 	}
 
-	// Call the read method to get the updated state
-	customDomainInfo, err := r.client.GetCustomDomainInfo(environment)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Error getting custom domain info",
-			"Could not get custom domain info, unexpected error: " + err.Error(),
-		)
-		return
-	}
-
 	// Set the data from the state into the response
-	plan.IsVerified = types.BoolValue(customDomainInfo.IsVerified)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
 }
 

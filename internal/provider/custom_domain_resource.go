@@ -52,12 +52,12 @@ func (r *customDomainResource) Schema(ctx context.Context, req resource.SchemaRe
 			"environment": schema.StringAttribute{
 				Required: true,
 				Validators: []validator.String{
-					stringvalidator.OneOf("Staging", "Prod", "PendingStaging", "PendingProd"),
+					stringvalidator.OneOf("Staging", "Prod"),
 				},
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},
-				Description: "The environment for which you are configuring the custom domain. Accepted values are `Staging`, `Prod`, `PendingStaging`, and `PendingProd`. Use the `Pending` environments for switching.",
+				Description: "The environment for which you are configuring the custom domain. Accepted values are `Staging` and `Prod`.",
 			},
 			"domain": schema.StringAttribute{
 				Required: true,
@@ -121,7 +121,7 @@ func (r *customDomainResource) Create(ctx context.Context, req resource.CreateRe
 	environment := plan.Environment.ValueString()
 	domain := plan.Domain.ValueString()
 	subdomain := plan.Subdomain.ValueStringPointer()
-	customDomainInfo, err := r.client.UpdateCustomDomainInfo(environment, domain, subdomain)
+	customDomainInfo, err := r.client.UpdateCustomDomainInfo(environment, domain, subdomain, false)
     if err != nil {
         resp.Diagnostics.AddError(
 			"Error setting custom domain info",
@@ -136,10 +136,10 @@ func (r *customDomainResource) Create(ctx context.Context, req resource.CreateRe
 	tflog.Trace(ctx, "created a propelauth_project_info resource")
 
 	// Save data into Terraform state
-	plan.CnameRecordKey = types.StringValue(customDomainInfo.CnameRecordKey)
-	plan.CnameRecordValue = types.StringValue(customDomainInfo.CnameRecordValue)
-	plan.TxtRecordKey = types.StringValue(customDomainInfo.TxtRecordKey)
-	plan.TxtRecordValue = types.StringValue(customDomainInfo.TxtRecordValue)
+	plan.CnameRecordKey = types.StringPointerValue(customDomainInfo.CnameRecordKey)
+	plan.CnameRecordValue = types.StringPointerValue(customDomainInfo.CnameRecordValue)
+	plan.TxtRecordKey = types.StringPointerValue(customDomainInfo.TxtRecordKey)
+	plan.TxtRecordValue = types.StringPointerValue(customDomainInfo.TxtRecordValue)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
 }
 
@@ -151,15 +151,32 @@ func (r *customDomainResource) Read(ctx context.Context, req resource.ReadReques
 		return
 	}
 
-	// Get the custom domain info
+	// Get the main env's custom domain info
 	environment := state.Environment.ValueString()
-	customDomainInfo, err := r.client.GetCustomDomainInfo(environment)
+
+	// isSwitching := state.IsPending.ValueBool()
+	customDomainInfo, err := r.client.GetCustomDomainInfo(environment, false)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error getting custom domain info",
 			"Could not get custom domain info, unexpected error: " + err.Error(),
 		)
 		return
+	}
+
+	isDomainOrSubdomainChanged := state.Domain.ValueString() != customDomainInfo.Domain || state.Subdomain.ValueStringPointer() != customDomainInfo.Subdomain
+
+	isSwitching := isDomainOrSubdomainChanged && customDomainInfo.IsVerified
+	if isSwitching {
+		// If the domain is switching, we need to fetch the pending state instead.
+		customDomainInfo, err = r.client.GetCustomDomainInfo(environment, true)
+		if err != nil {
+			resp.Diagnostics.AddError(
+				"Error getting custom domain info",
+				"Could not get custom domain info, unexpected error: " + err.Error(),
+			)
+			return
+		}
 	}
 
 	// Write logs using the tflog package
@@ -169,28 +186,59 @@ func (r *customDomainResource) Read(ctx context.Context, req resource.ReadReques
 	// Set the data from the state into the response
 	state.Domain = types.StringValue(customDomainInfo.Domain)
 	state.Subdomain = types.StringPointerValue(customDomainInfo.Subdomain)
-	state.TxtRecordKey = types.StringValue(customDomainInfo.TxtRecordKey)
-	state.TxtRecordValue = types.StringValue(customDomainInfo.TxtRecordValue)
-	state.CnameRecordKey = types.StringValue(customDomainInfo.CnameRecordKey)
-	state.CnameRecordValue = types.StringValue(customDomainInfo.CnameRecordValue)
+
+	if customDomainInfo.TxtRecordKey != nil {
+		state.TxtRecordKey = types.StringPointerValue(customDomainInfo.TxtRecordKey)
+	}
+	if customDomainInfo.TxtRecordValue != nil {
+		state.TxtRecordValue = types.StringPointerValue(customDomainInfo.TxtRecordValue)
+	}
+	if customDomainInfo.CnameRecordKey != nil {
+		state.CnameRecordKey = types.StringPointerValue(customDomainInfo.CnameRecordKey)
+	}
+	if customDomainInfo.CnameRecordValue != nil {
+		state.CnameRecordValue = types.StringPointerValue(customDomainInfo.CnameRecordValue)
+	}
+	
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 }
 
 func (r *customDomainResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	var plan customDomainResourceModel
-
 	// Read Terraform plan data into the model
+	var plan customDomainResourceModel
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
+	// Read the current state data
+	var state customDomainResourceModel
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// Re-fetch the main env's custom domain info to check 
+	// if its verification status has changed.
+	customDomainInfo, err := r.client.GetCustomDomainInfo(state.Environment.ValueString(), false)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error getting custom domain info",
+			"Could not get custom domain info, unexpected error: " + err.Error(),
+		)
+		return
+	}
+
+	isVerified := customDomainInfo.IsVerified
+	isPending := customDomainInfo.IsPending
+
 	// Update the custom domain info
 	environment := plan.Environment.ValueString()
 	domain := plan.Domain.ValueString()
 	subdomain := plan.Subdomain.ValueStringPointer()
-	customDomainInfo, err := r.client.UpdateCustomDomainInfo(environment, domain, subdomain)
+	isSwitching := isPending || (!isPending && isVerified)
+	customDomainInfo, err = r.client.UpdateCustomDomainInfo(environment, domain, subdomain, isSwitching)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error setting custom domain info",
@@ -204,10 +252,10 @@ func (r *customDomainResource) Update(ctx context.Context, req resource.UpdateRe
 	tflog.Trace(ctx, "updated a custom_domain resource")
 
 	// Save data into Terraform state
-	plan.CnameRecordKey = types.StringValue(customDomainInfo.CnameRecordKey)
-	plan.CnameRecordValue = types.StringValue(customDomainInfo.CnameRecordValue)
-	plan.TxtRecordKey = types.StringValue(customDomainInfo.TxtRecordKey)
-	plan.TxtRecordValue = types.StringValue(customDomainInfo.TxtRecordValue)
+	plan.CnameRecordKey = types.StringPointerValue(customDomainInfo.CnameRecordKey)
+	plan.CnameRecordValue = types.StringPointerValue(customDomainInfo.CnameRecordValue)
+	plan.TxtRecordKey = types.StringPointerValue(customDomainInfo.TxtRecordKey)
+	plan.TxtRecordValue = types.StringPointerValue(customDomainInfo.TxtRecordValue)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
 }
 
