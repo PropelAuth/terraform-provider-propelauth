@@ -6,13 +6,13 @@ import (
 )
 
 // GetCustomDomainInfo - Returns the custom domain info for the requested environment
-func (c *PropelAuthClient) GetCustomDomainInfo(environment string, isSwitching bool) (*CustomDomainInfo, error) {
+func (c *PropelAuthClient) GetCustomDomainInfo(environment string, isSwitching bool) (*CustomDomainInfoResponse, error) {
 	res, err := c.get(fmt.Sprintf("custom_domain?environment=%v&is_switching=%v", environment, isSwitching), nil)
 	if err != nil {
 		return nil, err
 	}
 
-	customDomainInfo := CustomDomainInfo{}
+	customDomainInfo := CustomDomainInfoResponse{}
 	err = json.Unmarshal(res.BodyBytes, &customDomainInfo)
 	if err != nil {
 		return nil, err
@@ -22,7 +22,7 @@ func (c *PropelAuthClient) GetCustomDomainInfo(environment string, isSwitching b
 }
 
 // UpdateCustomDomainInfo - Updates the custom domain info for the requested environment
-func (c *PropelAuthClient) UpdateCustomDomainInfo(environment string, domain string, subdomain *string, isSwitching bool) (*CustomDomainInfo, error) {
+func (c *PropelAuthClient) UpdateCustomDomainInfo(environment string, domain string, subdomain *string, isSwitching bool) (*CustomDomainInfoResponse, error) {
 	request := customDomainUpdateRequest{
 		Domain: domain,
 		Subdomain: subdomain,
@@ -40,7 +40,7 @@ func (c *PropelAuthClient) UpdateCustomDomainInfo(environment string, domain str
 		return nil, err
 	}
 
-	customDomainInfo := CustomDomainInfo{}
+	customDomainInfo := CustomDomainInfoResponse{}
 	err = json.Unmarshal(res.BodyBytes, &customDomainInfo)
 	if err != nil {
 		return nil, err

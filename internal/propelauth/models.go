@@ -250,7 +250,7 @@ type BeApiKey struct {
 	IsReadOnly bool   `json:"readonly"`
 }
 
-type CustomDomainInfo struct {
+type CustomDomainInfoResponse struct {
 	Domain string `json:"domain"`
 	Subdomain *string `json:"subdomain"`
 	IsVerified bool `json:"is_verified"`

@@ -168,7 +168,7 @@ func (r *customDomainResource) Read(ctx context.Context, req resource.ReadReques
 
 	isSwitching := isDomainOrSubdomainChanged && customDomainInfo.IsVerified
 	if isSwitching {
-		// If the domain is switching, we need to fetch the pending state instead.
+		// If the domain is switching, fetch the pending state instead.
 		customDomainInfo, err = r.client.GetCustomDomainInfo(environment, true)
 		if err != nil {
 			resp.Diagnostics.AddError(
@@ -187,6 +187,9 @@ func (r *customDomainResource) Read(ctx context.Context, req resource.ReadReques
 	state.Domain = types.StringValue(customDomainInfo.Domain)
 	state.Subdomain = types.StringPointerValue(customDomainInfo.Subdomain)
 
+	// So as not to need an update after verification of a domain, 
+	// these fields are only updated if the domain is not verified, which is when they are
+	// returned.
 	if customDomainInfo.TxtRecordKey != nil {
 		state.TxtRecordKey = types.StringPointerValue(customDomainInfo.TxtRecordKey)
 	}

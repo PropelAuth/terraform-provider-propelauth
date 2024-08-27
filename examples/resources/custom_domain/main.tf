@@ -17,8 +17,8 @@ provider "propelauth" {
 }
 
 resource "propelauth_custom_domain" "my_custom_domain" {
-  environment = "Staging"
-  domain      = "sharpenchess.com"
+  environment = "Prod"
+  domain      = "example.com"
   # subdomain   = "app" # Optional
 }
 
@@ -43,7 +43,6 @@ resource "propelauth_custom_domain_verification" "my_custom_domain_verification"
   ]
   environment = propelauth_custom_domain.my_custom_domain.environment
   domain      = propelauth_custom_domain.my_custom_domain.domain
-  # timeouts { create = "15m" }
 }
 
 output "project_custom_domain_result" {
