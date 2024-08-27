@@ -98,7 +98,7 @@ func (r *customDomainVerificationResource) Create(ctx context.Context, req resou
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error verifying custom domain",
-			"Could not verify custom domain, unexpected error: " + err.Error(),
+			"Could not verify custom domain, please check the domain records and try again.",
 		)
 		return
 	}
@@ -145,7 +145,7 @@ func (r *customDomainVerificationResource) Update(ctx context.Context,  req reso
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error verifying custom domain",
-			"Could not verify custom domain, unexpected error: " + err.Error(),
+			"Could not verify custom domain, please check the domain records and try again.",
 		)
 		return
 	}
