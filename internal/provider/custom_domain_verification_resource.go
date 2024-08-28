@@ -3,9 +3,11 @@ package provider
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"terraform-provider-propelauth/internal/propelauth"
 
+	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -33,6 +35,7 @@ type customDomainVerificationResource struct {
 type customDomainVerificationResourceModel struct {
 	Environment types.String `tfsdk:"environment"`
 	Domain types.String `tfsdk:"domain"`
+	Timeouts timeouts.Value `tfsdk:"timeouts"`
 }
 
 func (r *customDomainVerificationResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -58,6 +61,10 @@ func (r *customDomainVerificationResource) Schema(ctx context.Context, req resou
 				Required: true,
 				Description: "The domain to verify.",
 			},
+			"timeouts": timeouts.Attributes(ctx, timeouts.Opts{
+				Create: true,
+				Update: true,
+			}),
 		},
 	}
 }
@@ -92,10 +99,19 @@ func (r *customDomainVerificationResource) Create(ctx context.Context, req resou
         return
     }
 
+	createTimeout, err := plan.Timeouts.Create(ctx, 15*time.Minute)
+	if err != nil {
+		resp.Diagnostics.AddError("Error creating a timeout", "Could not create a timeout for the custom domain verification.")
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(ctx, createTimeout)
+	defer cancel()
+
 	// Verify the custom domain
 	environment := plan.Environment.ValueString()
-	err := r.client.VerifyCustomDomainInfo(environment, false)
-	if err != nil {
+	verificationErr := r.client.VerifyCustomDomainInfo(environment, false)
+	if verificationErr != nil {
 		resp.Diagnostics.AddError(
 			"Error verifying custom domain",
 			"Could not verify custom domain, please check the domain records and try again.",
@@ -138,11 +154,20 @@ func (r *customDomainVerificationResource) Update(ctx context.Context,  req reso
 		return
 	}
 
+	updateTimeout, err := plan.Timeouts.Update(ctx, 15*time.Minute)
+	if err != nil {
+		resp.Diagnostics.AddError("Error creating a timeout", "Could not create a timeout for the custom domain verification.")
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(ctx, updateTimeout)
+	defer cancel()
+
 	// Verify the custom domain
 	environment := plan.Environment.ValueString()
 	isSwitching := plan.Domain.ValueString() != state.Domain.ValueString()
-	err := r.client.VerifyCustomDomainInfo(environment, isSwitching)
-	if err != nil {
+	verificationErr := r.client.VerifyCustomDomainInfo(environment, isSwitching)
+	if verificationErr != nil {
 		resp.Diagnostics.AddError(
 			"Error verifying custom domain",
 			"Could not verify custom domain, please check the domain records and try again.",
