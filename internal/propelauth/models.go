@@ -232,3 +232,44 @@ type BeIntegrationInfo struct {
 	VerifierKey string `json:"verifier_key"`
 	Issuer string `json:"issuer"`
 }
+
+type RolesAndPermissions struct {
+	Roles []RoleDefinition `json:"roles"`
+	Permissions []Permission `json:"available_external_permissions"`
+	DefaultRole string `json:"default_role"`
+	DefaultOwnerRole string `json:"default_owner_role"`
+	OrgRoleStructure string `json:"org_role_structure"`
+}
+
+type RoleDefinition struct {
+	Name string `json:"name"`
+	CanInvite bool `json:"can_invite"`
+	CanChangeRoles bool `json:"can_change_roles"`
+	CanManageApiKeys bool `json:"can_manage_api_keys"`
+	CanRemoveUsers bool `json:"can_remove_users"`
+	CanSetupSaml bool `json:"can_setup_saml"`
+	CanViewOtherMembers bool `json:"can_view_other_members"`
+	CanDeleteOrg bool `json:"can_delete_org"`
+	CanEditOrgAccess bool `json:"can_edit_org_access"`
+	CanUpdateOrgMetadata bool `json:"can_update_org_metadata"`
+	RolesCanManage []string `json:"roles_can_manage,omitempty"`
+	Disabled bool `json:"disabled"`
+	IsVisibleToEndUser bool `json:"is_visible_to_end_user"`
+	ExternalPermissions []string `json:"external_permissions,omitempty"`
+	Description *string `json:"description,omitempty"`
+}
+
+type Permission struct {
+	Name string `json:"name"`
+	Description *string `json:"description,omitempty"`
+	DisplayName *string `json:"display_name,omitempty"`
+}
+
+type rolesAndPermissionsUpdate struct {
+	RolesAndPermissions RolesAndPermissions `json:"org_definition"`
+	RoleMigrationMap RoleMigrationMap `json:"role_to_role"`
+}
+
+type RoleMigrationMap struct {
+	OldToNewRoleMapping map[string]*string `json:"role_map"`
+}
