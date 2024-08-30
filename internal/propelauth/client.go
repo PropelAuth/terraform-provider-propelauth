@@ -63,11 +63,11 @@ func (c *PropelAuthClient) put(urlPostfix string, body []byte) (*StandardRespons
 	return c.requestHelper("PUT", url, body)
 }
 
-// func (c *PropelAuthClient) delete(urlPostfix string, body []byte) (*StandardResponse, error) {
-// 	url := c.assembleURL(urlPostfix, nil)
+func (c *PropelAuthClient) delete(urlPostfix string, body []byte) (*StandardResponse, error) {
+	url := c.assembleURL(urlPostfix, nil)
 
-// 	return c.requestHelper("DELETE", url, body)
-// }
+	return c.requestHelper("DELETE", url, body)
+}
 
 
 func (c *PropelAuthClient) requestHelper(method string, url string, body []byte) (*StandardResponse, error) {

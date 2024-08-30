@@ -273,3 +273,12 @@ type rolesAndPermissionsUpdate struct {
 type RoleMigrationMap struct {
 	OldToNewRoleMapping map[string]*string `json:"role_map"`
 }
+
+type RolePermissionsOverride struct {
+	Name string `json:"name"`
+	Roles []RoleDefinition `json:"roles"`
+}
+
+type RolePermissionsOverrideCreationResponse struct {
+	MappingId string `json:"mapping_id"`
+}
