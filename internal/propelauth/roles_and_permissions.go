@@ -185,3 +185,7 @@ func (r *RolesAndPermissions) GetHeirarchy() []string {
 		return hierarchy
 	}
 }
+
+func (r *RolesAndPermissions) IsMultiRole() bool {
+	return r.OrgRoleStructure == "multi_role"
+}

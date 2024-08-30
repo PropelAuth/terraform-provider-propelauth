@@ -76,12 +76,11 @@ func (r *rolesAndPermissionsResource) Schema(ctx context.Context, req resource.S
 		Description: "Roles and Permissions resource. This is for configuring the basic roles and permissionsrmation in PropelAuth.",
 		Attributes: map[string]schema.Attribute{
 			"multiple_roles_per_user": schema.BoolAttribute{
-				Optional: true,
 				Computed: true,
-				Default:  booldefault.StaticBool(false),
 				Description: "If true, than each member of an organization can have multiple roles and their is no heirarchy between roles. " +
 					"Instead, the relationship between roles is defined by the `roles_can_manage` field on each individual role definition. " +
-					"The default is false.",
+					"A single-role project can be migrated to multi-role, but not the other way around. Because of this, " +
+					"this can only be set in the PropelAuth dashboard.",
 			},
 			"permissions": schema.ListNestedAttribute{
 				Optional: true,
@@ -280,53 +279,53 @@ func (r *rolesAndPermissionsResource) ValidateConfig(ctx context.Context, req re
 		}
 	}
 
-	// Prepare an update the roles and permissions for validation
-	updateBuilder := propelauth.NewRolesAndPermissionsUpdateBuilder()
+	// // Prepare an update the roles and permissions for validation
+	// updateBuilder := propelauth.NewRolesAndPermissionsUpdateBuilder()
 
-	updateBuilder = updateBuilder.
-		SetMultipleRolesPerUser(plan.MultipleRolesPerUser.ValueBool()).
-		SetDefaultRole(plan.DefaultRole.ValueString()).
-		SetDefaultOwnerRole(plan.DefaultOwnerRole.ValueString())
+	// updateBuilder = updateBuilder.
+	// 	SetMultipleRolesPerUser(plan.MultipleRolesPerUser.ValueBool()).
+	// 	SetDefaultRole(plan.DefaultRole.ValueString()).
+	// 	SetDefaultOwnerRole(plan.DefaultOwnerRole.ValueString())
 
-	for _, permission := range plan.Permissions {
-		updateBuilder = updateBuilder.InsertPermission(propelauth.Permission{
-			Name: permission.Name.ValueString(),
-			DisplayName: permission.DisplayName.ValueStringPointer(),
-			Description: permission.Description.ValueStringPointer(),
-		})
-	}
+	// for _, permission := range plan.Permissions {
+	// 	updateBuilder = updateBuilder.InsertPermission(propelauth.Permission{
+	// 		Name: permission.Name.ValueString(),
+	// 		DisplayName: permission.DisplayName.ValueStringPointer(),
+	// 		Description: permission.Description.ValueStringPointer(),
+	// 	})
+	// }
 
-	for roleName, role := range plan.Roles {
-		updateBuilder = updateBuilder.InsertRole(roleName, convertRoleFromState(roleName, &role))
-		if role.ReplacingRole.ValueString() != "" {
-			updateBuilder = updateBuilder.InsertOldToNewRoleMapping(role.ReplacingRole.ValueString(), roleName)
-		}
-	}
+	// for roleName, role := range plan.Roles {
+	// 	updateBuilder = updateBuilder.InsertRole(roleName, convertRoleFromState(roleName, &role))
+	// 	if role.ReplacingRole.ValueString() != "" {
+	// 		updateBuilder = updateBuilder.InsertOldToNewRoleMapping(role.ReplacingRole.ValueString(), roleName)
+	// 	}
+	// }
 
-	updateBuilder.SetRoleHierarchy(convertArrayOfStringsForSource(plan.RoleHeirarchy))
+	// updateBuilder.SetRoleHierarchy(convertArrayOfStringsForSource(plan.RoleHeirarchy))
 
-	// get the old roles and permissions to track changes/deletions in role names
-	oldRolesAndPermissions, err := r.client.GetRolesAndPermissions()
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Error Validating PropelAuth Roles and Permissions",
-			"Could not read old PropelAuth Roles and Permissions: " + err.Error(),
-		)
-		return
-	}
+	// // get the old roles and permissions to track changes/deletions in role names
+	// oldRolesAndPermissions, err := r.client.GetRolesAndPermissions()
+	// if err != nil {
+	// 	resp.Diagnostics.AddError(
+	// 		"Error Validating PropelAuth Roles and Permissions",
+	// 		"Could not read old PropelAuth Roles and Permissions: " + err.Error(),
+	// 	)
+	// 	return
+	// }
 
-	for _, oldRole := range oldRolesAndPermissions.Roles {
-		updateBuilder.InsertOldRoleName(oldRole.Name)
-	}
+	// for _, oldRole := range oldRolesAndPermissions.Roles {
+	// 	updateBuilder.InsertOldRoleName(oldRole.Name)
+	// }
 
-    _, err = r.client.ValidateRolesAndPermissions(updateBuilder.Build())
-    if err != nil {
-        resp.Diagnostics.AddError(
-            "Invalid PropelAuth Roles and Permissions",
-            "The roles and permissions failed validation. Error response: "+err.Error(),
-        )
-        return
-    }
+    // _, err = r.client.ValidateRolesAndPermissions(updateBuilder.Build())
+    // if err != nil {
+    //     resp.Diagnostics.AddError(
+    //         "Invalid PropelAuth Roles and Permissions",
+    //         "The roles and permissions failed validation. Error response: "+err.Error(),
+    //     )
+    //     return
+    // }
 }
 
 func (r *rolesAndPermissionsResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
@@ -363,7 +362,6 @@ func (r *rolesAndPermissionsResource) Create(ctx context.Context, req resource.C
 	updateBuilder := propelauth.NewRolesAndPermissionsUpdateBuilder()
 
 	updateBuilder = updateBuilder.
-		SetMultipleRolesPerUser(plan.MultipleRolesPerUser.ValueBool()).
 		SetDefaultRole(plan.DefaultRole.ValueString()).
 		SetDefaultOwnerRole(plan.DefaultOwnerRole.ValueString())
 
@@ -393,6 +391,9 @@ func (r *rolesAndPermissionsResource) Create(ctx context.Context, req resource.C
 		)
 		return
 	}
+
+	updateBuilder.SetMultipleRolesPerUser(oldRolesAndPermissions.IsMultiRole())
+	plan.MultipleRolesPerUser = types.BoolValue(oldRolesAndPermissions.IsMultiRole())
 
 	for _, oldRole := range oldRolesAndPermissions.Roles {
 		updateBuilder.InsertOldRoleName(oldRole.Name)
@@ -434,7 +435,7 @@ func (r *rolesAndPermissionsResource) Read(ctx context.Context, req resource.Rea
 
 	// update state
 	// easy ones first
-	state.MultipleRolesPerUser = types.BoolValue(rolesAndPermissions.OrgRoleStructure == "multi_role")
+	state.MultipleRolesPerUser = types.BoolValue(rolesAndPermissions.IsMultiRole())
 	state.DefaultRole = types.StringValue(rolesAndPermissions.DefaultRole)
 	state.DefaultOwnerRole = types.StringValue(rolesAndPermissions.DefaultOwnerRole)
 	// role definitions
@@ -466,7 +467,6 @@ func (r *rolesAndPermissionsResource) Update(ctx context.Context, req resource.U
 	updateBuilder := propelauth.NewRolesAndPermissionsUpdateBuilder()
 
 	updateBuilder = updateBuilder.
-		SetMultipleRolesPerUser(plan.MultipleRolesPerUser.ValueBool()).
 		SetDefaultRole(plan.DefaultRole.ValueString()).
 		SetDefaultOwnerRole(plan.DefaultOwnerRole.ValueString())
 
@@ -496,6 +496,9 @@ func (r *rolesAndPermissionsResource) Update(ctx context.Context, req resource.U
 		)
 		return
 	}
+
+	updateBuilder.SetMultipleRolesPerUser(oldRolesAndPermissions.IsMultiRole())
+	plan.MultipleRolesPerUser = types.BoolValue(oldRolesAndPermissions.IsMultiRole())
 
 	for _, oldRole := range oldRolesAndPermissions.Roles {
 		updateBuilder.InsertOldRoleName(oldRole.Name)

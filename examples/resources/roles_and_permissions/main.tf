@@ -40,8 +40,8 @@ resource "propelauth_roles_and_permissions" "my_roles_and_permissions" {
       can_change_roles = true
       can_manage_api_keys = true
       can_remove_users = true
-      can_setup_saml = true # will always be true for the default_owner_role
-      can_delete_org = true # will always be true for the default_owner_role
+      can_setup_saml = true
+      can_delete_org = true
       can_edit_org_access = true
       can_update_org_metadata = true
       permissions = [
@@ -50,13 +50,12 @@ resource "propelauth_roles_and_permissions" "my_roles_and_permissions" {
         "ticket::read",
         "ticket::write"
       ]
-      # roles_can_manage = ["Admin", "Member"] # only for multiple_roles_per_user = true
     }
     "Admin" = {
       can_view_other_members = true
       can_invite = true
       can_change_roles = true
-      can_manage_api_keys = true
+      can_manage_api_keys = false
       can_remove_users = true
       can_setup_saml = false
       can_delete_org = false
@@ -67,7 +66,6 @@ resource "propelauth_roles_and_permissions" "my_roles_and_permissions" {
         "doc::write",
         "ticket::read"
       ]
-    # roles_can_manage = ["Member"] # only for multiple_roles_per_user = true
     }
     "Member" = {
       # the defaults for all PropelAuth permissions
@@ -89,16 +87,12 @@ resource "propelauth_roles_and_permissions" "my_roles_and_permissions" {
       can_update_org_metadata = false
       permissions = [
         "doc::read",
-        "doc::write",
         "ticket::read",
         "ai::deploy"
       ]
 	  }
-	  # "New Role Name" = {
-		#   replacing_role = "Old Role Name" # this field is for when you want to rename a role
-	  # }
 	}
-	role_hierarchy = [ # only for multiple_roles_per_user = false
+	role_hierarchy = [
 	  "Owner",
 	  "Admin",
 	  "Support",
@@ -106,7 +100,6 @@ resource "propelauth_roles_and_permissions" "my_roles_and_permissions" {
 	]
 	default_role = "Member"
 	default_owner_role = "Owner"
-	# default_mapping_name = "Free Tier"
 }
 
 output "test_roles_and_permissions" {
