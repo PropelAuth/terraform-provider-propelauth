@@ -4,6 +4,21 @@ import (
 	"encoding/json"
 )
 
+// ValidateRolesAndPermissions - Validates an update to roles and permissions without applying it.
+func (c *PropelAuthClient) ValidateRolesAndPermissions(candidateUpdate rolesAndPermissionsUpdate) (bool, error) {
+	updateJson, err := json.Marshal(candidateUpdate)
+	if err != nil {
+		return false, err
+	}
+
+	_, err = c.post("roles_and_permissions/validate", updateJson)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
 // GetRolesAndPermissions - Returns the roles and permissions.
 func (c *PropelAuthClient) GetRolesAndPermissions() (*RolesAndPermissions, error) {
 	res, err := c.get("roles_and_permissions", nil)
@@ -48,10 +63,10 @@ type RolesAndPermissionsUpdateBuilder struct {
 
 func NewRolesAndPermissionsUpdateBuilder() *RolesAndPermissionsUpdateBuilder {
 	return &RolesAndPermissionsUpdateBuilder{
-		roles: map[string]RoleDefinition{},
+		roles: make(map[string]RoleDefinition),
 		permissions: []Permission{},
-		oldToNewRoleMapping: map[string]*string{},
-		oldRoleNames: []string{},
+		oldToNewRoleMapping: make(map[string]*string),
+		oldRoleNames: make([]string, 0),
 	}
 }
 
@@ -99,7 +114,7 @@ func (b *RolesAndPermissionsUpdateBuilder) Build() rolesAndPermissionsUpdate {
 	updateRequest := rolesAndPermissionsUpdate{
 		RolesAndPermissions: RolesAndPermissions{},
 		RoleMigrationMap: RoleMigrationMap{
-			OldToNewRoleMapping: map[string]*string{},
+			OldToNewRoleMapping: make(map[string]*string),
 		},
 	}
 

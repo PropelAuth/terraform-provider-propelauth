@@ -75,7 +75,6 @@ resource "propelauth_roles_and_permissions" "my_roles_and_permissions" {
         "doc::read",
         "ticket::read"
       ]
-      replacing_role = "Member With Wrong Name"
     }
     "Support" = {
       is_internal = true
@@ -102,14 +101,14 @@ resource "propelauth_roles_and_permissions" "my_roles_and_permissions" {
 	role_hierarchy = [ # only for multiple_roles_per_user = false
 	  "Owner",
 	  "Admin",
-	  "Member",
-	  "Support"
+	  "Support",
+	  "Member"
 	]
 	default_role = "Member"
 	default_owner_role = "Owner"
 	# default_mapping_name = "Free Tier"
 }
 
-output "test_fe_integration_result" {
+output "test_roles_and_permissions" {
   value = propelauth_roles_and_permissions.my_roles_and_permissions
 }

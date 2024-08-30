@@ -7,6 +7,7 @@ import (
 	"terraform-provider-propelauth/internal/propelauth"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
@@ -18,6 +19,7 @@ import (
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &rolesAndPermissionsResource{}
 var _ resource.ResourceWithConfigure   = &rolesAndPermissionsResource{}
+var _ resource.ResourceWithValidateConfig = &rolesAndPermissionsResource{}
 
 func NewRolesAndPermissionsResource() resource.Resource {
 	return &rolesAndPermissionsResource{}
@@ -36,7 +38,7 @@ type rolesAndPermissionsResourceModel struct {
 	RoleHeirarchy []types.String `tfsdk:"role_hierarchy"`
 	DefaultRole types.String `tfsdk:"default_role"`
 	DefaultOwnerRole types.String `tfsdk:"default_owner_role"`
-	DefaultMappingName types.String `tfsdk:"default_mapping_name"`
+	// DefaultMappingName types.String `tfsdk:"default_mapping_name"`
 }
 
 type permissionModel struct {
@@ -111,16 +113,16 @@ func (r *rolesAndPermissionsResource) Schema(ctx context.Context, req resource.S
 				Required: true,
 				Description: "The `default_owner_role` is the role automatically assigned to the user who creates the organization.",
 			},
-			"default_mapping_name": schema.StringAttribute{
-				Optional: true,
-				Description: "The `default_mapping_name` is the name of the default role mapping and only matters if you intend to use  " +
-					"custom role to permission mappings. If not provided, the default mapping name in PropelAuth will be set to `Default`.",
-			},
+			// "default_mapping_name": schema.StringAttribute{
+			// 	Optional: true,
+			// 	Description: "The `default_mapping_name` is the name of the default role mapping and only matters if you intend to use  " +
+			// 		"custom role to permission mappings. If not provided, the default mapping name in PropelAuth will be set to `Default`.",
+			// },
 			"roles": schema.MapNestedAttribute{
 				Required: true,
 				Description: "A map of roles that can be assigned to members of an organization. This provides the the permissions " +
-					"in the defaul mapping. For overrides (ie custom mappings) that can be applied on top of this, see the " +
-					"`propelauth_role_permissions_override` resource. in the defaul mapping. For overrides (ie custom mappings) " +
+					"in the default mapping. For overrides (ie custom mappings) that can be applied on top of this, see the " +
+					"`propelauth_role_permissions_override` resource. in the default mapping. For overrides (ie custom mappings) " +
 					"that can be applied on top of this, see the `propelauth_role_permissions_override` resource.",
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
@@ -254,6 +256,79 @@ func (r *rolesAndPermissionsResource) Schema(ctx context.Context, req resource.S
 	}
 }
 
+func (r *rolesAndPermissionsResource) ValidateConfig(ctx context.Context, req resource.ValidateConfigRequest, resp *resource.ValidateConfigResponse) {
+	var plan rolesAndPermissionsResourceModel
+
+	// Read Terraform plan data into the model
+	diags := req.Config.Get(ctx, &plan)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// Validate the plan data
+
+	// Verify that all roles in the hierarchy are defined
+	for _, roleName := range plan.RoleHeirarchy {
+		if _, ok := plan.Roles[roleName.ValueString()]; !ok {
+			resp.Diagnostics.AddAttributeError(
+				path.Root("role_hierarchy"),
+				"PropelAuth Role in heirarchy not defined",
+				fmt.Sprintf("Role %s is in the role hierarchy but is not defined in the roles map.", roleName.ValueString()),
+			)
+			return
+		}
+	}
+
+	// Prepare an update the roles and permissions for validation
+	updateBuilder := propelauth.NewRolesAndPermissionsUpdateBuilder()
+
+	updateBuilder = updateBuilder.
+		SetMultipleRolesPerUser(plan.MultipleRolesPerUser.ValueBool()).
+		SetDefaultRole(plan.DefaultRole.ValueString()).
+		SetDefaultOwnerRole(plan.DefaultOwnerRole.ValueString())
+
+	for _, permission := range plan.Permissions {
+		updateBuilder = updateBuilder.InsertPermission(propelauth.Permission{
+			Name: permission.Name.ValueString(),
+			DisplayName: permission.DisplayName.ValueStringPointer(),
+			Description: permission.Description.ValueStringPointer(),
+		})
+	}
+
+	for roleName, role := range plan.Roles {
+		updateBuilder = updateBuilder.InsertRole(roleName, convertRoleFromState(roleName, &role))
+		if role.ReplacingRole.ValueString() != "" {
+			updateBuilder = updateBuilder.InsertOldToNewRoleMapping(role.ReplacingRole.ValueString(), roleName)
+		}
+	}
+
+	updateBuilder.SetRoleHierarchy(convertArrayOfStringsForSource(plan.RoleHeirarchy))
+
+	// get the old roles and permissions to track changes/deletions in role names
+	oldRolesAndPermissions, err := r.client.GetRolesAndPermissions()
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error Validating PropelAuth Roles and Permissions",
+			"Could not read old PropelAuth Roles and Permissions: " + err.Error(),
+		)
+		return
+	}
+
+	for _, oldRole := range oldRolesAndPermissions.Roles {
+		updateBuilder.InsertOldRoleName(oldRole.Name)
+	}
+
+    _, err = r.client.ValidateRolesAndPermissions(updateBuilder.Build())
+    if err != nil {
+        resp.Diagnostics.AddError(
+            "Invalid PropelAuth Roles and Permissions",
+            "The roles and permissions failed validation. Error response: "+err.Error(),
+        )
+        return
+    }
+}
+
 func (r *rolesAndPermissionsResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
 	// Prevent panic if the provider has not been configured.
 	if req.ProviderData == nil {
@@ -301,7 +376,7 @@ func (r *rolesAndPermissionsResource) Create(ctx context.Context, req resource.C
 	}
 
 	for roleName, role := range plan.Roles {
-		updateBuilder = updateBuilder.InsertRole(roleName, convertRoleFromModel(roleName, &role))
+		updateBuilder = updateBuilder.InsertRole(roleName, convertRoleFromState(roleName, &role))
 		if role.ReplacingRole.ValueString() != "" {
 			updateBuilder = updateBuilder.InsertOldToNewRoleMapping(role.ReplacingRole.ValueString(), roleName)
 		}
@@ -404,7 +479,7 @@ func (r *rolesAndPermissionsResource) Update(ctx context.Context, req resource.U
 	}
 
 	for roleName, role := range plan.Roles {
-		updateBuilder = updateBuilder.InsertRole(roleName, convertRoleFromModel(roleName, &role))
+		updateBuilder = updateBuilder.InsertRole(roleName, convertRoleFromState(roleName, &role))
 		if role.ReplacingRole.ValueString() != "" {
 			updateBuilder = updateBuilder.InsertOldToNewRoleMapping(role.ReplacingRole.ValueString(), roleName)
 		}
@@ -444,7 +519,7 @@ func (r *rolesAndPermissionsResource) Delete(ctx context.Context, req resource.D
 }
 
 
-func convertRoleFromModel(roleName string, role *roleModel) propelauth.RoleDefinition {
+func convertRoleFromState(roleName string, role *roleModel) propelauth.RoleDefinition {
 	return propelauth.RoleDefinition{
 		Name: roleName,
 		CanViewOtherMembers: role.CanViewOtherMembers.ValueBool(),
@@ -487,7 +562,7 @@ func updateStateForRole(state *rolesAndPermissionsResourceModel, role *propelaut
 		roleInState.Description = types.StringPointerValue(role.Description)
 		state.Roles[role.Name] = roleInState
 	} else {
-		state.Roles[role.Name] = convertRoleToModel(role)
+		state.Roles[role.Name] = convertRoleToState(role)
 	}
 }
 
@@ -535,7 +610,7 @@ func convertArrayOfStringsForSource(array []types.String) []string {
 	return result
 }
 
-func convertRoleToModel(role *propelauth.RoleDefinition) roleModel {
+func convertRoleToState(role *propelauth.RoleDefinition) roleModel {
 	roleInState := roleModel{
 		CanViewOtherMembers: types.BoolValue(role.CanViewOtherMembers),
 		CanInvite: types.BoolValue(role.CanInvite),
