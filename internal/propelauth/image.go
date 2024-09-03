@@ -17,7 +17,7 @@ func (c *PropelAuthClient) UploadImage(imageType string, pathToLocalImage string
 	url := c.assembleURL(path)
 
 	var requestBody bytes.Buffer
-    w := multipart.NewWriter(&requestBody)
+	w := multipart.NewWriter(&requestBody)
 
 	// write image data to the request
 	fw, err := w.CreateFormFile("file", pathToLocalImage)
@@ -39,7 +39,7 @@ func (c *PropelAuthClient) UploadImage(imageType string, pathToLocalImage string
 	if err != nil {
 		return nil, fmt.Errorf("error on closing writer for image upload: %w", err)
 	}
-	
+
 	// create request
 	req, err := http.NewRequest("POST", url, &requestBody)
 	if err != nil {
@@ -48,8 +48,8 @@ func (c *PropelAuthClient) UploadImage(imageType string, pathToLocalImage string
 
 	// add headers
 	req.Header.Set("Content-Type", w.FormDataContentType())
-	req.Header.Set("Authorization", "Bearer " + c.apiKey)
-	req.Header.Set("User-Agent", "terraform-provider-propelauth/0.0 go/" + runtime.Version() + " " + runtime.GOOS + "/" + runtime.GOARCH)
+	req.Header.Set("Authorization", "Bearer "+c.apiKey)
+	req.Header.Set("User-Agent", "terraform-provider-propelauth/0.0 go/"+runtime.Version()+" "+runtime.GOOS+"/"+runtime.GOARCH)
 
 	// send request
 	resp, err := c.httpClient.Do(req)

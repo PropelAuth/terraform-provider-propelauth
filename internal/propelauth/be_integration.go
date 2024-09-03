@@ -78,7 +78,7 @@ func (c *PropelAuthClient) CreateBeApiKey(environment string, name string, isRea
 	return &beApiKey, nil
 }
 
-// // UpdateBeApiKey - Updates an existing BE API key and returns the result.
+// UpdateBeApiKey - Updates an existing BE API key and returns the result.
 func (c *PropelAuthClient) UpdateBeApiKey(environment string, apiKeyID string, name string) (*BeApiKey, error) {
 	request := BeApiKeyUpdateRequest{
 		ApiKeyId: apiKeyID,
@@ -117,6 +117,6 @@ func (c *PropelAuthClient) DeleteBeApiKey(environment string, apiKeyID string) e
 	if err != nil {
 		return err
 	}
-	
+
 	return nil
 }

@@ -21,7 +21,7 @@ import (
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &userPropertySettingsResource{}
-var _ resource.ResourceWithConfigure   = &userPropertySettingsResource{}
+var _ resource.ResourceWithConfigure = &userPropertySettingsResource{}
 
 func NewUserPropertySettingsResource() resource.Resource {
 	return &userPropertySettingsResource{}
@@ -34,14 +34,14 @@ type userPropertySettingsResource struct {
 
 // userPropertySettingsResourceModel describes the resource data model.
 type userPropertySettingsResourceModel struct {
-	NameProperty *namePropertyModel `tfsdk:"name_property"`
-	MetadataProperty *metadataPropertyModel `tfsdk:"metadata_property"`
-	UsernameProperty *usernamePropertyModel `tfsdk:"username_property"`
-	PictureUrlProperty *pictureUrlPropertyModel `tfsdk:"picture_url_property"`
-	TosProperty *tosPropertyModel `tfsdk:"tos_property"`
+	NameProperty           *namePropertyModel           `tfsdk:"name_property"`
+	MetadataProperty       *metadataPropertyModel       `tfsdk:"metadata_property"`
+	UsernameProperty       *usernamePropertyModel       `tfsdk:"username_property"`
+	PictureUrlProperty     *pictureUrlPropertyModel     `tfsdk:"picture_url_property"`
+	TosProperty            *tosPropertyModel            `tfsdk:"tos_property"`
 	ReferralSourceProperty *referralSourcePropertyModel `tfsdk:"referral_source_property"`
-	PhoneNumberProperty *phoneNumberPropertyModel `tfsdk:"phone_number_property"`
-	CustomProperties []customPropertyModel `tfsdk:"custom_properties"`
+	PhoneNumberProperty    *phoneNumberPropertyModel    `tfsdk:"phone_number_property"`
+	CustomProperties       []customPropertyModel        `tfsdk:"custom_properties"`
 }
 
 type namePropertyModel struct {
@@ -49,13 +49,13 @@ type namePropertyModel struct {
 }
 
 type metadataPropertyModel struct {
-	InJwt types.Bool `tfsdk:"in_jwt"`
+	InJwt          types.Bool `tfsdk:"in_jwt"`
 	CollectViaSaml types.Bool `tfsdk:"collect_via_saml"`
 }
 
 type usernamePropertyModel struct {
 	DisplayName types.String `tfsdk:"display_name"`
-	InJwt types.Bool `tfsdk:"in_jwt"`
+	InJwt       types.Bool   `tfsdk:"in_jwt"`
 }
 
 type pictureUrlPropertyModel struct {
@@ -63,51 +63,51 @@ type pictureUrlPropertyModel struct {
 }
 
 type tosPropertyModel struct {
-	InJwt types.Bool `tfsdk:"in_jwt"`
-	Required types.Bool `tfsdk:"required"`
-	RequiredBy types.Int64 `tfsdk:"required_by"`
-	TosLinks []tosLinkModel `tfsdk:"tos_links"`
+	InJwt      types.Bool     `tfsdk:"in_jwt"`
+	Required   types.Bool     `tfsdk:"required"`
+	RequiredBy types.Int64    `tfsdk:"required_by"`
+	TosLinks   []tosLinkModel `tfsdk:"tos_links"`
 }
 
 type tosLinkModel struct {
-	Url types.String `tfsdk:"url"`
+	Url  types.String `tfsdk:"url"`
 	Name types.String `tfsdk:"name"`
 }
 
 type referralSourcePropertyModel struct {
-	DisplayName types.String `tfsdk:"display_name"`
-	InJwt types.Bool `tfsdk:"in_jwt"`
-	Required types.Bool `tfsdk:"required"`
-	RequiredBy types.Int64 `tfsdk:"required_by"`
-	UserWriteable types.String `tfsdk:"user_writable"`
-	Options []types.String `tfsdk:"options"`
-	ShowInAccount types.Bool `tfsdk:"show_in_account"`
-	CollectViaSaml types.Bool `tfsdk:"collect_via_saml"`
+	DisplayName    types.String   `tfsdk:"display_name"`
+	InJwt          types.Bool     `tfsdk:"in_jwt"`
+	Required       types.Bool     `tfsdk:"required"`
+	RequiredBy     types.Int64    `tfsdk:"required_by"`
+	UserWriteable  types.String   `tfsdk:"user_writable"`
+	Options        []types.String `tfsdk:"options"`
+	ShowInAccount  types.Bool     `tfsdk:"show_in_account"`
+	CollectViaSaml types.Bool     `tfsdk:"collect_via_saml"`
 }
 
 type phoneNumberPropertyModel struct {
-	DisplayName types.String `tfsdk:"display_name"`
-	ShowInAccount types.Bool `tfsdk:"show_in_account"`
-	CollectViaSaml types.Bool `tfsdk:"collect_via_saml"`
-	Required types.Bool `tfsdk:"required"`
-	RequiredBy types.Int64 `tfsdk:"required_by"`
-	UserWritable types.String `tfsdk:"user_writable"`
-	InJwt types.Bool `tfsdk:"in_jwt"`
+	DisplayName    types.String `tfsdk:"display_name"`
+	ShowInAccount  types.Bool   `tfsdk:"show_in_account"`
+	CollectViaSaml types.Bool   `tfsdk:"collect_via_saml"`
+	Required       types.Bool   `tfsdk:"required"`
+	RequiredBy     types.Int64  `tfsdk:"required_by"`
+	UserWritable   types.String `tfsdk:"user_writable"`
+	InJwt          types.Bool   `tfsdk:"in_jwt"`
 }
 
 type customPropertyModel struct {
-	Name types.String `tfsdk:"name"`
-	DisplayName types.String `tfsdk:"display_name"`
-	FieldType types.String `tfsdk:"field_type"`
-	Required types.Bool `tfsdk:"required"`
-	RequiredBy types.Int64 `tfsdk:"required_by"`
-	InJwt types.Bool `tfsdk:"in_jwt"`
-	IsUserFacing types.Bool `tfsdk:"is_user_facing"`
-	CollectOnSignup types.Bool `tfsdk:"collect_on_signup"`
-	CollectViaSaml types.Bool `tfsdk:"collect_via_saml"`
-	ShowInAccount types.Bool `tfsdk:"show_in_account"`
-	UserWritable types.String `tfsdk:"user_writable"`
-	EnumValues []types.String `tfsdk:"enum_values"`
+	Name            types.String   `tfsdk:"name"`
+	DisplayName     types.String   `tfsdk:"display_name"`
+	FieldType       types.String   `tfsdk:"field_type"`
+	Required        types.Bool     `tfsdk:"required"`
+	RequiredBy      types.Int64    `tfsdk:"required_by"`
+	InJwt           types.Bool     `tfsdk:"in_jwt"`
+	IsUserFacing    types.Bool     `tfsdk:"is_user_facing"`
+	CollectOnSignup types.Bool     `tfsdk:"collect_on_signup"`
+	CollectViaSaml  types.Bool     `tfsdk:"collect_via_saml"`
+	ShowInAccount   types.Bool     `tfsdk:"show_in_account"`
+	UserWritable    types.String   `tfsdk:"user_writable"`
+	EnumValues      []types.String `tfsdk:"enum_values"`
 }
 
 func (r *userPropertySettingsResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -122,53 +122,53 @@ func (r *userPropertySettingsResource) Schema(ctx context.Context, req resource.
 			"subscription status, external IDs, or just arbitrary JSON data.",
 		Attributes: map[string]schema.Attribute{
 			"name_property": schema.SingleNestedAttribute{
-				Optional: true,
+				Optional:    true,
 				Description: "Settings for the user's name property. If no block is provided, the name property will be disabled.",
 				Attributes: map[string]schema.Attribute{
 					"in_jwt": inJwtAttribute(true),
 				},
 			},
 			"metadata_property": schema.SingleNestedAttribute{
-				Optional: true,
+				Optional:    true,
 				Description: "Settings for the user's metadata property. If no block is provided, the metadata property will be disabled.",
 				Attributes: map[string]schema.Attribute{
-					"in_jwt": inJwtAttribute(true),
+					"in_jwt":           inJwtAttribute(true),
 					"collect_via_saml": collectViaSamlAttribute(),
 				},
 			},
 			"username_property": schema.SingleNestedAttribute{
-				Optional: true,
+				Optional:    true,
 				Description: "Settings for the user's username property. If no block is provided, the username property will be disabled.",
 				Attributes: map[string]schema.Attribute{
 					"display_name": displayNameAttribute("Username"),
-					"in_jwt": inJwtAttribute(true),
+					"in_jwt":       inJwtAttribute(true),
 				},
 			},
 			"picture_url_property": schema.SingleNestedAttribute{
-				Optional: true,
+				Optional:    true,
 				Description: "Settings for the user's picture URL property. If no block is provided, the picture URL property will be disabled.",
 				Attributes: map[string]schema.Attribute{
 					"in_jwt": inJwtAttribute(true),
 				},
 			},
 			"tos_property": schema.SingleNestedAttribute{
-				Optional: true,
+				Optional:    true,
 				Description: "Settings for the user's Terms of Service property. If no block is provided, the terms of service property will be disabled.",
 				Attributes: map[string]schema.Attribute{
-					"in_jwt": inJwtAttribute(false),
-					"required": requiredAttribute(),
+					"in_jwt":      inJwtAttribute(false),
+					"required":    requiredAttribute(),
 					"required_by": requiredByAttribute(),
 					"tos_links": schema.ListNestedAttribute{
-						Optional: true,
+						Optional:    true,
 						Description: "A list of Terms of Service links. Each link must have a URL and a name.",
 						NestedObject: schema.NestedAttributeObject{
 							Attributes: map[string]schema.Attribute{
 								"url": schema.StringAttribute{
-									Required: true,
+									Required:    true,
 									Description: "The URL of the Terms of Service link.",
 								},
 								"name": schema.StringAttribute{
-									Required: true,
+									Required:    true,
 									Description: "The name of the Terms of Service link.",
 								},
 							},
@@ -177,29 +177,29 @@ func (r *userPropertySettingsResource) Schema(ctx context.Context, req resource.
 				},
 			},
 			"referral_source_property": schema.SingleNestedAttribute{
-				Optional: true,
+				Optional:    true,
 				Description: "Settings for the user's referral source property. If no block is provided, the referral source property will be disabled.",
 				Attributes: map[string]schema.Attribute{
-					"display_name": displayNameAttribute("How did you hear about us?"),
-					"in_jwt": inJwtAttribute(true),
-					"required": requiredAttribute(),
-					"required_by": requiredByAttribute(),
-					"user_writable": userWriteableAttribute("WriteIfUnset"),
-					"show_in_account": showInAccountAttribute(false),
+					"display_name":     displayNameAttribute("How did you hear about us?"),
+					"in_jwt":           inJwtAttribute(true),
+					"required":         requiredAttribute(),
+					"required_by":      requiredByAttribute(),
+					"user_writable":    userWriteableAttribute("WriteIfUnset"),
+					"show_in_account":  showInAccountAttribute(false),
 					"collect_via_saml": collectViaSamlAttribute(),
 					"options": schema.ListAttribute{
-						Optional: true,
-						Computed: true,
+						Optional:    true,
+						Computed:    true,
 						ElementType: types.StringType,
 						Default: listdefault.StaticValue(types.ListValueMust(
-								types.StringType,
-								[]attr.Value{
-									types.StringValue("Search engine"),
-									types.StringValue("Recommendation"),
-									types.StringValue("Social media"),
-									types.StringValue("Blog post"),
-									types.StringValue("Other"),
-								},
+							types.StringType,
+							[]attr.Value{
+								types.StringValue("Search engine"),
+								types.StringValue("Recommendation"),
+								types.StringValue("Social media"),
+								types.StringValue("Blog post"),
+								types.StringValue("Other"),
+							},
 						)),
 						Description: "A list of options for the referral source property. If this is unset, the default options " +
 							"will be used. These are `Search engine`, `Recommendation`, `Social media`, `Blog post`, `Other`.",
@@ -207,20 +207,20 @@ func (r *userPropertySettingsResource) Schema(ctx context.Context, req resource.
 				},
 			},
 			"phone_number_property": schema.SingleNestedAttribute{
-				Optional: true,
+				Optional:    true,
 				Description: "Settings for the user's phone number property. If no block is provided, the phone number property will be disabled.",
 				Attributes: map[string]schema.Attribute{
-					"display_name": displayNameAttribute("Phone number"),
-					"show_in_account": showInAccountAttribute(false),
+					"display_name":     displayNameAttribute("Phone number"),
+					"show_in_account":  showInAccountAttribute(false),
 					"collect_via_saml": collectViaSamlAttribute(),
-					"required": requiredAttribute(),
-					"required_by": requiredByAttribute(),
-					"user_writable": userWriteableAttribute("WriteIfUnset"),
-					"in_jwt": inJwtAttribute(false),
+					"required":         requiredAttribute(),
+					"required_by":      requiredByAttribute(),
+					"user_writable":    userWriteableAttribute("WriteIfUnset"),
+					"in_jwt":           inJwtAttribute(false),
 				},
 			},
 			"custom_properties": schema.ListNestedAttribute{
-				Optional: true,
+				Optional:    true,
 				Description: "Custom properties for the user. If no blocks are provided, no custom properties will be enabled.",
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
@@ -230,7 +230,7 @@ func (r *userPropertySettingsResource) Schema(ctx context.Context, req resource.
 								"It cannot be changed after creation.",
 						},
 						"display_name": schema.StringAttribute{
-							Required: true,
+							Required:    true,
 							Description: "The field name users see in the UI for the property.",
 						},
 						"field_type": schema.StringAttribute{
@@ -241,28 +241,28 @@ func (r *userPropertySettingsResource) Schema(ctx context.Context, req resource.
 								stringvalidator.OneOf("Checkbox", "Date", "Enum", "Integer", "Json", "LongText", "Text", "Toggle", "Url"),
 							},
 						},
-						"required": requiredAttribute(),
+						"required":    requiredAttribute(),
 						"required_by": requiredByAttribute(),
-						"in_jwt": inJwtAttribute(true),
+						"in_jwt":      inJwtAttribute(true),
 						"is_user_facing": schema.BoolAttribute{
 							Optional: true,
 							Computed: true,
-							Default: booldefault.StaticBool(true),
+							Default:  booldefault.StaticBool(true),
 							Description: "Whether the property should be displayed in the user's account page hosted by PropelAuth. " +
 								"The default value is `false`.",
 						},
 						"collect_on_signup": schema.BoolAttribute{
 							Optional: true,
 							Computed: true,
-							Default: booldefault.StaticBool(true),
+							Default:  booldefault.StaticBool(true),
 							Description: "Whether the property should be collected from new users during the sign up flow. " +
 								"The default value is `true`.",
 						},
 						"collect_via_saml": collectViaSamlAttribute(),
-						"show_in_account": showInAccountAttribute(true),
-						"user_writable": userWriteableAttribute("Write"),
+						"show_in_account":  showInAccountAttribute(true),
+						"user_writable":    userWriteableAttribute("Write"),
 						"enum_values": schema.ListAttribute{
-							Optional: true,
+							Optional:    true,
 							Description: "A list of possible values for the property. This is only required for the `Enum` field type.",
 							ElementType: types.StringType,
 						},
@@ -298,17 +298,17 @@ func (r *userPropertySettingsResource) Create(ctx context.Context, req resource.
 
 	// Read Terraform plan data into the model
 	diags := req.Plan.Get(ctx, &plan)
-    resp.Diagnostics.Append(diags...)
-    if resp.Diagnostics.HasError() {
-        return
-    }
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Fetch the current user property settings from PropelAuth
 	userPropertySettings, err := r.client.GetUserProperties()
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error Reading PropelAuth user properties settings",
-			"Could not read PropelAuth user properties settings: " + err.Error(),
+			"Could not read PropelAuth user properties settings: "+err.Error(),
 		)
 		return
 	}
@@ -317,7 +317,7 @@ func (r *userPropertySettingsResource) Create(ctx context.Context, req resource.
 	updateDefaultPropertiesFromPlan(&plan, userPropertySettings)
 	updateCustomPropertiesFromPlan(&plan, userPropertySettings)
 
-    _, err = r.client.UpdateUserProperties(userPropertySettings)
+	_, err = r.client.UpdateUserProperties(userPropertySettings)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error setting user properties settings",
@@ -347,7 +347,7 @@ func (r *userPropertySettingsResource) Read(ctx context.Context, req resource.Re
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error Reading PropelAuth user properties settings",
-			"Could not read PropelAuth user properties settings: " + err.Error(),
+			"Could not read PropelAuth user properties settings: "+err.Error(),
 		)
 		return
 	}
@@ -365,7 +365,7 @@ func (r *userPropertySettingsResource) Read(ctx context.Context, req resource.Re
 	if userPropertySettings.MetadataPropertyEnabled() {
 		metadataPropertySettings := userPropertySettings.GetMetadataPropertySettings()
 		state.MetadataProperty = &metadataPropertyModel{
-			InJwt: types.BoolValue(metadataPropertySettings.InJwt),
+			InJwt:          types.BoolValue(metadataPropertySettings.InJwt),
 			CollectViaSaml: types.BoolValue(metadataPropertySettings.CollectViaSaml),
 		}
 	} else {
@@ -376,7 +376,7 @@ func (r *userPropertySettingsResource) Read(ctx context.Context, req resource.Re
 		usernamePropertySettings := userPropertySettings.GetUsernamePropertySettings()
 		state.UsernameProperty = &usernamePropertyModel{
 			DisplayName: types.StringValue(usernamePropertySettings.DisplayName),
-			InJwt: types.BoolValue(usernamePropertySettings.InJwt),
+			InJwt:       types.BoolValue(usernamePropertySettings.InJwt),
 		}
 	} else {
 		state.UsernameProperty = nil
@@ -394,13 +394,13 @@ func (r *userPropertySettingsResource) Read(ctx context.Context, req resource.Re
 	if userPropertySettings.PhoneNumberPropertyEnabled() {
 		phoneNumberPropertySettings := userPropertySettings.GetPhoneNumberPropertySettings()
 		state.PhoneNumberProperty = &phoneNumberPropertyModel{
-			DisplayName: types.StringValue(phoneNumberPropertySettings.DisplayName),
-			ShowInAccount: types.BoolValue(phoneNumberPropertySettings.ShowInAccount),
+			DisplayName:    types.StringValue(phoneNumberPropertySettings.DisplayName),
+			ShowInAccount:  types.BoolValue(phoneNumberPropertySettings.ShowInAccount),
 			CollectViaSaml: types.BoolValue(phoneNumberPropertySettings.CollectViaSaml),
-			Required: types.BoolValue(phoneNumberPropertySettings.Required),
-			RequiredBy: types.Int64Value(phoneNumberPropertySettings.RequiredBy),
-			UserWritable: types.StringValue(phoneNumberPropertySettings.UserWritable),
-			InJwt: types.BoolValue(phoneNumberPropertySettings.InJwt),
+			Required:       types.BoolValue(phoneNumberPropertySettings.Required),
+			RequiredBy:     types.Int64Value(phoneNumberPropertySettings.RequiredBy),
+			UserWritable:   types.StringValue(phoneNumberPropertySettings.UserWritable),
+			InJwt:          types.BoolValue(phoneNumberPropertySettings.InJwt),
 		}
 	} else {
 		state.PhoneNumberProperty = nil
@@ -411,15 +411,15 @@ func (r *userPropertySettingsResource) Read(ctx context.Context, req resource.Re
 		tosLinks := make([]tosLinkModel, len(tosPropertySettings.TosLinks))
 		for i, tosLink := range tosPropertySettings.TosLinks {
 			tosLinks[i] = tosLinkModel{
-				Url: types.StringValue(tosLink.Url),
+				Url:  types.StringValue(tosLink.Url),
 				Name: types.StringValue(tosLink.Name),
 			}
 		}
 		state.TosProperty = &tosPropertyModel{
-			InJwt: types.BoolValue(tosPropertySettings.InJwt),
-			Required: types.BoolValue(tosPropertySettings.Required),
+			InJwt:      types.BoolValue(tosPropertySettings.InJwt),
+			Required:   types.BoolValue(tosPropertySettings.Required),
 			RequiredBy: types.Int64Value(tosPropertySettings.RequiredBy),
-			TosLinks: tosLinks,
+			TosLinks:   tosLinks,
 		}
 	} else {
 		state.TosProperty = nil
@@ -432,13 +432,13 @@ func (r *userPropertySettingsResource) Read(ctx context.Context, req resource.Re
 			options[i] = types.StringValue(option)
 		}
 		state.ReferralSourceProperty = &referralSourcePropertyModel{
-			DisplayName: types.StringValue(referralSourcePropertySettings.DisplayName),
-			InJwt: types.BoolValue(referralSourcePropertySettings.InJwt),
-			Required: types.BoolValue(referralSourcePropertySettings.Required),
-			RequiredBy: types.Int64Value(referralSourcePropertySettings.RequiredBy),
-			UserWriteable: types.StringValue(referralSourcePropertySettings.UserWritable),
-			Options: options,
-			ShowInAccount: types.BoolValue(referralSourcePropertySettings.ShowInAccount),
+			DisplayName:    types.StringValue(referralSourcePropertySettings.DisplayName),
+			InJwt:          types.BoolValue(referralSourcePropertySettings.InJwt),
+			Required:       types.BoolValue(referralSourcePropertySettings.Required),
+			RequiredBy:     types.Int64Value(referralSourcePropertySettings.RequiredBy),
+			UserWriteable:  types.StringValue(referralSourcePropertySettings.UserWritable),
+			Options:        options,
+			ShowInAccount:  types.BoolValue(referralSourcePropertySettings.ShowInAccount),
 			CollectViaSaml: types.BoolValue(referralSourcePropertySettings.CollectViaSaml),
 		}
 	} else {
@@ -456,17 +456,17 @@ func (r *userPropertySettingsResource) Update(ctx context.Context, req resource.
 
 	// Read Terraform plan data into the model
 	diags := req.Plan.Get(ctx, &plan)
-    resp.Diagnostics.Append(diags...)
-    if resp.Diagnostics.HasError() {
-        return
-    }
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Fetch the current user property settings from PropelAuth
 	userPropertySettings, err := r.client.GetUserProperties()
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error Reading PropelAuth user properties settings",
-			"Could not read PropelAuth user properties settings: " + err.Error(),
+			"Could not read PropelAuth user properties settings: "+err.Error(),
 		)
 		return
 	}
@@ -475,7 +475,7 @@ func (r *userPropertySettingsResource) Update(ctx context.Context, req resource.
 	updateDefaultPropertiesFromPlan(&plan, userPropertySettings)
 	updateCustomPropertiesFromPlan(&plan, userPropertySettings)
 
-    _, err = r.client.UpdateUserProperties(userPropertySettings)
+	_, err = r.client.UpdateUserProperties(userPropertySettings)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error setting user properties settings",
@@ -507,7 +507,7 @@ func updateDefaultPropertiesFromPlan(plan *userPropertySettingsResourceModel, us
 
 	if plan.MetadataProperty != nil {
 		userPropertySettings.UpdateAndEnableMetadataProperty(propelauth.MetadataPropertySettings{
-			InJwt: plan.MetadataProperty.InJwt.ValueBool(),
+			InJwt:          plan.MetadataProperty.InJwt.ValueBool(),
 			CollectViaSaml: plan.MetadataProperty.CollectViaSaml.ValueBool(),
 		})
 	} else {
@@ -517,7 +517,7 @@ func updateDefaultPropertiesFromPlan(plan *userPropertySettingsResourceModel, us
 	if plan.UsernameProperty != nil {
 		userPropertySettings.UpdateAndEnableUsernameProperty(propelauth.UsernamePropertySettings{
 			DisplayName: plan.UsernameProperty.DisplayName.ValueString(),
-			InJwt: plan.UsernameProperty.InJwt.ValueBool(),
+			InJwt:       plan.UsernameProperty.InJwt.ValueBool(),
 		})
 	} else {
 		userPropertySettings.DisableUsernameProperty()
@@ -533,13 +533,13 @@ func updateDefaultPropertiesFromPlan(plan *userPropertySettingsResourceModel, us
 
 	if plan.PhoneNumberProperty != nil {
 		userPropertySettings.UpdateAndEnablePhoneNumberProperty(propelauth.PhoneNumberPropertySettings{
-			DisplayName: plan.PhoneNumberProperty.DisplayName.ValueString(),
-			ShowInAccount: plan.PhoneNumberProperty.ShowInAccount.ValueBool(),
+			DisplayName:    plan.PhoneNumberProperty.DisplayName.ValueString(),
+			ShowInAccount:  plan.PhoneNumberProperty.ShowInAccount.ValueBool(),
 			CollectViaSaml: plan.PhoneNumberProperty.CollectViaSaml.ValueBool(),
-			Required: plan.PhoneNumberProperty.Required.ValueBool(),
-			RequiredBy: plan.PhoneNumberProperty.RequiredBy.ValueInt64(),
-			UserWritable: plan.PhoneNumberProperty.UserWritable.ValueString(),
-			InJwt: plan.PhoneNumberProperty.InJwt.ValueBool(),
+			Required:       plan.PhoneNumberProperty.Required.ValueBool(),
+			RequiredBy:     plan.PhoneNumberProperty.RequiredBy.ValueInt64(),
+			UserWritable:   plan.PhoneNumberProperty.UserWritable.ValueString(),
+			InJwt:          plan.PhoneNumberProperty.InJwt.ValueBool(),
 		})
 	} else {
 		userPropertySettings.DisablePhoneNumberProperty()
@@ -547,14 +547,14 @@ func updateDefaultPropertiesFromPlan(plan *userPropertySettingsResourceModel, us
 
 	if plan.TosProperty != nil {
 		tosPropertySettings := propelauth.TosPropertySettings{
-			InJwt: plan.TosProperty.InJwt.ValueBool(),
-			Required: plan.TosProperty.Required.ValueBool(),
+			InJwt:      plan.TosProperty.InJwt.ValueBool(),
+			Required:   plan.TosProperty.Required.ValueBool(),
 			RequiredBy: plan.TosProperty.RequiredBy.ValueInt64(),
-			TosLinks: make([]propelauth.TosLink, len(plan.TosProperty.TosLinks)),
+			TosLinks:   make([]propelauth.TosLink, len(plan.TosProperty.TosLinks)),
 		}
 		for i, tosLink := range plan.TosProperty.TosLinks {
 			tosPropertySettings.TosLinks[i] = propelauth.TosLink{
-				Url: tosLink.Url.ValueString(),
+				Url:  tosLink.Url.ValueString(),
 				Name: tosLink.Name.ValueString(),
 			}
 		}
@@ -565,14 +565,14 @@ func updateDefaultPropertiesFromPlan(plan *userPropertySettingsResourceModel, us
 
 	if plan.ReferralSourceProperty != nil {
 		referralSourcePropertySettings := propelauth.ReferralSourcePropertySettings{
-			DisplayName: plan.ReferralSourceProperty.DisplayName.ValueString(),
-			InJwt: plan.ReferralSourceProperty.InJwt.ValueBool(),
-			Required: plan.ReferralSourceProperty.Required.ValueBool(),
-			RequiredBy: plan.ReferralSourceProperty.RequiredBy.ValueInt64(),
-			UserWritable: plan.ReferralSourceProperty.UserWriteable.ValueString(),
-			ShowInAccount: plan.ReferralSourceProperty.ShowInAccount.ValueBool(),
+			DisplayName:    plan.ReferralSourceProperty.DisplayName.ValueString(),
+			InJwt:          plan.ReferralSourceProperty.InJwt.ValueBool(),
+			Required:       plan.ReferralSourceProperty.Required.ValueBool(),
+			RequiredBy:     plan.ReferralSourceProperty.RequiredBy.ValueInt64(),
+			UserWritable:   plan.ReferralSourceProperty.UserWriteable.ValueString(),
+			ShowInAccount:  plan.ReferralSourceProperty.ShowInAccount.ValueBool(),
 			CollectViaSaml: plan.ReferralSourceProperty.CollectViaSaml.ValueBool(),
-			Options: make([]string, len(plan.ReferralSourceProperty.Options)),
+			Options:        make([]string, len(plan.ReferralSourceProperty.Options)),
 		}
 		for i, option := range plan.ReferralSourceProperty.Options {
 			referralSourcePropertySettings.Options[i] = option.ValueString()
@@ -587,25 +587,25 @@ func updateCustomPropertiesFromPlan(plan *userPropertySettingsResourceModel, use
 	customPropertyUpdates := make([]propelauth.CustomPropertySettings, len(plan.CustomProperties))
 	for i, customProperty := range plan.CustomProperties {
 		customPropertyUpdate := propelauth.CustomPropertySettings{
-			Name: customProperty.Name.ValueString(),
-			DisplayName: customProperty.DisplayName.ValueString(),
-			FieldType: customProperty.FieldType.ValueString(),
-			Required: customProperty.Required.ValueBool(),
-			RequiredBy: customProperty.RequiredBy.ValueInt64(),
-			InJwt: customProperty.InJwt.ValueBool(),
-			IsUserFacing: customProperty.IsUserFacing.ValueBool(),
+			Name:            customProperty.Name.ValueString(),
+			DisplayName:     customProperty.DisplayName.ValueString(),
+			FieldType:       customProperty.FieldType.ValueString(),
+			Required:        customProperty.Required.ValueBool(),
+			RequiredBy:      customProperty.RequiredBy.ValueInt64(),
+			InJwt:           customProperty.InJwt.ValueBool(),
+			IsUserFacing:    customProperty.IsUserFacing.ValueBool(),
 			CollectOnSignup: customProperty.CollectOnSignup.ValueBool(),
-			CollectViaSaml: customProperty.CollectViaSaml.ValueBool(),
-			ShowInAccount: customProperty.ShowInAccount.ValueBool(),
-			UserWritable: customProperty.UserWritable.ValueString(),
-			EnumValues: make([]string, len(customProperty.EnumValues)),
+			CollectViaSaml:  customProperty.CollectViaSaml.ValueBool(),
+			ShowInAccount:   customProperty.ShowInAccount.ValueBool(),
+			UserWritable:    customProperty.UserWritable.ValueString(),
+			EnumValues:      make([]string, len(customProperty.EnumValues)),
 		}
 		for j, enumValue := range customProperty.EnumValues {
 			customPropertyUpdate.EnumValues[j] = enumValue.ValueString()
 		}
 		customPropertyUpdates[i] = customPropertyUpdate
 	}
-	
+
 	for _, customPropertyUpdate := range customPropertyUpdates {
 		userPropertySettings.UpsertCustomProperty(customPropertyUpdate)
 	}
@@ -643,17 +643,17 @@ func reconcileCustomProperties(state *userPropertySettingsResourceModel, userPro
 
 func convertCustomPropertyToModel(customProperty *propelauth.CustomPropertySettings) customPropertyModel {
 	customPropertyModel := customPropertyModel{
-		Name: types.StringValue(customProperty.Name),
-		DisplayName: types.StringValue(customProperty.DisplayName),
-		FieldType: types.StringValue(customProperty.FieldType),
-		Required: types.BoolValue(customProperty.Required),
-		RequiredBy: types.Int64Value(customProperty.RequiredBy),
-		InJwt: types.BoolValue(customProperty.InJwt),
-		IsUserFacing: types.BoolValue(customProperty.IsUserFacing),
+		Name:            types.StringValue(customProperty.Name),
+		DisplayName:     types.StringValue(customProperty.DisplayName),
+		FieldType:       types.StringValue(customProperty.FieldType),
+		Required:        types.BoolValue(customProperty.Required),
+		RequiredBy:      types.Int64Value(customProperty.RequiredBy),
+		InJwt:           types.BoolValue(customProperty.InJwt),
+		IsUserFacing:    types.BoolValue(customProperty.IsUserFacing),
 		CollectOnSignup: types.BoolValue(customProperty.CollectOnSignup),
-		CollectViaSaml: types.BoolValue(customProperty.CollectViaSaml),
-		ShowInAccount: types.BoolValue(customProperty.ShowInAccount),
-		UserWritable: types.StringValue(customProperty.UserWritable),
+		CollectViaSaml:  types.BoolValue(customProperty.CollectViaSaml),
+		ShowInAccount:   types.BoolValue(customProperty.ShowInAccount),
+		UserWritable:    types.StringValue(customProperty.UserWritable),
 	}
 
 	if customProperty.FieldType == "Enum" {
@@ -669,17 +669,17 @@ func convertCustomPropertyToModel(customProperty *propelauth.CustomPropertySetti
 
 func convertCustomPropertyFromModel(customPropertyModel customPropertyModel) propelauth.CustomPropertySettings {
 	customProperty := propelauth.CustomPropertySettings{
-		Name: customPropertyModel.Name.ValueString(),
-		DisplayName: customPropertyModel.DisplayName.ValueString(),
-		FieldType: customPropertyModel.FieldType.ValueString(),
-		Required: customPropertyModel.Required.ValueBool(),
-		RequiredBy: customPropertyModel.RequiredBy.ValueInt64(),
-		InJwt: customPropertyModel.InJwt.ValueBool(),
-		IsUserFacing: customPropertyModel.IsUserFacing.ValueBool(),
+		Name:            customPropertyModel.Name.ValueString(),
+		DisplayName:     customPropertyModel.DisplayName.ValueString(),
+		FieldType:       customPropertyModel.FieldType.ValueString(),
+		Required:        customPropertyModel.Required.ValueBool(),
+		RequiredBy:      customPropertyModel.RequiredBy.ValueInt64(),
+		InJwt:           customPropertyModel.InJwt.ValueBool(),
+		IsUserFacing:    customPropertyModel.IsUserFacing.ValueBool(),
 		CollectOnSignup: customPropertyModel.CollectOnSignup.ValueBool(),
-		CollectViaSaml: customPropertyModel.CollectViaSaml.ValueBool(),
-		ShowInAccount: customPropertyModel.ShowInAccount.ValueBool(),
-		UserWritable: customPropertyModel.UserWritable.ValueString(),
+		CollectViaSaml:  customPropertyModel.CollectViaSaml.ValueBool(),
+		ShowInAccount:   customPropertyModel.ShowInAccount.ValueBool(),
+		UserWritable:    customPropertyModel.UserWritable.ValueString(),
 	}
 
 	if customPropertyModel.FieldType.ValueString() == "Enum" {
@@ -697,8 +697,8 @@ func inJwtAttribute(defaultValue bool) schema.Attribute {
 	return schema.BoolAttribute{
 		Optional: true,
 		Computed: true,
-		Default: booldefault.StaticBool(defaultValue),
-		Description: fmt.Sprintf("Whether the property should be included in the user token. " +
+		Default:  booldefault.StaticBool(defaultValue),
+		Description: fmt.Sprintf("Whether the property should be included in the user token. "+
 			"The default value is `%v`.", defaultValue),
 	}
 }
@@ -707,7 +707,7 @@ func collectViaSamlAttribute() schema.Attribute {
 	return schema.BoolAttribute{
 		Optional: true,
 		Computed: true,
-		Default: booldefault.StaticBool(false),
+		Default:  booldefault.StaticBool(false),
 		Description: "Whether the property should be collected for users during the enterprise SSO login flow. " +
 			"The default value is `false`.",
 	}
@@ -717,8 +717,8 @@ func displayNameAttribute(defaultValue string) schema.Attribute {
 	return schema.StringAttribute{
 		Optional: true,
 		Computed: true,
-		Default: stringdefault.StaticString(defaultValue),
-		Description: fmt.Sprintf("The field name users see in the UI for the property. " +
+		Default:  stringdefault.StaticString(defaultValue),
+		Description: fmt.Sprintf("The field name users see in the UI for the property. "+
 			"The default value is `%v`.", defaultValue),
 	}
 }
@@ -727,7 +727,7 @@ func requiredAttribute() schema.Attribute {
 	return schema.BoolAttribute{
 		Optional: true,
 		Computed: true,
-		Default: booldefault.StaticBool(true),
+		Default:  booldefault.StaticBool(true),
 		Description: "Whether the property is required for users. " +
 			"The default value is `true`.",
 	}
@@ -737,7 +737,7 @@ func requiredByAttribute() schema.Attribute {
 	return schema.Int64Attribute{
 		Optional: true,
 		Computed: true,
-		Default: int64default.StaticInt64(0),
+		Default:  int64default.StaticInt64(0),
 		Description: "In epoch time. Only accounts created after this time are required to " +
 			"provide this field. For example, a value of 0 means all accounts are required to provide " +
 			"this field. The default value is 0.",
@@ -748,12 +748,12 @@ func userWriteableAttribute(defaultValue string) schema.Attribute {
 	return schema.StringAttribute{
 		Optional: true,
 		Computed: true,
-		Default: stringdefault.StaticString(defaultValue),
+		Default:  stringdefault.StaticString(defaultValue),
 		Validators: []validator.String{
 			stringvalidator.OneOf("Write", "Read", "WriteIfUnset"),
 		},
-		Description: fmt.Sprintf("This setting determines whether the user can edit the value of the property " +
-			"and how many times. Options are `Write`, `Read`, and `WriteIfUnset`. The default value is `%v`", 
+		Description: fmt.Sprintf("This setting determines whether the user can edit the value of the property "+
+			"and how many times. Options are `Write`, `Read`, and `WriteIfUnset`. The default value is `%v`",
 			defaultValue),
 	}
 }
@@ -762,8 +762,8 @@ func showInAccountAttribute(defaultValue bool) schema.Attribute {
 	return schema.BoolAttribute{
 		Optional: true,
 		Computed: true,
-		Default: booldefault.StaticBool(defaultValue),
-		Description: fmt.Sprintf("Whether the property should be displayed in the user's account page hosted by " +
+		Default:  booldefault.StaticBool(defaultValue),
+		Description: fmt.Sprintf("Whether the property should be displayed in the user's account page hosted by "+
 			"PropelAuth. The default value is `%v`.", defaultValue),
 	}
 }

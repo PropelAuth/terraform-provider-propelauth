@@ -19,13 +19,13 @@ type PropelAuthClient struct {
 }
 
 type PropelAuthApiError struct {
-	ErrorCode string `json:"error_code"`
-	UserFacingError string `json:"user_facing_error"`
-	FieldErrors map[string][]string `json:"field_errors"`
+	ErrorCode        string              `json:"error_code"`
+	UserFacingError  string              `json:"user_facing_error"`
+	FieldErrors      map[string][]string `json:"field_errors"`
 	UserFacingErrors map[string][]string `json:"user_facing_errors"`
 }
 
-func convertStringErrorToPropelAuthError (errBytes []byte) (*PropelAuthApiError, error) {
+func convertStringErrorToPropelAuthError(errBytes []byte) (*PropelAuthApiError, error) {
 	propelAuthApiError := PropelAuthApiError{}
 	unmarshalError := json.Unmarshal(errBytes, &propelAuthApiError)
 	if unmarshalError != nil {

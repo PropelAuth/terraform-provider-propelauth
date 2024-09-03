@@ -16,17 +16,17 @@ func TestAccUserPropertySettingsResource(t *testing.T) {
 				Config: testAccUserPropertySettingsResourceConfig(false, "https://example.com/tos", "Birthday"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr(
-						"propelauth_user_property_settings.test", 
+						"propelauth_user_property_settings.test",
 						"phone_number_property.in_jwt",
 						"false",
 					),
 					resource.TestCheckResourceAttr(
-						"propelauth_user_property_settings.test", 
+						"propelauth_user_property_settings.test",
 						"tos_property.tos_links.0.url",
 						"https://example.com/tos",
 					),
 					resource.TestCheckResourceAttr(
-						"propelauth_user_property_settings.test", 
+						"propelauth_user_property_settings.test",
 						"custom_properties.0.display_name",
 						"Birthday",
 					),
@@ -37,17 +37,17 @@ func TestAccUserPropertySettingsResource(t *testing.T) {
 				Config: testAccUserPropertySettingsResourceConfig(true, "https://example.com/tos/v2", "Name Day"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr(
-						"propelauth_user_property_settings.test", 
+						"propelauth_user_property_settings.test",
 						"phone_number_property.in_jwt",
 						"true",
 					),
 					resource.TestCheckResourceAttr(
-						"propelauth_user_property_settings.test", 
+						"propelauth_user_property_settings.test",
 						"tos_property.tos_links.0.url",
 						"https://example.com/tos/v2",
 					),
 					resource.TestCheckResourceAttr(
-						"propelauth_user_property_settings.test", 
+						"propelauth_user_property_settings.test",
 						"custom_properties.0.display_name",
 						"Name Day",
 					),

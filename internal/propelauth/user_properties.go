@@ -89,7 +89,7 @@ func (up *UserProperties) GetNamePropertySettings() NamePropertySettings {
 }
 
 type MetadataPropertySettings struct {
-	InJwt bool
+	InJwt          bool
 	CollectViaSaml bool
 }
 
@@ -119,7 +119,7 @@ func (up *UserProperties) GetMetadataPropertySettings() MetadataPropertySettings
 	for i := range up.Fields {
 		if up.Fields[i].Name == "metadata" {
 			return MetadataPropertySettings{
-				InJwt: up.Fields[i].InJwt,
+				InJwt:          up.Fields[i].InJwt,
 				CollectViaSaml: up.Fields[i].CollectViaSaml,
 			}
 		}
@@ -128,7 +128,7 @@ func (up *UserProperties) GetMetadataPropertySettings() MetadataPropertySettings
 }
 
 type UsernamePropertySettings struct {
-	InJwt bool
+	InJwt       bool
 	DisplayName string
 }
 
@@ -158,7 +158,7 @@ func (up *UserProperties) GetUsernamePropertySettings() UsernamePropertySettings
 	for i := range up.Fields {
 		if up.Fields[i].Name == "legacy__username" {
 			return UsernamePropertySettings{
-				InJwt: up.Fields[i].InJwt,
+				InJwt:       up.Fields[i].InJwt,
 				DisplayName: up.Fields[i].DisplayName,
 			}
 		}
@@ -203,13 +203,13 @@ func (up *UserProperties) GetPictureUrlPropertySettings() PictureUrlPropertySett
 }
 
 type PhoneNumberPropertySettings struct {
-	InJwt bool
-	DisplayName string
-	ShowInAccount bool
+	InJwt          bool
+	DisplayName    string
+	ShowInAccount  bool
 	CollectViaSaml bool
-	Required bool
-	RequiredBy int64
-	UserWritable string
+	Required       bool
+	RequiredBy     int64
+	UserWritable   string
 }
 
 // UpdatePhoneNumberProperty - Updates the phone number property and sets it to enabled.
@@ -243,13 +243,13 @@ func (up *UserProperties) GetPhoneNumberPropertySettings() PhoneNumberPropertySe
 	for i := range up.Fields {
 		if up.Fields[i].Name == "phone_number" {
 			return PhoneNumberPropertySettings{
-				InJwt: up.Fields[i].InJwt,
-				DisplayName: up.Fields[i].DisplayName,
-				ShowInAccount: up.Fields[i].ShowInAccount,
+				InJwt:          up.Fields[i].InJwt,
+				DisplayName:    up.Fields[i].DisplayName,
+				ShowInAccount:  up.Fields[i].ShowInAccount,
 				CollectViaSaml: up.Fields[i].CollectViaSaml,
-				Required: up.Fields[i].Required,
-				RequiredBy: up.Fields[i].RequiredBy,
-				UserWritable: up.Fields[i].UserWritable,
+				Required:       up.Fields[i].Required,
+				RequiredBy:     up.Fields[i].RequiredBy,
+				UserWritable:   up.Fields[i].UserWritable,
 			}
 		}
 	}
@@ -257,10 +257,10 @@ func (up *UserProperties) GetPhoneNumberPropertySettings() PhoneNumberPropertySe
 }
 
 type TosPropertySettings struct {
-	InJwt bool
-	Required bool
+	InJwt      bool
+	Required   bool
 	RequiredBy int64
-	TosLinks []TosLink
+	TosLinks   []TosLink
 }
 
 // UpdateTosProperty - Updates the TOS property and sets it to enabled.
@@ -293,10 +293,10 @@ func (up *UserProperties) GetTosPropertySettings() TosPropertySettings {
 	for i := range up.Fields {
 		if up.Fields[i].Name == "tos" {
 			return TosPropertySettings{
-				InJwt: up.Fields[i].InJwt,
-				Required: up.Fields[i].Required,
+				InJwt:      up.Fields[i].InJwt,
+				Required:   up.Fields[i].Required,
 				RequiredBy: up.Fields[i].RequiredBy,
-				TosLinks: up.Fields[i].Metadata.TosLinks,
+				TosLinks:   up.Fields[i].Metadata.TosLinks,
 			}
 		}
 	}
@@ -304,13 +304,13 @@ func (up *UserProperties) GetTosPropertySettings() TosPropertySettings {
 }
 
 type ReferralSourcePropertySettings struct {
-	InJwt bool
-	DisplayName string
-	Required bool
-	RequiredBy int64
-	UserWritable string
-	Options []string
-	ShowInAccount bool
+	InJwt          bool
+	DisplayName    string
+	Required       bool
+	RequiredBy     int64
+	UserWritable   string
+	Options        []string
+	ShowInAccount  bool
 	CollectViaSaml bool
 }
 
@@ -348,13 +348,13 @@ func (up *UserProperties) GetReferralSourcePropertySettings() ReferralSourceProp
 	for i := range up.Fields {
 		if up.Fields[i].Name == "referral_source" {
 			return ReferralSourcePropertySettings{
-				InJwt: up.Fields[i].InJwt,
-				DisplayName: up.Fields[i].DisplayName,
-				Required: up.Fields[i].Required,
-				RequiredBy: up.Fields[i].RequiredBy,
-				UserWritable: up.Fields[i].UserWritable,
-				Options: up.Fields[i].Metadata.EnumValues,
-				ShowInAccount: up.Fields[i].ShowInAccount,
+				InJwt:          up.Fields[i].InJwt,
+				DisplayName:    up.Fields[i].DisplayName,
+				Required:       up.Fields[i].Required,
+				RequiredBy:     up.Fields[i].RequiredBy,
+				UserWritable:   up.Fields[i].UserWritable,
+				Options:        up.Fields[i].Metadata.EnumValues,
+				ShowInAccount:  up.Fields[i].ShowInAccount,
 				CollectViaSaml: up.Fields[i].CollectViaSaml,
 			}
 		}
@@ -363,18 +363,18 @@ func (up *UserProperties) GetReferralSourcePropertySettings() ReferralSourceProp
 }
 
 type CustomPropertySettings struct {
-	Name string
-	DisplayName string
-	FieldType string
-	Required bool
-	RequiredBy int64
-	InJwt bool
-	IsUserFacing bool
+	Name            string
+	DisplayName     string
+	FieldType       string
+	Required        bool
+	RequiredBy      int64
+	InJwt           bool
+	IsUserFacing    bool
 	CollectOnSignup bool
-	CollectViaSaml bool
-	ShowInAccount bool
-	UserWritable string
-	EnumValues []string
+	CollectViaSaml  bool
+	ShowInAccount   bool
+	UserWritable    string
+	EnumValues      []string
 }
 
 func (c *CustomPropertySettings) IsEqual(other CustomPropertySettings) bool {
@@ -402,7 +402,6 @@ func (c *CustomPropertySettings) IsEqual(other CustomPropertySettings) bool {
 	return true
 }
 
-
 // UpsertCustomProperty - Upserts a custom property.
 func (up *UserProperties) UpsertCustomProperty(customProperty CustomPropertySettings) {
 	for i := range up.Fields {
@@ -425,17 +424,17 @@ func (up *UserProperties) UpsertCustomProperty(customProperty CustomPropertySett
 		}
 	}
 	up.Fields = append(up.Fields, UserProperty{
-		Name: customProperty.Name,
-		DisplayName: customProperty.DisplayName,
-		FieldType: customProperty.FieldType,
-		Required: customProperty.Required,
-		RequiredBy: customProperty.RequiredBy,
-		InJwt: customProperty.InJwt,
-		IsUserFacing: customProperty.IsUserFacing,
+		Name:            customProperty.Name,
+		DisplayName:     customProperty.DisplayName,
+		FieldType:       customProperty.FieldType,
+		Required:        customProperty.Required,
+		RequiredBy:      customProperty.RequiredBy,
+		InJwt:           customProperty.InJwt,
+		IsUserFacing:    customProperty.IsUserFacing,
 		CollectOnSignup: customProperty.CollectOnSignup,
-		CollectViaSaml: customProperty.CollectViaSaml,
-		ShowInAccount: customProperty.ShowInAccount,
-		UserWritable: customProperty.UserWritable,
+		CollectViaSaml:  customProperty.CollectViaSaml,
+		ShowInAccount:   customProperty.ShowInAccount,
+		UserWritable:    customProperty.UserWritable,
 		Metadata: userPropertyMetadata{
 			EnumValues: customProperty.EnumValues,
 		},
@@ -458,18 +457,18 @@ func (up *UserProperties) GetEnabledCustomProperties() []CustomPropertySettings 
 	for i := range up.Fields {
 		if !isDefaultPropertyName(up.Fields[i].Name) && up.Fields[i].IsEnabled {
 			enabledCustomProperties = append(enabledCustomProperties, CustomPropertySettings{
-				Name: up.Fields[i].Name,
-				DisplayName: up.Fields[i].DisplayName,
-				FieldType: up.Fields[i].FieldType,
-				Required: up.Fields[i].Required,
-				RequiredBy: up.Fields[i].RequiredBy,
-				InJwt: up.Fields[i].InJwt,
-				IsUserFacing: up.Fields[i].IsUserFacing,
+				Name:            up.Fields[i].Name,
+				DisplayName:     up.Fields[i].DisplayName,
+				FieldType:       up.Fields[i].FieldType,
+				Required:        up.Fields[i].Required,
+				RequiredBy:      up.Fields[i].RequiredBy,
+				InJwt:           up.Fields[i].InJwt,
+				IsUserFacing:    up.Fields[i].IsUserFacing,
 				CollectOnSignup: up.Fields[i].CollectOnSignup,
-				CollectViaSaml: up.Fields[i].CollectViaSaml,
-				ShowInAccount: up.Fields[i].ShowInAccount,
-				UserWritable: up.Fields[i].UserWritable,
-				EnumValues: up.Fields[i].Metadata.EnumValues,
+				CollectViaSaml:  up.Fields[i].CollectViaSaml,
+				ShowInAccount:   up.Fields[i].ShowInAccount,
+				UserWritable:    up.Fields[i].UserWritable,
+				EnumValues:      up.Fields[i].Metadata.EnumValues,
 			})
 		}
 	}
@@ -484,18 +483,18 @@ func (up *UserProperties) GetEnabledCustomProperty(propertyName string) (CustomP
 	for i := range up.Fields {
 		if up.Fields[i].Name == propertyName && up.Fields[i].IsEnabled {
 			return CustomPropertySettings{
-				Name: up.Fields[i].Name,
-				DisplayName: up.Fields[i].DisplayName,
-				FieldType: up.Fields[i].FieldType,
-				Required: up.Fields[i].Required,
-				RequiredBy: up.Fields[i].RequiredBy,
-				InJwt: up.Fields[i].InJwt,
-				IsUserFacing: up.Fields[i].IsUserFacing,
+				Name:            up.Fields[i].Name,
+				DisplayName:     up.Fields[i].DisplayName,
+				FieldType:       up.Fields[i].FieldType,
+				Required:        up.Fields[i].Required,
+				RequiredBy:      up.Fields[i].RequiredBy,
+				InJwt:           up.Fields[i].InJwt,
+				IsUserFacing:    up.Fields[i].IsUserFacing,
 				CollectOnSignup: up.Fields[i].CollectOnSignup,
-				CollectViaSaml: up.Fields[i].CollectViaSaml,
-				ShowInAccount: up.Fields[i].ShowInAccount,
-				UserWritable: up.Fields[i].UserWritable,
-				EnumValues: up.Fields[i].Metadata.EnumValues,
+				CollectViaSaml:  up.Fields[i].CollectViaSaml,
+				ShowInAccount:   up.Fields[i].ShowInAccount,
+				UserWritable:    up.Fields[i].UserWritable,
+				EnumValues:      up.Fields[i].Metadata.EnumValues,
 			}, true
 		}
 	}
@@ -508,34 +507,33 @@ func (up *UserProperties) GetHangingCustomProperties(customPropertiesInState []s
 	for i := range up.Fields {
 		if !Contains(customPropertiesInState, up.Fields[i].Name) && !isDefaultPropertyName(up.Fields[i].Name) && up.Fields[i].IsEnabled {
 			hangingCustomProperties = append(hangingCustomProperties, CustomPropertySettings{
-				Name: up.Fields[i].Name,
-				DisplayName: up.Fields[i].DisplayName,
-				FieldType: up.Fields[i].FieldType,
-				Required: up.Fields[i].Required,
-				RequiredBy: up.Fields[i].RequiredBy,
-				InJwt: up.Fields[i].InJwt,
-				IsUserFacing: up.Fields[i].IsUserFacing,
+				Name:            up.Fields[i].Name,
+				DisplayName:     up.Fields[i].DisplayName,
+				FieldType:       up.Fields[i].FieldType,
+				Required:        up.Fields[i].Required,
+				RequiredBy:      up.Fields[i].RequiredBy,
+				InJwt:           up.Fields[i].InJwt,
+				IsUserFacing:    up.Fields[i].IsUserFacing,
 				CollectOnSignup: up.Fields[i].CollectOnSignup,
-				CollectViaSaml: up.Fields[i].CollectViaSaml,
-				ShowInAccount: up.Fields[i].ShowInAccount,
-				UserWritable: up.Fields[i].UserWritable,
-				EnumValues: up.Fields[i].Metadata.EnumValues,
+				CollectViaSaml:  up.Fields[i].CollectViaSaml,
+				ShowInAccount:   up.Fields[i].ShowInAccount,
+				UserWritable:    up.Fields[i].UserWritable,
+				EnumValues:      up.Fields[i].Metadata.EnumValues,
 			})
 		}
 	}
 	return hangingCustomProperties
 }
 
-
 // internal helper functions
 
 func containsName(slice []CustomPropertySettings, target string) bool {
-    for _, s := range slice {
-        if s.Name == target {
-            return true
-        }
-    }
-    return false
+	for _, s := range slice {
+		if s.Name == target {
+			return true
+		}
+	}
+	return false
 }
 
 func isDefaultPropertyName(name string) bool {

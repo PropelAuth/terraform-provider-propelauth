@@ -14,7 +14,7 @@ import (
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &projectInfoResource{}
-var _ resource.ResourceWithConfigure   = &projectInfoResource{}
+var _ resource.ResourceWithConfigure = &projectInfoResource{}
 
 func NewProjectInfoResource() resource.Resource {
 	return &projectInfoResource{}
@@ -40,8 +40,8 @@ func (r *projectInfoResource) Schema(ctx context.Context, req resource.SchemaReq
 		Description: "Project Info resource. This is for configuring the basic project information in PropelAuth.",
 		Attributes: map[string]schema.Attribute{
 			"name": schema.StringAttribute{
-				Optional:            true,
-				Computed:            true,
+				Optional:    true,
+				Computed:    true,
 				Description: "The project's name. It will be used in emails and hosted page titles.",
 			},
 		},
@@ -73,22 +73,21 @@ func (r *projectInfoResource) Create(ctx context.Context, req resource.CreateReq
 
 	// Read Terraform plan data into the model
 	diags := req.Plan.Get(ctx, &plan)
-    resp.Diagnostics.Append(diags...)
-    if resp.Diagnostics.HasError() {
-        return
-    }
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Update the project info
 	name := plan.Name.ValueString()
-    projectInfoResponse, err := r.client.UpdateProjectInfo(&name)
-    if err != nil {
-        resp.Diagnostics.AddError(
-            "Error setting project info",
-            "Could not set project info, unexpected error: "+err.Error(),
-        )
-        return
-    }
-
+	projectInfoResponse, err := r.client.UpdateProjectInfo(&name)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error setting project info",
+			"Could not set project info, unexpected error: "+err.Error(),
+		)
+		return
+	}
 
 	// save into the Terraform state.
 	plan.Name = types.StringValue(projectInfoResponse.Name)
@@ -112,12 +111,12 @@ func (r *projectInfoResource) Read(ctx context.Context, req resource.ReadRequest
 	// retrieve the project info from PropelAuth
 	project_info, err := r.client.GetProjectInfo()
 	if err != nil {
-        resp.Diagnostics.AddError(
-            "Error Reading PropelAuth Project Info",
-            "Could not read PropelAuth Project Info: " + err.Error(),
-        )
-        return
-    }
+		resp.Diagnostics.AddError(
+			"Error Reading PropelAuth Project Info",
+			"Could not read PropelAuth Project Info: "+err.Error(),
+		)
+		return
+	}
 
 	// overwrite project info
 	state.Name = types.StringValue(project_info.Name)
@@ -135,19 +134,19 @@ func (r *projectInfoResource) Update(ctx context.Context, req resource.UpdateReq
 
 	// Update the project info
 	name := plan.Name.ValueString()
-    projectInfoResponse, err := r.client.UpdateProjectInfo(&name)
-    if err != nil {
-        resp.Diagnostics.AddError(
-            "Error setting project info",
-            "Could not set project info, unexpected error: "+err.Error(),
-        )
-        return
-    }
+	projectInfoResponse, err := r.client.UpdateProjectInfo(&name)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error setting project info",
+			"Could not set project info, unexpected error: "+err.Error(),
+		)
+		return
+	}
 
 	if name != projectInfoResponse.Name {
 		resp.Diagnostics.AddError(
 			"Error updating project info",
-			"Project name failed to update. The `name` is instead " + projectInfoResponse.Name,
+			"Project name failed to update. The `name` is instead "+projectInfoResponse.Name,
 		)
 		return
 	}
