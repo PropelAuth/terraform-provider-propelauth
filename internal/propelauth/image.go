@@ -11,7 +11,7 @@ import (
 	"runtime"
 )
 
-// UploadImage - Uploads an image to the project and returns the the new image_id
+// UploadImage - Uploads an image to the project and returns the the new image_id.
 func (c *PropelAuthClient) UploadImage(imageType string, pathToLocalImage string) (*ImageUploadResponse, error) {
 	path := fmt.Sprintf("image/%s", imageType)
 	url := c.assembleURL(path, nil)

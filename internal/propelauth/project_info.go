@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 )
 
-// GetProjectInfo - Returns a project metadata
+// GetProjectInfo - Returns a project metadata.
 func (c *PropelAuthClient) GetProjectInfo() (*ProjectInfoResponse, error) {
 	res, err := c.get("info", nil)
 	if err != nil {
@@ -20,7 +20,7 @@ func (c *PropelAuthClient) GetProjectInfo() (*ProjectInfoResponse, error) {
 	return &projectInfo, nil
 }
 
-// UpdateProjectInfo - Updates the project's metadata -- principally the name
+// UpdateProjectInfo - Updates the project's metadata -- principally the name.
 func (c *PropelAuthClient) UpdateProjectInfo(name *string) (*ProjectInfoResponse, error) {
 	projectInfo := ProjectInfoUpdateRequest{
 		Name: *name,

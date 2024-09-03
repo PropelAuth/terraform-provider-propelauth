@@ -12,14 +12,13 @@ provider "propelauth" {
   #   api_key    = "<PROPELAUTH_API_KEY>"    # or PROPELAUTH_API_KEY environment variable
 }
 
-resource "propelauth_organization_configuration" "my_org_configuration" {
-  has_orgs                        = true
-  orgs_metaname                   = "Company"
-  max_num_orgs_users_can_be_in    = 1
-  users_can_delete_their_own_orgs = true
-  orgs_can_require_2fa            = true
+resource "propelauth_be_api_key" "my_be_api_key" {
+  environment = "Test"
+  name        = "My API Key"
+  read_only   = false
 }
 
-output "org_configuration_result" {
-  value = propelauth_organization_configuration.my_org_configuration
+output "be_api_key_result" {
+  value     = propelauth_be_api_key.my_be_api_key
+  sensitive = true
 }
