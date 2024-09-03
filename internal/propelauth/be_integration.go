@@ -8,7 +8,7 @@ import (
 
 // GetBeIntegrationInfo - Returns the BE integration info for the requested environment.
 func (c *PropelAuthClient) GetBeIntegrationInfo(environment string) (*BeIntegrationInfo, error) {
-	res, err := c.get("be_integration", nil)
+	res, err := c.get("be_integration")
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +35,6 @@ func (c *PropelAuthClient) GetBeIntegrationInfo(environment string) (*BeIntegrat
 func (c *PropelAuthClient) GetBeApiKeyInfo(environment string, apiKeyID string) (*BeApiKey, error) {
 	res, err := c.get(
 		fmt.Sprintf("%v/be_integration/api_key/%v", strings.ToLower(environment), apiKeyID),
-		nil,
 	)
 	if err != nil {
 		return nil, err

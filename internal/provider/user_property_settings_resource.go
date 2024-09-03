@@ -133,7 +133,7 @@ func (r *userPropertySettingsResource) Schema(ctx context.Context, req resource.
 				Description: "Settings for the user's metadata property. If no block is provided, the metadata property will be disabled.",
 				Attributes: map[string]schema.Attribute{
 					"in_jwt": inJwtAttribute(true),
-					"collect_via_saml": collectViaSamlAttribute(false),
+					"collect_via_saml": collectViaSamlAttribute(),
 				},
 			},
 			"username_property": schema.SingleNestedAttribute{
@@ -156,8 +156,8 @@ func (r *userPropertySettingsResource) Schema(ctx context.Context, req resource.
 				Description: "Settings for the user's Terms of Service property. If no block is provided, the terms of service property will be disabled.",
 				Attributes: map[string]schema.Attribute{
 					"in_jwt": inJwtAttribute(false),
-					"required": requiredAttribute(true),
-					"required_by": requiredByAttribute(0),
+					"required": requiredAttribute(),
+					"required_by": requiredByAttribute(),
 					"tos_links": schema.ListNestedAttribute{
 						Optional: true,
 						Description: "A list of Terms of Service links. Each link must have a URL and a name.",
@@ -182,11 +182,11 @@ func (r *userPropertySettingsResource) Schema(ctx context.Context, req resource.
 				Attributes: map[string]schema.Attribute{
 					"display_name": displayNameAttribute("How did you hear about us?"),
 					"in_jwt": inJwtAttribute(true),
-					"required": requiredAttribute(true),
-					"required_by": requiredByAttribute(0),
+					"required": requiredAttribute(),
+					"required_by": requiredByAttribute(),
 					"user_writable": userWriteableAttribute("WriteIfUnset"),
 					"show_in_account": showInAccountAttribute(false),
-					"collect_via_saml": collectViaSamlAttribute(false),
+					"collect_via_saml": collectViaSamlAttribute(),
 					"options": schema.ListAttribute{
 						Optional: true,
 						Computed: true,
@@ -212,9 +212,9 @@ func (r *userPropertySettingsResource) Schema(ctx context.Context, req resource.
 				Attributes: map[string]schema.Attribute{
 					"display_name": displayNameAttribute("Phone number"),
 					"show_in_account": showInAccountAttribute(false),
-					"collect_via_saml": collectViaSamlAttribute(false),
-					"required": requiredAttribute(true),
-					"required_by": requiredByAttribute(0),
+					"collect_via_saml": collectViaSamlAttribute(),
+					"required": requiredAttribute(),
+					"required_by": requiredByAttribute(),
 					"user_writable": userWriteableAttribute("WriteIfUnset"),
 					"in_jwt": inJwtAttribute(false),
 				},
@@ -241,8 +241,8 @@ func (r *userPropertySettingsResource) Schema(ctx context.Context, req resource.
 								stringvalidator.OneOf("Checkbox", "Date", "Enum", "Integer", "Json", "LongText", "Text", "Toggle", "Url"),
 							},
 						},
-						"required": requiredAttribute(true),
-						"required_by": requiredByAttribute(0),
+						"required": requiredAttribute(),
+						"required_by": requiredByAttribute(),
 						"in_jwt": inJwtAttribute(true),
 						"is_user_facing": schema.BoolAttribute{
 							Optional: true,
@@ -258,7 +258,7 @@ func (r *userPropertySettingsResource) Schema(ctx context.Context, req resource.
 							Description: "Whether the property should be collected from new users during the sign up flow. " +
 								"The default value is `true`.",
 						},
-						"collect_via_saml": collectViaSamlAttribute(false),
+						"collect_via_saml": collectViaSamlAttribute(),
 						"show_in_account": showInAccountAttribute(true),
 						"user_writable": userWriteableAttribute("Write"),
 						"enum_values": schema.ListAttribute{
@@ -631,7 +631,7 @@ func reconcileCustomProperties(state *userPropertySettingsResourceModel, userPro
 	}
 
 	hangingCustomProperties := userPropertySettings.GetHangingCustomProperties(customPropertyNamesInState)
-	convertedCustomPropertiesFromHanging := make([]customPropertyModel, len(hangingCustomProperties))
+	convertedCustomPropertiesFromHanging := make([]customPropertyModel, 0, len(hangingCustomProperties))
 
 	for _, hangingCustomProperty := range hangingCustomProperties {
 		convertedCustomProperty := convertCustomPropertyToModel(&hangingCustomProperty)
@@ -703,13 +703,13 @@ func inJwtAttribute(defaultValue bool) schema.Attribute {
 	}
 }
 
-func collectViaSamlAttribute(defaultValue bool) schema.Attribute {
+func collectViaSamlAttribute() schema.Attribute {
 	return schema.BoolAttribute{
 		Optional: true,
 		Computed: true,
-		Default: booldefault.StaticBool(defaultValue),
-		Description: fmt.Sprintf("Whether the property should be collected for users during the enterprise SSO login flow. " +
-			"The default value is `%v`.", defaultValue),
+		Default: booldefault.StaticBool(false),
+		Description: "Whether the property should be collected for users during the enterprise SSO login flow. " +
+			"The default value is `false`.",
 	}
 }
 
@@ -723,24 +723,24 @@ func displayNameAttribute(defaultValue string) schema.Attribute {
 	}
 }
 
-func requiredAttribute(defaultValue bool) schema.Attribute {
+func requiredAttribute() schema.Attribute {
 	return schema.BoolAttribute{
 		Optional: true,
 		Computed: true,
-		Default: booldefault.StaticBool(defaultValue),
-		Description: fmt.Sprintf("Whether the property is required for users. " +
-			"The default value is `%v`.", defaultValue),
+		Default: booldefault.StaticBool(true),
+		Description: "Whether the property is required for users. " +
+			"The default value is `true`.",
 	}
 }
 
-func requiredByAttribute(defaultValue int64) schema.Attribute {
+func requiredByAttribute() schema.Attribute {
 	return schema.Int64Attribute{
 		Optional: true,
 		Computed: true,
-		Default: int64default.StaticInt64(defaultValue),
-		Description: fmt.Sprintf("In epoch time. Only accounts created after this time are required to " +
+		Default: int64default.StaticInt64(0),
+		Description: "In epoch time. Only accounts created after this time are required to " +
 			"provide this field. For example, a value of 0 means all accounts are required to provide " +
-			"this field. The default value is `%v`.", defaultValue),
+			"this field. The default value is 0.",
 	}
 }
 

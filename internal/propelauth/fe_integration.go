@@ -8,7 +8,7 @@ import (
 
 // GetTestFeIntegrationInfo - Returns the FE integration info for the test environment.
 func (c *PropelAuthClient) GetTestFeIntegrationInfo() (*TestFeIntegrationInfo, error) {
-	res, err := c.get("fe_integration", nil)
+	res, err := c.get("fe_integration")
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +83,7 @@ func (c *PropelAuthClient) UpdateLiveFeIntegration(environment string, update Fe
 
 // GetLiveFeIntegrationInfo - Returns the FE integration info for a live staging or prod environment.
 func (c *PropelAuthClient) GetLiveFeIntegrationInfo(environment string) (*FeIntegrationInfoForEnv, error) {
-	res, err := c.get("fe_integration", nil)
+	res, err := c.get("fe_integration")
 	if err != nil {
 		return nil, err
 	}

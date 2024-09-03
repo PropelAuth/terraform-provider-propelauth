@@ -14,7 +14,7 @@ import (
 // UploadImage - Uploads an image to the project and returns the the new image_id.
 func (c *PropelAuthClient) UploadImage(imageType string, pathToLocalImage string) (*ImageUploadResponse, error) {
 	path := fmt.Sprintf("image/%s", imageType)
-	url := c.assembleURL(path, nil)
+	url := c.assembleURL(path)
 
 	var requestBody bytes.Buffer
     w := multipart.NewWriter(&requestBody)

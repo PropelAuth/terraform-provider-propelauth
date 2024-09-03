@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/url"
 	"runtime"
 	"time"
 )
@@ -64,32 +63,32 @@ func NewClient(tenant_id, project_id, api_key *string) (*PropelAuthClient, error
 
 // public http methods
 
-func (c *PropelAuthClient) get(urlPostfix string, queryParams url.Values) (*StandardResponse, error) {
-	url := c.assembleURL(urlPostfix, queryParams)
+func (c *PropelAuthClient) get(urlPostfix string) (*StandardResponse, error) {
+	url := c.assembleURL(urlPostfix)
 
 	return c.requestHelper("GET", url, nil)
 }
 
 func (c *PropelAuthClient) patch(urlPostfix string, body []byte) (*StandardResponse, error) {
-	url := c.assembleURL(urlPostfix, nil)
+	url := c.assembleURL(urlPostfix)
 
 	return c.requestHelper("PATCH", url, body)
 }
 
 func (c *PropelAuthClient) post(urlPostfix string, body []byte) (*StandardResponse, error) {
-	url := c.assembleURL(urlPostfix, nil)
+	url := c.assembleURL(urlPostfix)
 
 	return c.requestHelper("POST", url, body)
 }
 
 func (c *PropelAuthClient) put(urlPostfix string, body []byte) (*StandardResponse, error) {
-	url := c.assembleURL(urlPostfix, nil)
+	url := c.assembleURL(urlPostfix)
 
 	return c.requestHelper("PUT", url, body)
 }
 
 func (c *PropelAuthClient) delete(urlPostfix string, body []byte) (*StandardResponse, error) {
-	url := c.assembleURL(urlPostfix, nil)
+	url := c.assembleURL(urlPostfix)
 
 	return c.requestHelper("DELETE", url, body)
 }
@@ -127,7 +126,7 @@ func (c *PropelAuthClient) requestHelper(method string, url string, body []byte)
 	if resp.StatusCode >= 400 {
 		propelauthApiError, _ := convertStringErrorToPropelAuthError(respBytes)
 		if propelauthApiError != nil {
-			return nil, fmt.Errorf(propelauthApiError.ErrorCode)
+			return nil, fmt.Errorf("%s", propelauthApiError.ErrorCode)
 		}
 		return nil, fmt.Errorf("error on response: %s", string(respBytes[:]))
 	}
@@ -143,11 +142,8 @@ func (c *PropelAuthClient) requestHelper(method string, url string, body []byte)
 	return &queryResponse, nil
 }
 
-func (c *PropelAuthClient) assembleURL(urlPostfix string, queryParams url.Values) string {
+func (c *PropelAuthClient) assembleURL(urlPostfix string) string {
 	url := c.baseURL + "/" + urlPostfix
-	if queryParams != nil {
-		url += "?" + queryParams.Encode()
-	}
 
 	return url
 }

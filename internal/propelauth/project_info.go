@@ -6,7 +6,7 @@ import (
 
 // GetProjectInfo - Returns a project metadata.
 func (c *PropelAuthClient) GetProjectInfo() (*ProjectInfoResponse, error) {
-	res, err := c.get("info", nil)
+	res, err := c.get("info")
 	if err != nil {
 		return nil, err
 	}
