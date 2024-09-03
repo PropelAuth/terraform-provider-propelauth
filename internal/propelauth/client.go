@@ -10,14 +10,13 @@ import (
 	"time"
 )
 
-// TODO: FOR THE LOVE OF GOD, DON'T FORGET TO CHANGE THIS TO THE REAL URL.
-const BaseURLTemplate string = "https://api.propelauth.localhost/iac/%s/project/%s"
+const BaseURLTemplate string = "https://api.propelauth.com/iac/%s/project/%s"
 
 // PropelAuthClient - Client for the PropelAuth API to manage an existing project and all its resources.
 type PropelAuthClient struct {
-	BaseURL    string
-	HTTPClient *http.Client
-	ApiKey     string
+	baseURL    string
+	httpClient *http.Client
+	apiKey     string
 }
 
 type PropelAuthApiError struct {
@@ -54,10 +53,10 @@ type StandardResponse struct {
 
 func NewClient(tenant_id, project_id, api_key *string) (*PropelAuthClient, error) {
 	c := PropelAuthClient{
-		HTTPClient: &http.Client{Timeout: 10 * time.Second},
+		httpClient: &http.Client{Timeout: 10 * time.Second},
 		// Default Hashicups URL
-		BaseURL: fmt.Sprintf(BaseURLTemplate, *tenant_id, *project_id),
-		ApiKey:  *api_key,
+		baseURL: fmt.Sprintf(BaseURLTemplate, *tenant_id, *project_id),
+		apiKey:  *api_key,
 	}
 
 	return &c, nil
@@ -106,11 +105,11 @@ func (c *PropelAuthClient) requestHelper(method string, url string, body []byte)
 
 	// add headers
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+c.ApiKey)
+	req.Header.Set("Authorization", "Bearer "+c.apiKey)
 	req.Header.Set("User-Agent", "terraform-provider-propelauth/0.0 go/"+runtime.Version()+" "+runtime.GOOS+"/"+runtime.GOARCH)
 
 	// send request
-	resp, err := c.HTTPClient.Do(req)
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("error making http request: %w", err)
 	}
@@ -145,7 +144,7 @@ func (c *PropelAuthClient) requestHelper(method string, url string, body []byte)
 }
 
 func (c *PropelAuthClient) assembleURL(urlPostfix string, queryParams url.Values) string {
-	url := c.BaseURL + "/" + urlPostfix
+	url := c.baseURL + "/" + urlPostfix
 	if queryParams != nil {
 		url += "?" + queryParams.Encode()
 	}

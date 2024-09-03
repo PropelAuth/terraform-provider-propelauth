@@ -48,11 +48,11 @@ func (c *PropelAuthClient) UploadImage(imageType string, pathToLocalImage string
 
 	// add headers
 	req.Header.Set("Content-Type", w.FormDataContentType())
-	req.Header.Set("Authorization", "Bearer " + c.ApiKey)
+	req.Header.Set("Authorization", "Bearer " + c.apiKey)
 	req.Header.Set("User-Agent", "terraform-provider-propelauth/0.0 go/" + runtime.Version() + " " + runtime.GOOS + "/" + runtime.GOARCH)
 
 	// send request
-	resp, err := c.HTTPClient.Do(req)
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("error making http request: %w", err)
 	}
