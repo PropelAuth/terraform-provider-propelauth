@@ -32,7 +32,6 @@ resource "propelauth_roles_and_permissions" "my_roles_and_permissions" {
 	    name = "ai::deploy"
 	  }
 	]
-	# multiple_roles_per_user = false # default is false
 	roles = {
     "Owner" = {
       can_view_other_members = true
