@@ -13,16 +13,16 @@ func TestAccProjectInfoResource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create and Read testing
 			{
-				Config: testAccProjectInfoResourceConfig("one"),
+				Config: testAccProjectInfoResourceConfig("Terraform Acceptance Testing"),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("propelauth_project_info.test", "name", "one"),
+					resource.TestCheckResourceAttr("propelauth_project_info.test", "name", "Terraform Acceptance Testing"),
 				),
 			},
 			// Update and Read testing
 			{
-				Config: testAccProjectInfoResourceConfig("two"),
+				Config: testAccProjectInfoResourceConfig("Terraform Testing"),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("propelauth_project_info.test", "name", "two"),
+					resource.TestCheckResourceAttr("propelauth_project_info.test", "name", "Terraform Testing"),
 				),
 			},
 			// Delete testing automatically occurs in TestCase

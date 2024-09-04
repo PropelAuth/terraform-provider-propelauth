@@ -273,7 +273,7 @@ func (r *rolesAndPermissionsResource) ValidateConfig(ctx context.Context, req re
 		if len(plan.RoleHierarchy) < len(plan.Roles) {
 			resp.Diagnostics.AddAttributeWarning(
 				path.Root("role_hierarchy"),
-				"Not all defined roles are included in the heriarchy",
+				"Not all defined roles are included in the hierarchy",
 				"If multiple_roles_per_user = true, you can ignore this. If not, any roles excluded from the hierarchy "+
 					"will be omitted in the source system.",
 			)
