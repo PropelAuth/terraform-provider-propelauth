@@ -130,6 +130,7 @@ func (up *UserProperties) UpdateAndEnableMetadataProperty(metadataProperty Metad
 		CollectViaSaml:  metadataProperty.CollectViaSaml,
 		IsEnabled:       true,
 		ShowInAccount:   false,
+		UserWritable:    "Read",
 	})
 }
 
@@ -173,7 +174,7 @@ func (up *UserProperties) UpdateAndEnableUsernameProperty(usernameProperty Usern
 	}
 	up.Fields = append(up.Fields, UserProperty{
 		Name:            "legacy__username",
-		DisplayName:     "Username",
+		DisplayName:     usernameProperty.DisplayName,
 		FieldType:       "Text",
 		Required:        true,
 		RequiredBy:      0,
@@ -183,6 +184,7 @@ func (up *UserProperties) UpdateAndEnableUsernameProperty(usernameProperty Usern
 		CollectOnSignup: true,
 		CollectViaSaml:  true,
 		IsEnabled:       true,
+		UserWritable:    "Write",
 	})
 }
 
@@ -234,6 +236,7 @@ func (up *UserProperties) UpdateAndEnablePictureUrlProperty(pictureUrlProperty P
 		CollectOnSignup: false,
 		CollectViaSaml:  false,
 		IsEnabled:       true,
+		UserWritable:    "Write",
 	})
 }
 
