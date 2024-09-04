@@ -83,5 +83,8 @@ jobs:
       - run: go mod download
       - env:
           TF_ACC: "1"
+          PROPELAUTH_TENANT_ID: ${{ secrets.PROPELAUTH_TENANT_ID }}
+          PROPELAUTH_PROJECT_ID: ${{ secrets.PROPELAUTH_PROJECT_ID }}
+          PROPELAUTH_API_KEY: ${{ secrets.PROPELAUTH_API_KEY }}
         run: go test -v -cover ./internal/provider/
         timeout-minutes: 10
