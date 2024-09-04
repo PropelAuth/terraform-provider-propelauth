@@ -3,7 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
-
+	"strings"
 	"terraform-provider-propelauth/internal/propelauth"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -18,7 +18,7 @@ import (
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &customDomainResource{}
-var _ resource.ResourceWithConfigure   = &customDomainResource{}
+var _ resource.ResourceWithConfigure = &customDomainResource{}
 
 func NewCustomDomainResource() resource.Resource {
 	return &customDomainResource{}
@@ -31,13 +31,15 @@ type customDomainResource struct {
 
 // projectInfoResourceModel describes the resource data model.
 type customDomainResourceModel struct {
-	Environment types.String `tfsdk:"environment"`
-	Domain types.String `tfsdk:"domain"`
-	Subdomain types.String `tfsdk:"subdomain"`
-	TxtRecordKey types.String `tfsdk:"txt_record_key"`
-	TxtRecordValue types.String `tfsdk:"txt_record_value"`
-	CnameRecordKey types.String `tfsdk:"cname_record_key"`
-	CnameRecordValue types.String `tfsdk:"cname_record_value"`
+	Environment                 types.String `tfsdk:"environment"`
+	Domain                      types.String `tfsdk:"domain"`
+	Subdomain                   types.String `tfsdk:"subdomain"`
+	TxtRecordKey                types.String `tfsdk:"txt_record_key"`
+	TxtRecordKeyWithoutDomain   types.String `tfsdk:"txt_record_key_without_domain"`
+	TxtRecordValue              types.String `tfsdk:"txt_record_value"`
+	CnameRecordKey              types.String `tfsdk:"cname_record_key"`
+	CnameRecordKeyWithoutDomain types.String `tfsdk:"cname_record_key_without_domain"`
+	CnameRecordValue            types.String `tfsdk:"cname_record_value"`
 }
 
 func (r *customDomainResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -60,27 +62,35 @@ func (r *customDomainResource) Schema(ctx context.Context, req resource.SchemaRe
 				Description: "The environment for which you are configuring the custom domain. Accepted values are `Staging` and `Prod`.",
 			},
 			"domain": schema.StringAttribute{
-				Required: true,
+				Required:    true,
 				Description: "The domain name for the custom domain.",
 			},
 			"subdomain": schema.StringAttribute{
-				Optional: true,
+				Optional:    true,
 				Description: "The subdomain for the custom domain. This is optional.",
 			},
 			"txt_record_key": schema.StringAttribute{
-				Computed: true,
+				Computed:    true,
 				Description: "The TXT record key for the custom domain.",
 			},
+			"txt_record_key_without_domain": schema.StringAttribute{
+				Computed:    true,
+				Description: "The TXT record key for the custom domain without the domain (e.g. just auth instead of auth.example.com) .",
+			},
 			"txt_record_value": schema.StringAttribute{
-				Computed: true,
+				Computed:    true,
 				Description: "The TXT record value for the custom domain.",
 			},
 			"cname_record_key": schema.StringAttribute{
-				Computed: true,
+				Computed:    true,
 				Description: "The CNAME record key for the custom domain.",
 			},
+			"cname_record_key_without_domain": schema.StringAttribute{
+				Computed:    true,
+				Description: "The CNAME record key for the custom domain without the domain (e.g. just auth instead of auth.example.com) .",
+			},
 			"cname_record_value": schema.StringAttribute{
-				Computed: true,
+				Computed:    true,
 				Description: "The CNAME record value for the custom domain.",
 			},
 		},
@@ -112,33 +122,41 @@ func (r *customDomainResource) Create(ctx context.Context, req resource.CreateRe
 
 	// Read Terraform plan data into the model
 	diags := req.Plan.Get(ctx, &plan)
-    resp.Diagnostics.Append(diags...)
-    if resp.Diagnostics.HasError() {
-        return
-    }
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Update the custom domain info
 	environment := plan.Environment.ValueString()
 	domain := plan.Domain.ValueString()
 	subdomain := plan.Subdomain.ValueStringPointer()
 	customDomainInfo, err := r.client.UpdateCustomDomainInfo(environment, domain, subdomain, false)
-    if err != nil {
-        resp.Diagnostics.AddError(
+	if err != nil {
+		resp.Diagnostics.AddError(
 			"Error setting custom domain info",
-			"Could not set custom domain info, unexpected error: " + err.Error(),
+			"Could not set custom domain info, unexpected error: "+err.Error(),
 		)
-        return
-    }
-
+		return
+	}
 
 	// Write logs using the tflog package
 	// Documentation: https://terraform.io/plugin/log
 	tflog.Trace(ctx, "created a propelauth_project_info resource")
 
+	// Derive fields so they can be used either with or without the full domain
+	cnameRecordKeyParts := strings.Split(*customDomainInfo.CnameRecordKey, ".")
+	cnameRecordKeyWithoutDomain := strings.Join(cnameRecordKeyParts[:len(cnameRecordKeyParts)-2], ".")
+
+	txtRecordKeyParts := strings.Split(*customDomainInfo.TxtRecordKey, ".")
+	txtRecordKeyWithoutDomain := strings.Join(txtRecordKeyParts[:len(txtRecordKeyParts)-2], ".")
+
 	// Save data into Terraform state
 	plan.CnameRecordKey = types.StringPointerValue(customDomainInfo.CnameRecordKey)
 	plan.CnameRecordValue = types.StringPointerValue(customDomainInfo.CnameRecordValue)
+	plan.CnameRecordKeyWithoutDomain = types.StringValue(cnameRecordKeyWithoutDomain)
 	plan.TxtRecordKey = types.StringPointerValue(customDomainInfo.TxtRecordKey)
+	plan.TxtRecordKeyWithoutDomain = types.StringValue(txtRecordKeyWithoutDomain)
 	plan.TxtRecordValue = types.StringPointerValue(customDomainInfo.TxtRecordValue)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
 }
@@ -159,7 +177,7 @@ func (r *customDomainResource) Read(ctx context.Context, req resource.ReadReques
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error getting custom domain info",
-			"Could not get custom domain info, unexpected error: " + err.Error(),
+			"Could not get custom domain info, unexpected error: "+err.Error(),
 		)
 		return
 	}
@@ -173,7 +191,7 @@ func (r *customDomainResource) Read(ctx context.Context, req resource.ReadReques
 		if err != nil {
 			resp.Diagnostics.AddError(
 				"Error getting custom domain info",
-				"Could not get custom domain info, unexpected error: " + err.Error(),
+				"Could not get custom domain info, unexpected error: "+err.Error(),
 			)
 			return
 		}
@@ -187,22 +205,30 @@ func (r *customDomainResource) Read(ctx context.Context, req resource.ReadReques
 	state.Domain = types.StringValue(customDomainInfo.Domain)
 	state.Subdomain = types.StringPointerValue(customDomainInfo.Subdomain)
 
-	// So as not to need an update after verification of a domain, 
+	// So as not to need an update after verification of a domain,
 	// these fields are only updated if the domain is not verified, which is when they are
 	// returned.
 	if customDomainInfo.TxtRecordKey != nil {
 		state.TxtRecordKey = types.StringPointerValue(customDomainInfo.TxtRecordKey)
+
+		txtRecordKeyParts := strings.Split(*customDomainInfo.TxtRecordKey, ".")
+		txtRecordKeyWithoutDomain := strings.Join(txtRecordKeyParts[:len(txtRecordKeyParts)-2], ".")
+		state.TxtRecordKeyWithoutDomain = types.StringValue(txtRecordKeyWithoutDomain)
 	}
 	if customDomainInfo.TxtRecordValue != nil {
 		state.TxtRecordValue = types.StringPointerValue(customDomainInfo.TxtRecordValue)
 	}
 	if customDomainInfo.CnameRecordKey != nil {
 		state.CnameRecordKey = types.StringPointerValue(customDomainInfo.CnameRecordKey)
+
+		cnameRecordKeyParts := strings.Split(*customDomainInfo.CnameRecordKey, ".")
+		cnameRecordKeyWithoutDomain := strings.Join(cnameRecordKeyParts[:len(cnameRecordKeyParts)-2], ".")
+		state.CnameRecordKeyWithoutDomain = types.StringValue(cnameRecordKeyWithoutDomain)
 	}
 	if customDomainInfo.CnameRecordValue != nil {
 		state.CnameRecordValue = types.StringPointerValue(customDomainInfo.CnameRecordValue)
 	}
-	
+
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 }
 
@@ -222,13 +248,13 @@ func (r *customDomainResource) Update(ctx context.Context, req resource.UpdateRe
 		return
 	}
 
-	// Re-fetch the main env's custom domain info to check 
+	// Re-fetch the main env's custom domain info to check
 	// if its verification status has changed.
 	customDomainInfo, err := r.client.GetCustomDomainInfo(state.Environment.ValueString(), false)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error getting custom domain info",
-			"Could not get custom domain info, unexpected error: " + err.Error(),
+			"Could not get custom domain info, unexpected error: "+err.Error(),
 		)
 		return
 	}
@@ -245,7 +271,7 @@ func (r *customDomainResource) Update(ctx context.Context, req resource.UpdateRe
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error setting custom domain info",
-			"Could not set custom domain info, unexpected error: " + err.Error(),
+			"Could not set custom domain info, unexpected error: "+err.Error(),
 		)
 		return
 	}
@@ -254,10 +280,19 @@ func (r *customDomainResource) Update(ctx context.Context, req resource.UpdateRe
 	// Documentation: https://terraform.io/plugin/log
 	tflog.Trace(ctx, "updated a custom_domain resource")
 
+	// Derive fields so they can be used either with or without the full domain
+	cnameRecordKeyParts := strings.Split(*customDomainInfo.CnameRecordKey, ".")
+	cnameRecordKeyWithoutDomain := strings.Join(cnameRecordKeyParts[:len(cnameRecordKeyParts)-2], ".")
+
+	txtRecordKeyParts := strings.Split(*customDomainInfo.TxtRecordKey, ".")
+	txtRecordKeyWithoutDomain := strings.Join(txtRecordKeyParts[:len(txtRecordKeyParts)-2], ".")
+
 	// Save data into Terraform state
 	plan.CnameRecordKey = types.StringPointerValue(customDomainInfo.CnameRecordKey)
+	plan.CnameRecordKeyWithoutDomain = types.StringValue(cnameRecordKeyWithoutDomain)
 	plan.CnameRecordValue = types.StringPointerValue(customDomainInfo.CnameRecordValue)
 	plan.TxtRecordKey = types.StringPointerValue(customDomainInfo.TxtRecordKey)
+	plan.TxtRecordKeyWithoutDomain = types.StringValue(txtRecordKeyWithoutDomain)
 	plan.TxtRecordValue = types.StringPointerValue(customDomainInfo.TxtRecordValue)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
 }

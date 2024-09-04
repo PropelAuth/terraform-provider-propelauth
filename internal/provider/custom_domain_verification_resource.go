@@ -20,7 +20,7 @@ import (
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &customDomainVerificationResource{}
-var _ resource.ResourceWithConfigure   = &customDomainVerificationResource{}
+var _ resource.ResourceWithConfigure = &customDomainVerificationResource{}
 
 func NewCustomDomainVerificationResource() resource.Resource {
 	return &customDomainVerificationResource{}
@@ -33,9 +33,9 @@ type customDomainVerificationResource struct {
 
 // projectInfoResourceModel describes the resource data model.
 type customDomainVerificationResourceModel struct {
-	Environment types.String `tfsdk:"environment"`
-	Domain types.String `tfsdk:"domain"`
-	Timeouts timeouts.Value `tfsdk:"timeouts"`
+	Environment types.String   `tfsdk:"environment"`
+	Domain      types.String   `tfsdk:"domain"`
+	Timeouts    timeouts.Value `tfsdk:"timeouts"`
 }
 
 func (r *customDomainVerificationResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -58,7 +58,7 @@ func (r *customDomainVerificationResource) Schema(ctx context.Context, req resou
 				Description: "The environment for which you are configuring the custom domain. Accepted values are `Staging`, `Prod`.",
 			},
 			"domain": schema.StringAttribute{
-				Required: true,
+				Required:    true,
 				Description: "The domain to verify.",
 			},
 			"timeouts": timeouts.Attributes(ctx, timeouts.Opts{
@@ -94,12 +94,12 @@ func (r *customDomainVerificationResource) Create(ctx context.Context, req resou
 
 	// Read Terraform plan data into the model
 	diags := req.Plan.Get(ctx, &plan)
-    resp.Diagnostics.Append(diags...)
-    if resp.Diagnostics.HasError() {
-        return
-    }
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
-	createTimeout, err := plan.Timeouts.Create(ctx, 15*time.Minute)
+	createTimeout, err := plan.Timeouts.Create(ctx, 5*time.Minute)
 	if err != nil {
 		resp.Diagnostics.AddError("Error creating a timeout", "Could not create a timeout for the custom domain verification.")
 		return
@@ -108,19 +108,33 @@ func (r *customDomainVerificationResource) Create(ctx context.Context, req resou
 	ctx, cancel := context.WithTimeout(ctx, createTimeout)
 	defer cancel()
 
-	// Verify the custom domain
+	// Retry interval
+	retryInterval := 30 * time.Second
+
+	// Verify the custom domain with retries
 	environment := plan.Environment.ValueString()
-	verificationErr := r.client.VerifyCustomDomainInfo(environment, false)
-	if verificationErr != nil {
-		resp.Diagnostics.AddError(
-			"Error verifying custom domain",
-			"Could not verify custom domain, please check the domain records and try again.",
-		)
-		return
+	for {
+		select {
+		case <-ctx.Done():
+			resp.Diagnostics.AddError("Timeout exceeded", "Could not verify custom domain within the timeout. It can take a few minutes for the DNS records to propagate, please verify the records are set and try again.")
+			return
+		default:
+			verificationErr := r.client.VerifyCustomDomainInfo(environment, false)
+			if verificationErr == nil {
+				// Verification successful
+				// Set the data from the state into the response
+				resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
+				return
+			}
+
+			// Log the retry attempt
+			tflog.Warn(ctx, "Unable to verify the custom domain. It can take a few minutes for the DNS records to propagate. Retrying in 30 seconds...")
+
+			// Wait for the retry interval before the next attempt
+			time.Sleep(retryInterval)
+		}
 	}
 
-	// Set the data from the state into the response
-	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
 }
 
 func (r *customDomainVerificationResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
@@ -138,7 +152,7 @@ func (r *customDomainVerificationResource) Read(ctx context.Context, req resourc
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 }
 
-func (r *customDomainVerificationResource) Update(ctx context.Context,  req resource.UpdateRequest, resp *resource.UpdateResponse) {
+func (r *customDomainVerificationResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	var plan customDomainVerificationResourceModel
 
 	// Read Terraform plan data into the model
@@ -154,7 +168,7 @@ func (r *customDomainVerificationResource) Update(ctx context.Context,  req reso
 		return
 	}
 
-	updateTimeout, err := plan.Timeouts.Update(ctx, 15*time.Minute)
+	updateTimeout, err := plan.Timeouts.Update(ctx, 5*time.Minute)
 	if err != nil {
 		resp.Diagnostics.AddError("Error creating a timeout", "Could not create a timeout for the custom domain verification.")
 		return
@@ -163,20 +177,33 @@ func (r *customDomainVerificationResource) Update(ctx context.Context,  req reso
 	ctx, cancel := context.WithTimeout(ctx, updateTimeout)
 	defer cancel()
 
-	// Verify the custom domain
+	// Retry interval
+	retryInterval := 30 * time.Second
+
+	// Verify the custom domain with retries
 	environment := plan.Environment.ValueString()
 	isSwitching := plan.Domain.ValueString() != state.Domain.ValueString()
-	verificationErr := r.client.VerifyCustomDomainInfo(environment, isSwitching)
-	if verificationErr != nil {
-		resp.Diagnostics.AddError(
-			"Error verifying custom domain",
-			"Could not verify custom domain, please check the domain records and try again.",
-		)
-		return
-	}
+	for {
+		select {
+		case <-ctx.Done():
+			resp.Diagnostics.AddError("Timeout exceeded", "Could not verify custom domain within the timeout. It can take a few minutes for the DNS records to propagate, please verify the records are set and try again.")
+			return
+		default:
+			verificationErr := r.client.VerifyCustomDomainInfo(environment, isSwitching)
+			if verificationErr == nil {
+				// Verification successful
+				// Set the data from the state into the response
+				resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
+				return
+			}
 
-	// Set the data from the state into the response
-	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
+			// Log the retry attempt
+			tflog.Warn(ctx, "Unable to verify the custom domain. It can take a few minutes for the DNS records to propagate. Retrying in 30 seconds...")
+
+			// Wait for the retry interval before the next attempt
+			time.Sleep(retryInterval)
+		}
+	}
 }
 
 func (r *customDomainVerificationResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
