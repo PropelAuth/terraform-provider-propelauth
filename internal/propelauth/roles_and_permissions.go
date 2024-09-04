@@ -174,7 +174,7 @@ func (r *RolesAndPermissions) GetPermission(permissionName string) (*Permission,
 	return nil, false
 }
 
-func (r *RolesAndPermissions) GetHeirarchy() []string {
+func (r *RolesAndPermissions) GetHierarchy() []string {
 	if r.OrgRoleStructure == "multi_role" {
 		return nil
 	} else {

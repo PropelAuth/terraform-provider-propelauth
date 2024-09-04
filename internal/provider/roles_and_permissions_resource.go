@@ -35,7 +35,7 @@ type rolesAndPermissionsResourceModel struct {
 	MultipleRolesPerUser types.Bool           `tfsdk:"multiple_roles_per_user"`
 	Permissions          []permissionModel    `tfsdk:"permissions"`
 	Roles                map[string]roleModel `tfsdk:"roles"`
-	RoleHeirarchy        []types.String       `tfsdk:"role_hierarchy"`
+	RoleHierarchy        []types.String       `tfsdk:"role_hierarchy"`
 	DefaultRole          types.String         `tfsdk:"default_role"`
 	DefaultOwnerRole     types.String         `tfsdk:"default_owner_role"`
 }
@@ -75,7 +75,7 @@ func (r *rolesAndPermissionsResource) Schema(ctx context.Context, req resource.S
 		Attributes: map[string]schema.Attribute{
 			"multiple_roles_per_user": schema.BoolAttribute{
 				Computed: true,
-				Description: "If true, than each member of an organization can have multiple roles and their is no heirarchy between roles. " +
+				Description: "If true, than each member of an organization can have multiple roles and their is no hierarchy between roles. " +
 					"Instead, the relationship between roles is defined by the `roles_can_manage` field on each individual role definition. " +
 					"A single-role project can be migrated to multi-role, but not the other way around. Because of this, " +
 					"this can only be set in the PropelAuth dashboard.",
@@ -239,7 +239,7 @@ func (r *rolesAndPermissionsResource) Schema(ctx context.Context, req resource.S
 					types.StringType,
 					[]attr.Value{},
 				)),
-				Description: "A list of roles in order of heirarchy. The first role in the list is the highest role and " +
+				Description: "A list of roles in order of hierarchy. The first role in the list is the highest role and " +
 					"the last role is the lowest role. This is only relevant if `multiple_roles_per_user` is false. " +
 					"If `multiple_roles_per_user` is true, the roles that a role can manage is defined by the `roles_can_manage` " +
 					"field on each individual role definition.",
@@ -261,20 +261,20 @@ func (r *rolesAndPermissionsResource) ValidateConfig(ctx context.Context, req re
 	// Validate the plan data
 
 	// Verify that all roles in the hierarchy are defined
-	for _, roleName := range plan.RoleHeirarchy {
+	for _, roleName := range plan.RoleHierarchy {
 		if _, ok := plan.Roles[roleName.ValueString()]; !ok {
 			resp.Diagnostics.AddAttributeError(
 				path.Root("role_hierarchy"),
-				"PropelAuth Role in heirarchy not defined",
+				"PropelAuth Role in hierarchy not defined",
 				fmt.Sprintf("Role %s is in the role hierarchy but is not defined in the roles map.", roleName.ValueString()),
 			)
 			return
 		}
-		if len(plan.RoleHeirarchy) < len(plan.Roles) {
+		if len(plan.RoleHierarchy) < len(plan.Roles) {
 			resp.Diagnostics.AddAttributeWarning(
-				path.Root("role_heirarchy"),
+				path.Root("role_hierarchy"),
 				"Not all defined roles are included in the heriarchy",
-				"If multiple_roles_per_user = true, you can ignore this. If not, any roles excluded from the heirarchy "+
+				"If multiple_roles_per_user = true, you can ignore this. If not, any roles excluded from the hierarchy "+
 					"will be omitted in the source system.",
 			)
 			return
@@ -334,7 +334,7 @@ func (r *rolesAndPermissionsResource) Create(ctx context.Context, req resource.C
 		}
 	}
 
-	updateBuilder.SetRoleHierarchy(convertArrayOfStringsForSource(plan.RoleHeirarchy))
+	updateBuilder.SetRoleHierarchy(convertArrayOfStringsForSource(plan.RoleHierarchy))
 
 	// get the old roles and permissions to track changes/deletions in role names
 	oldRolesAndPermissions, err := r.client.GetRolesAndPermissions()
@@ -398,10 +398,10 @@ func (r *rolesAndPermissionsResource) Read(ctx context.Context, req resource.Rea
 	}
 	// permissions
 	reconcilePermissions(&state, rolesAndPermissions)
-	// role heirarchy
-	sourceRoleHeirarchy := rolesAndPermissions.GetHeirarchy()
-	if !state.MultipleRolesPerUser.ValueBool() && !arraysMatch(state.RoleHeirarchy, sourceRoleHeirarchy) {
-		state.RoleHeirarchy = convertArrayOfStringsForState(sourceRoleHeirarchy)
+	// role hierarchy
+	sourceRoleHierarchy := rolesAndPermissions.GetHierarchy()
+	if !state.MultipleRolesPerUser.ValueBool() && !arraysMatch(state.RoleHierarchy, sourceRoleHierarchy) {
+		state.RoleHierarchy = convertArrayOfStringsForState(sourceRoleHierarchy)
 	}
 
 	// Save updated state into Terraform state
@@ -439,7 +439,7 @@ func (r *rolesAndPermissionsResource) Update(ctx context.Context, req resource.U
 		}
 	}
 
-	updateBuilder.SetRoleHierarchy(convertArrayOfStringsForSource(plan.RoleHeirarchy))
+	updateBuilder.SetRoleHierarchy(convertArrayOfStringsForSource(plan.RoleHierarchy))
 
 	// get the old roles and permissions to track changes/deletions in role names
 	oldRolesAndPermissions, err := r.client.GetRolesAndPermissions()
