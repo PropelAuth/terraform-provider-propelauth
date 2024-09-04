@@ -62,8 +62,23 @@ func (up *UserProperties) UpdateAndEnableNameProperty(nameProperty NamePropertyS
 		if up.Fields[i].Name == "legacy__name" {
 			up.Fields[i].IsEnabled = true
 			up.Fields[i].InJwt = nameProperty.InJwt
+			return
 		}
 	}
+	up.Fields = append(up.Fields, UserProperty{
+		Name:            "legacy__name",
+		DisplayName:     "Name",
+		FieldType:       "Name",
+		Required:        true,
+		RequiredBy:      0,
+		InJwt:           nameProperty.InJwt,
+		IsUserFacing:    true,
+		CollectOnSignup: true,
+		IsEnabled:       true,
+		ShowInAccount:   true,
+		CollectViaSaml:  true,
+		UserWritable:    "Write",
+	})
 }
 
 // DisableNameProperty - Disables the name property.
@@ -100,8 +115,22 @@ func (up *UserProperties) UpdateAndEnableMetadataProperty(metadataProperty Metad
 			up.Fields[i].IsEnabled = true
 			up.Fields[i].InJwt = metadataProperty.InJwt
 			up.Fields[i].CollectViaSaml = metadataProperty.CollectViaSaml
+			return
 		}
 	}
+	up.Fields = append(up.Fields, UserProperty{
+		Name:            "metadata",
+		DisplayName:     "metadata",
+		FieldType:       "Json",
+		Required:        false,
+		RequiredBy:      0,
+		InJwt:           metadataProperty.InJwt,
+		IsUserFacing:    false,
+		CollectOnSignup: false,
+		CollectViaSaml:  metadataProperty.CollectViaSaml,
+		IsEnabled:       true,
+		ShowInAccount:   false,
+	})
 }
 
 // DisableMetadataProperty - Disables the metadata property.
@@ -139,8 +168,22 @@ func (up *UserProperties) UpdateAndEnableUsernameProperty(usernameProperty Usern
 			up.Fields[i].IsEnabled = true
 			up.Fields[i].InJwt = usernameProperty.InJwt
 			up.Fields[i].DisplayName = usernameProperty.DisplayName
+			return
 		}
 	}
+	up.Fields = append(up.Fields, UserProperty{
+		Name:            "legacy__username",
+		DisplayName:     "Username",
+		FieldType:       "Text",
+		Required:        true,
+		RequiredBy:      0,
+		InJwt:           usernameProperty.InJwt,
+		IsUserFacing:    true,
+		ShowInAccount:   true,
+		CollectOnSignup: true,
+		CollectViaSaml:  true,
+		IsEnabled:       true,
+	})
 }
 
 // DisableUsernameProperty - Disables the username property.
@@ -176,8 +219,22 @@ func (up *UserProperties) UpdateAndEnablePictureUrlProperty(pictureUrlProperty P
 		if up.Fields[i].Name == "legacy__picture_url" {
 			up.Fields[i].IsEnabled = true
 			up.Fields[i].InJwt = pictureUrlProperty.InJwt
+			return
 		}
 	}
+	up.Fields = append(up.Fields, UserProperty{
+		Name:            "legacy__picture_url",
+		DisplayName:     "Profile Picture",
+		FieldType:       "PictureUrl",
+		Required:        false,
+		RequiredBy:      0,
+		InJwt:           pictureUrlProperty.InJwt,
+		IsUserFacing:    true,
+		ShowInAccount:   true,
+		CollectOnSignup: false,
+		CollectViaSaml:  false,
+		IsEnabled:       true,
+	})
 }
 
 // DisablePictureUrlProperty - Disables the picture url property.
@@ -224,8 +281,23 @@ func (up *UserProperties) UpdateAndEnablePhoneNumberProperty(phoneNumberProperty
 			up.Fields[i].Required = phoneNumberProperty.Required
 			up.Fields[i].RequiredBy = phoneNumberProperty.RequiredBy
 			up.Fields[i].UserWritable = phoneNumberProperty.UserWritable
+			return
 		}
 	}
+	up.Fields = append(up.Fields, UserProperty{
+		Name:            "phone_number",
+		DisplayName:     phoneNumberProperty.DisplayName,
+		FieldType:       "PhoneNumber",
+		Required:        phoneNumberProperty.Required,
+		RequiredBy:      phoneNumberProperty.RequiredBy,
+		InJwt:           phoneNumberProperty.InJwt,
+		IsUserFacing:    true,
+		CollectOnSignup: true,
+		CollectViaSaml:  phoneNumberProperty.CollectViaSaml,
+		ShowInAccount:   phoneNumberProperty.ShowInAccount,
+		UserWritable:    phoneNumberProperty.UserWritable,
+		IsEnabled:       true,
+	})
 }
 
 // DisablePhoneNumberProperty - Disables the phone number property.
@@ -274,8 +346,26 @@ func (up *UserProperties) UpdateAndEnableTosProperty(tosProperty TosPropertySett
 			up.Fields[i].Metadata = userPropertyMetadata{
 				TosLinks: tosProperty.TosLinks,
 			}
+			return
 		}
 	}
+	up.Fields = append(up.Fields, UserProperty{
+		Name:            "tos",
+		DisplayName:     "Terms of Service",
+		FieldType:       "Tos",
+		Required:        tosProperty.Required,
+		RequiredBy:      tosProperty.RequiredBy,
+		InJwt:           tosProperty.InJwt,
+		IsUserFacing:    true,
+		CollectOnSignup: true,
+		CollectViaSaml:  false,
+		ShowInAccount:   false,
+		UserWritable:    "WriteIfUnset",
+		Metadata: userPropertyMetadata{
+			TosLinks: tosProperty.TosLinks,
+		},
+		IsEnabled: true,
+	})
 }
 
 // DisableTosProperty - Disables the TOS property.
@@ -329,8 +419,27 @@ func (up *UserProperties) UpdateAndEnableReferralSourceProperty(referralSourcePr
 			}
 			up.Fields[i].ShowInAccount = referralSourceProperty.ShowInAccount
 			up.Fields[i].CollectViaSaml = referralSourceProperty.CollectViaSaml
+
+			return
 		}
 	}
+	up.Fields = append(up.Fields, UserProperty{
+		Name:            "referral_source",
+		DisplayName:     referralSourceProperty.DisplayName,
+		FieldType:       "Enum",
+		Required:        referralSourceProperty.Required,
+		RequiredBy:      referralSourceProperty.RequiredBy,
+		InJwt:           referralSourceProperty.InJwt,
+		IsUserFacing:    true,
+		CollectOnSignup: true,
+		CollectViaSaml:  referralSourceProperty.CollectViaSaml,
+		ShowInAccount:   referralSourceProperty.ShowInAccount,
+		UserWritable:    referralSourceProperty.UserWritable,
+		Metadata: userPropertyMetadata{
+			EnumValues: referralSourceProperty.Options,
+		},
+		IsEnabled: true,
+	})
 }
 
 // DisableReferralSourceProperty - Disables the referral source property.
