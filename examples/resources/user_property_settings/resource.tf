@@ -1,18 +1,5 @@
-terraform {
-  required_providers {
-    propelauth = {
-      source = "registry.terraform.io/propelauth/propelauth"
-    }
-  }
-}
-
-provider "propelauth" {
-  #   tenant_id  = "<PROPELAUTH_TENANT_ID>"  # or PROPELAUTH_TENANT_ID environment variable
-  #   project_id = "<PROPELAUTH_PROJECT_ID>" # or PROPELAUTH_PROJECT_ID environment variable
-  #   api_key    = "<PROPELAUTH_API_KEY>"    # or PROPELAUTH_API_KEY environment variable
-}
-
-resource "propelauth_user_property_settings" "my_user_property_settings" {
+# Configure all the properties that can be set on a user in your PropelAuth project.
+resource "propelauth_user_property_settings" "example" {
   name_property = {
     in_jwt = false
   }
