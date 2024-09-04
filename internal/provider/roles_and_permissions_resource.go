@@ -18,7 +18,7 @@ import (
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &rolesAndPermissionsResource{}
-var _ resource.ResourceWithConfigure   = &rolesAndPermissionsResource{}
+var _ resource.ResourceWithConfigure = &rolesAndPermissionsResource{}
 var _ resource.ResourceWithValidateConfig = &rolesAndPermissionsResource{}
 
 func NewRolesAndPermissionsResource() resource.Resource {
@@ -32,38 +32,37 @@ type rolesAndPermissionsResource struct {
 
 // rolesAndPermissionsResourceModel describes the resource data model.
 type rolesAndPermissionsResourceModel struct {
-	MultipleRolesPerUser types.Bool `tfsdk:"multiple_roles_per_user"`
-	Permissions []permissionModel `tfsdk:"permissions"`
-	Roles map[string]roleModel `tfsdk:"roles"`
-	RoleHeirarchy []types.String `tfsdk:"role_hierarchy"`
-	DefaultRole types.String `tfsdk:"default_role"`
-	DefaultOwnerRole types.String `tfsdk:"default_owner_role"`
+	MultipleRolesPerUser types.Bool           `tfsdk:"multiple_roles_per_user"`
+	Permissions          []permissionModel    `tfsdk:"permissions"`
+	Roles                map[string]roleModel `tfsdk:"roles"`
+	RoleHeirarchy        []types.String       `tfsdk:"role_hierarchy"`
+	DefaultRole          types.String         `tfsdk:"default_role"`
+	DefaultOwnerRole     types.String         `tfsdk:"default_owner_role"`
 }
 
 type permissionModel struct {
-	Name types.String `tfsdk:"name"`
+	Name        types.String `tfsdk:"name"`
 	DisplayName types.String `tfsdk:"display_name"`
 	Description types.String `tfsdk:"description"`
 }
 
 type roleModel struct {
-	CanViewOtherMembers types.Bool `tfsdk:"can_view_other_members"`
-	CanInvite types.Bool `tfsdk:"can_invite"`
-	CanChangeRoles types.Bool `tfsdk:"can_change_roles"`
-	CanManageApiKeys types.Bool `tfsdk:"can_manage_api_keys"`
-	CanRemoveUsers types.Bool `tfsdk:"can_remove_users"`
-	CanSetupSaml types.Bool `tfsdk:"can_setup_saml"`
-	CanDeleteOrg types.Bool `tfsdk:"can_delete_org"`
-	CanEditOrgAccess types.Bool `tfsdk:"can_edit_org_access"`
-	CanUpdateOrgMetadata types.Bool `tfsdk:"can_update_org_metadata"`
-	Permissions []types.String `tfsdk:"permissions"`
-	RolesCanManage []types.String `tfsdk:"roles_can_manage"`
-	IsInternal types.Bool `tfsdk:"is_internal"`
-	Disabled types.Bool `tfsdk:"disabled"`
-	Description types.String `tfsdk:"description"`
-	ReplacingRole types.String `tfsdk:"replacing_role"`
+	CanViewOtherMembers  types.Bool     `tfsdk:"can_view_other_members"`
+	CanInvite            types.Bool     `tfsdk:"can_invite"`
+	CanChangeRoles       types.Bool     `tfsdk:"can_change_roles"`
+	CanManageApiKeys     types.Bool     `tfsdk:"can_manage_api_keys"`
+	CanRemoveUsers       types.Bool     `tfsdk:"can_remove_users"`
+	CanSetupSaml         types.Bool     `tfsdk:"can_setup_saml"`
+	CanDeleteOrg         types.Bool     `tfsdk:"can_delete_org"`
+	CanEditOrgAccess     types.Bool     `tfsdk:"can_edit_org_access"`
+	CanUpdateOrgMetadata types.Bool     `tfsdk:"can_update_org_metadata"`
+	Permissions          []types.String `tfsdk:"permissions"`
+	RolesCanManage       []types.String `tfsdk:"roles_can_manage"`
+	IsInternal           types.Bool     `tfsdk:"is_internal"`
+	Disabled             types.Bool     `tfsdk:"disabled"`
+	Description          types.String   `tfsdk:"description"`
+	ReplacingRole        types.String   `tfsdk:"replacing_role"`
 }
-
 
 func (r *rolesAndPermissionsResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_roles_and_permissions"
@@ -82,12 +81,12 @@ func (r *rolesAndPermissionsResource) Schema(ctx context.Context, req resource.S
 					"this can only be set in the PropelAuth dashboard.",
 			},
 			"permissions": schema.ListNestedAttribute{
-				Optional: true,
+				Optional:    true,
 				Description: "A list of permissions that are specific to your application and can be assigned to individual roles.",
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"name": schema.StringAttribute{
-							Required: true,
+							Required:    true,
 							Description: "The name of the permission. This should be a unique identifier for the permission.",
 						},
 						"display_name": schema.StringAttribute{
@@ -96,7 +95,7 @@ func (r *rolesAndPermissionsResource) Schema(ctx context.Context, req resource.S
 								"If not provided, the `name` will be used.",
 						},
 						"description": schema.StringAttribute{
-							Optional: true,
+							Optional:    true,
 							Description: "A description of the permission. This is a human readable description of what the permission allows.",
 						},
 					},
@@ -108,7 +107,7 @@ func (r *rolesAndPermissionsResource) Schema(ctx context.Context, req resource.S
 					"It is also the fallback role in the instance their role is deleted from the configuration without a replacement.",
 			},
 			"default_owner_role": schema.StringAttribute{
-				Required: true,
+				Required:    true,
 				Description: "The `default_owner_role` is the role automatically assigned to the user who creates the organization.",
 			},
 			"roles": schema.MapNestedAttribute{
@@ -139,7 +138,7 @@ func (r *rolesAndPermissionsResource) Schema(ctx context.Context, req resource.S
 							Default:  booldefault.StaticBool(false),
 							Description: "If true, users with this role in the org can change the roles of other users in the organization. " +
 								"The default is false.",
-						},	
+						},
 						"can_manage_api_keys": schema.BoolAttribute{
 							Optional: true,
 							Computed: true,
@@ -185,8 +184,8 @@ func (r *rolesAndPermissionsResource) Schema(ctx context.Context, req resource.S
 						},
 						"permissions": schema.ListAttribute{
 							ElementType: types.StringType,
-							Optional: true,
-							Computed: true,
+							Optional:    true,
+							Computed:    true,
 							Default: listdefault.StaticValue(types.ListValueMust(
 								types.StringType,
 								[]attr.Value{},
@@ -195,8 +194,8 @@ func (r *rolesAndPermissionsResource) Schema(ctx context.Context, req resource.S
 						},
 						"roles_can_manage": schema.ListAttribute{
 							ElementType: types.StringType,
-							Optional: true,
-							Computed: true,
+							Optional:    true,
+							Computed:    true,
 							Default: listdefault.StaticValue(types.ListValueMust(
 								types.StringType,
 								[]attr.Value{},
@@ -226,7 +225,7 @@ func (r *rolesAndPermissionsResource) Schema(ctx context.Context, req resource.S
 								"now have this role. The `replacing_role` should not exist in the `roles` map.",
 						},
 						"description": schema.StringAttribute{
-							Optional: true,
+							Optional:    true,
 							Description: "A human-readable description of the role.",
 						},
 					},
@@ -234,8 +233,8 @@ func (r *rolesAndPermissionsResource) Schema(ctx context.Context, req resource.S
 			},
 			"role_hierarchy": schema.ListAttribute{
 				ElementType: types.StringType,
-				Optional: true,
-				Computed: true,
+				Optional:    true,
+				Computed:    true,
 				Default: listdefault.StaticValue(types.ListValueMust(
 					types.StringType,
 					[]attr.Value{},
@@ -275,7 +274,7 @@ func (r *rolesAndPermissionsResource) ValidateConfig(ctx context.Context, req re
 			resp.Diagnostics.AddAttributeWarning(
 				path.Root("role_heirarchy"),
 				"Not all defined roles are included in the heriarchy",
-				"If multiple_roles_per_user = true, you can ignore this. If not, any roles excluded from the heirarchy " +
+				"If multiple_roles_per_user = true, you can ignore this. If not, any roles excluded from the heirarchy "+
 					"will be omitted in the source system.",
 			)
 			return
@@ -308,10 +307,10 @@ func (r *rolesAndPermissionsResource) Create(ctx context.Context, req resource.C
 
 	// Read Terraform plan data into the model
 	diags := req.Plan.Get(ctx, &plan)
-    resp.Diagnostics.Append(diags...)
-    if resp.Diagnostics.HasError() {
-        return
-    }
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Update the roles and permissions
 	updateBuilder := propelauth.NewRolesAndPermissionsUpdateBuilder()
@@ -322,7 +321,7 @@ func (r *rolesAndPermissionsResource) Create(ctx context.Context, req resource.C
 
 	for _, permission := range plan.Permissions {
 		updateBuilder = updateBuilder.InsertPermission(propelauth.Permission{
-			Name: permission.Name.ValueString(),
+			Name:        permission.Name.ValueString(),
 			DisplayName: permission.DisplayName.ValueStringPointer(),
 			Description: permission.Description.ValueStringPointer(),
 		})
@@ -342,7 +341,7 @@ func (r *rolesAndPermissionsResource) Create(ctx context.Context, req resource.C
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error Creating PropelAuth Roles and Permissions",
-			"Could not read old PropelAuth Roles and Permissions: " + err.Error(),
+			"Could not read old PropelAuth Roles and Permissions: "+err.Error(),
 		)
 		return
 	}
@@ -354,14 +353,14 @@ func (r *rolesAndPermissionsResource) Create(ctx context.Context, req resource.C
 		updateBuilder.InsertOldRoleName(oldRole.Name)
 	}
 
-    _, err = r.client.UpdateRolesAndPermissions(updateBuilder.Build())
-    if err != nil {
-        resp.Diagnostics.AddError(
-            "Error setting roles and permissions",
-            "Could not set roles and permissions, unexpected error: "+err.Error(),
-        )
-        return
-    }
+	_, err = r.client.UpdateRolesAndPermissions(updateBuilder.Build())
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error setting roles and permissions",
+			"Could not set roles and permissions, unexpected error: "+err.Error(),
+		)
+		return
+	}
 
 	// log that the resource was created
 	tflog.Trace(ctx, "created a propelauth_roles_and_permissions resource")
@@ -381,12 +380,12 @@ func (r *rolesAndPermissionsResource) Read(ctx context.Context, req resource.Rea
 	// retrieve the roles and permissions from PropelAuth
 	rolesAndPermissions, err := r.client.GetRolesAndPermissions()
 	if err != nil {
-        resp.Diagnostics.AddError(
-            "Error Reading PropelAuth Roles and Permissions",
-            "Could not read PropelAuth Roles and Permissions: " + err.Error(),
-        )
-        return
-    }
+		resp.Diagnostics.AddError(
+			"Error Reading PropelAuth Roles and Permissions",
+			"Could not read PropelAuth Roles and Permissions: "+err.Error(),
+		)
+		return
+	}
 
 	// update state
 	// easy ones first
@@ -427,7 +426,7 @@ func (r *rolesAndPermissionsResource) Update(ctx context.Context, req resource.U
 
 	for _, permission := range plan.Permissions {
 		updateBuilder = updateBuilder.InsertPermission(propelauth.Permission{
-			Name: permission.Name.ValueString(),
+			Name:        permission.Name.ValueString(),
 			DisplayName: permission.DisplayName.ValueStringPointer(),
 			Description: permission.Description.ValueStringPointer(),
 		})
@@ -447,7 +446,7 @@ func (r *rolesAndPermissionsResource) Update(ctx context.Context, req resource.U
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error Updating PropelAuth Roles and Permissions",
-			"Could not read current PropelAuth Roles and Permissions: " + err.Error(),
+			"Could not read current PropelAuth Roles and Permissions: "+err.Error(),
 		)
 		return
 	}
@@ -459,14 +458,14 @@ func (r *rolesAndPermissionsResource) Update(ctx context.Context, req resource.U
 		updateBuilder.InsertOldRoleName(oldRole.Name)
 	}
 
-    _, err = r.client.UpdateRolesAndPermissions(updateBuilder.Build())
-    if err != nil {
-        resp.Diagnostics.AddError(
-            "Error setting roles and permissions",
-            "Could not set roles and permissions, unexpected error: "+err.Error(),
-        )
-        return
-    }
+	_, err = r.client.UpdateRolesAndPermissions(updateBuilder.Build())
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error setting roles and permissions",
+			"Could not set roles and permissions, unexpected error: "+err.Error(),
+		)
+		return
+	}
 
 	tflog.Trace(ctx, "updated a propelauth_roles_and_permissions resource")
 	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
@@ -476,24 +475,23 @@ func (r *rolesAndPermissionsResource) Delete(ctx context.Context, req resource.D
 	tflog.Trace(ctx, "deleted a propelauth_roles_and_permissions resource")
 }
 
-
 func convertRoleFromState(roleName string, role *roleModel) propelauth.RoleDefinition {
 	return propelauth.RoleDefinition{
-		Name: roleName,
-		CanViewOtherMembers: role.CanViewOtherMembers.ValueBool(),
-		CanInvite: role.CanInvite.ValueBool(),
-		CanChangeRoles: role.CanChangeRoles.ValueBool(),
-		CanManageApiKeys: role.CanManageApiKeys.ValueBool(),
-		CanRemoveUsers: role.CanRemoveUsers.ValueBool(),
-		CanSetupSaml: role.CanSetupSaml.ValueBool(),
-		CanDeleteOrg: role.CanDeleteOrg.ValueBool(),
-		CanEditOrgAccess: role.CanEditOrgAccess.ValueBool(),
+		Name:                 roleName,
+		CanViewOtherMembers:  role.CanViewOtherMembers.ValueBool(),
+		CanInvite:            role.CanInvite.ValueBool(),
+		CanChangeRoles:       role.CanChangeRoles.ValueBool(),
+		CanManageApiKeys:     role.CanManageApiKeys.ValueBool(),
+		CanRemoveUsers:       role.CanRemoveUsers.ValueBool(),
+		CanSetupSaml:         role.CanSetupSaml.ValueBool(),
+		CanDeleteOrg:         role.CanDeleteOrg.ValueBool(),
+		CanEditOrgAccess:     role.CanEditOrgAccess.ValueBool(),
 		CanUpdateOrgMetadata: role.CanUpdateOrgMetadata.ValueBool(),
-		ExternalPermissions: convertArrayOfStringsForSource(role.Permissions),
-		RolesCanManage: convertArrayOfStringsForSource(role.RolesCanManage),
-		IsVisibleToEndUser: !role.IsInternal.ValueBool(),
-		Disabled: role.Disabled.ValueBool(),
-		Description: role.Description.ValueStringPointer(),
+		ExternalPermissions:  convertArrayOfStringsForSource(role.Permissions),
+		RolesCanManage:       convertArrayOfStringsForSource(role.RolesCanManage),
+		IsVisibleToEndUser:   !role.IsInternal.ValueBool(),
+		Disabled:             role.Disabled.ValueBool(),
+		Description:          role.Description.ValueStringPointer(),
 	}
 }
 
@@ -570,20 +568,20 @@ func convertArrayOfStringsForSource(array []types.String) []string {
 
 func convertRoleToState(role *propelauth.RoleDefinition) roleModel {
 	roleInState := roleModel{
-		CanViewOtherMembers: types.BoolValue(role.CanViewOtherMembers),
-		CanInvite: types.BoolValue(role.CanInvite),
-		CanChangeRoles: types.BoolValue(role.CanChangeRoles),
-		CanManageApiKeys: types.BoolValue(role.CanManageApiKeys),
-		CanRemoveUsers: types.BoolValue(role.CanRemoveUsers),
-		CanSetupSaml: types.BoolValue(role.CanSetupSaml),
-		CanDeleteOrg: types.BoolValue(role.CanDeleteOrg),
-		CanEditOrgAccess: types.BoolValue(role.CanEditOrgAccess),
+		CanViewOtherMembers:  types.BoolValue(role.CanViewOtherMembers),
+		CanInvite:            types.BoolValue(role.CanInvite),
+		CanChangeRoles:       types.BoolValue(role.CanChangeRoles),
+		CanManageApiKeys:     types.BoolValue(role.CanManageApiKeys),
+		CanRemoveUsers:       types.BoolValue(role.CanRemoveUsers),
+		CanSetupSaml:         types.BoolValue(role.CanSetupSaml),
+		CanDeleteOrg:         types.BoolValue(role.CanDeleteOrg),
+		CanEditOrgAccess:     types.BoolValue(role.CanEditOrgAccess),
 		CanUpdateOrgMetadata: types.BoolValue(role.CanUpdateOrgMetadata),
-		Permissions: make([]types.String, len(role.ExternalPermissions)),
-		RolesCanManage: make([]types.String, len(role.RolesCanManage)),
-		IsInternal: types.BoolValue(!role.IsVisibleToEndUser),
-		Disabled: types.BoolValue(role.Disabled),
-		Description: types.StringPointerValue(role.Description),
+		Permissions:          make([]types.String, len(role.ExternalPermissions)),
+		RolesCanManage:       make([]types.String, len(role.RolesCanManage)),
+		IsInternal:           types.BoolValue(!role.IsVisibleToEndUser),
+		Disabled:             types.BoolValue(role.Disabled),
+		Description:          types.StringPointerValue(role.Description),
 	}
 
 	for i, permission := range role.ExternalPermissions {
@@ -614,7 +612,7 @@ func reconcilePermissions(state *rolesAndPermissionsResourceModel, rolesAndPermi
 		exists := state.PermissionExists(permissionInRolesAndPermissions.Name)
 		if !exists {
 			state.Permissions = append(state.Permissions, permissionModel{
-				Name: types.StringValue(permissionInRolesAndPermissions.Name),
+				Name:        types.StringValue(permissionInRolesAndPermissions.Name),
 				DisplayName: types.StringPointerValue(permissionInRolesAndPermissions.DisplayName),
 				Description: types.StringPointerValue(permissionInRolesAndPermissions.Description),
 			})

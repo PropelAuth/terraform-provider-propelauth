@@ -52,21 +52,21 @@ func (c *PropelAuthClient) UpdateRolesAndPermissions(update rolesAndPermissionsU
 
 type RolesAndPermissionsUpdateBuilder struct {
 	multipleRolesPerUser bool
-	defaultRole string
-	defaultOwnerRole string
-	roleHierarchy []string
-	roles map[string]RoleDefinition
-	permissions []Permission
-	oldToNewRoleMapping map[string]*string
-	oldRoleNames []string
+	defaultRole          string
+	defaultOwnerRole     string
+	roleHierarchy        []string
+	roles                map[string]RoleDefinition
+	permissions          []Permission
+	oldToNewRoleMapping  map[string]*string
+	oldRoleNames         []string
 }
 
 func NewRolesAndPermissionsUpdateBuilder() *RolesAndPermissionsUpdateBuilder {
 	return &RolesAndPermissionsUpdateBuilder{
-		roles: make(map[string]RoleDefinition),
-		permissions: []Permission{},
+		roles:               make(map[string]RoleDefinition),
+		permissions:         []Permission{},
 		oldToNewRoleMapping: make(map[string]*string),
-		oldRoleNames: make([]string, 0),
+		oldRoleNames:        make([]string, 0),
 	}
 }
 
@@ -127,7 +127,7 @@ func (b *RolesAndPermissionsUpdateBuilder) Build() rolesAndPermissionsUpdate {
 	updateRequest.RolesAndPermissions.DefaultRole = b.defaultRole
 	updateRequest.RolesAndPermissions.DefaultOwnerRole = b.defaultOwnerRole
 	updateRequest.RolesAndPermissions.Permissions = b.permissions
-	
+
 	if b.multipleRolesPerUser {
 		for _, role := range b.roles {
 			updateRequest.RolesAndPermissions.Roles = append(updateRequest.RolesAndPermissions.Roles, role)
