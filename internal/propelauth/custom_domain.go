@@ -7,7 +7,7 @@ import (
 
 // GetCustomDomainInfo - Returns the custom domain info for the requested environment
 func (c *PropelAuthClient) GetCustomDomainInfo(environment string, isSwitching bool) (*CustomDomainInfoResponse, error) {
-	res, err := c.get(fmt.Sprintf("custom_domain?environment=%v&is_switching=%v", environment, isSwitching), nil)
+	res, err := c.get(fmt.Sprintf("custom_domain?environment=%v&is_switching=%v", environment, isSwitching))
 	if err != nil {
 		return nil, err
 	}
