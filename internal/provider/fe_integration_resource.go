@@ -51,7 +51,7 @@ func (r *feIntegrationResource) Metadata(ctx context.Context, req resource.Metad
 func (r *feIntegrationResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the language server.
-		Description: "Front-end Integration. This is for configuring the front-end integration for one of your poject's environments.",
+		Description: "Front-end Integration. This is for configuring the front-end integration for one of your project's environments.",
 		Attributes: map[string]schema.Attribute{
 			"environment": schema.StringAttribute{
 				Required: true,

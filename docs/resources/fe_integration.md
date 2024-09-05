@@ -3,12 +3,12 @@
 page_title: "propelauth_fe_integration Resource - propelauth"
 subcategory: ""
 description: |-
-  Front-end Integration. This is for configuring the front-end integration for one of your poject's environments.
+  Front-end Integration. This is for configuring the front-end integration for one of your project's environments.
 ---
 
 # propelauth_fe_integration (Resource)
 
-Front-end Integration. This is for configuring the front-end integration for one of your poject's environments.
+Front-end Integration. This is for configuring the front-end integration for one of your project's environments.
 
 ## Example Usage
 

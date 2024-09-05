@@ -3,12 +3,12 @@
 page_title: "propelauth_roles_and_permissions Resource - propelauth"
 subcategory: ""
 description: |-
-  Roles and Permissions resource. This is for configuring the basic roles and permissionsrmation in PropelAuth.
+  Roles and Permissions resource. This is for configuring the basic roles and permissions information in PropelAuth.
 ---
 
 # propelauth_roles_and_permissions (Resource)
 
-Roles and Permissions resource. This is for configuring the basic roles and permissionsrmation in PropelAuth.
+Roles and Permissions resource. This is for configuring the basic roles and permissions information in PropelAuth.
 
 ## Example Usage
 

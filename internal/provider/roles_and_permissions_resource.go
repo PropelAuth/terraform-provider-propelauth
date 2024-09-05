@@ -71,7 +71,7 @@ func (r *rolesAndPermissionsResource) Metadata(ctx context.Context, req resource
 func (r *rolesAndPermissionsResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the language server.
-		Description: "Roles and Permissions resource. This is for configuring the basic roles and permissionsrmation in PropelAuth.",
+		Description: "Roles and Permissions resource. This is for configuring the basic roles and permissions information in PropelAuth.",
 		Attributes: map[string]schema.Attribute{
 			"multiple_roles_per_user": schema.BoolAttribute{
 				Computed: true,
