@@ -33,6 +33,6 @@ provider "propelauth" {
 
 ### Optional
 
-- `api_key` (String, Sensitive) A PropelAuth Infrastructure Integration Key for your project. You can generate one on Infrastructure Integration page of the PropelAuth Dashboard.
-- `project_id` (String) Your PropelAuth Project ID. This can be retrieved from Infrastructure Integration page of the PropelAuth Dashboard.
-- `tenant_id` (String) Your PropelAuth Tenant ID. This can be retrieved from Infrastructure Integration page of the PropelAuth Dashboard.
+- `api_key` (String, Sensitive) A PropelAuth Infrastructure Integration Key for your project. You can generate one on the Infrastructure Integration page of the PropelAuth Dashboard. If not provided, the provider will attempt to use the PROPELAUTH_API_KEY environment variable.
+- `project_id` (String) Your PropelAuth Project ID. This can be retrieved from Infrastructure Integration page of the PropelAuth Dashboard. If not provided, the provider will attempt to use the PROPELAUTH_PROJECT_ID environment variable.
+- `tenant_id` (String) Your PropelAuth Tenant ID. This can be retrieved from Infrastructure Integration page of the PropelAuth Dashboard. If not provided, the provider will attempt to use the PROPELAUTH_TENANT_ID environment variable.
