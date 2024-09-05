@@ -16,9 +16,9 @@ const (
     // such as updating the Makefile and running the testing through that tool.
     providerConfig = `
 provider "propelauth" {
-   tenant_id = "e1dc8461-5d8a-4bad-a929-19745de693f4"
-   project_id = "5a5f7a4f-1a51-4312-bbbe-4126cceab59b"
-   api_key = "c557308180b7da18d7e0e9cbd2ae3b36833c0165b5158c439efe59662df01701c2e23b00211b9c25b5223e51417f323b"
+#   tenant_id = "<PROPELAUTH_TENANT_ID>"
+#   project_id = "<PROPELAUTH_PROJECT_ID>"
+#   api_key = "<PROPELAUTH_API_KEY>"
 }
 `
 )

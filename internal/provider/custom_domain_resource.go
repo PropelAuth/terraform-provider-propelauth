@@ -142,7 +142,7 @@ func (r *customDomainResource) Create(ctx context.Context, req resource.CreateRe
 
 	// Write logs using the tflog package
 	// Documentation: https://terraform.io/plugin/log
-	tflog.Trace(ctx, "created a propelauth_project_info resource")
+	tflog.Trace(ctx, "created a propelauth_custom_domain resource")
 
 	// Derive fields so they can be used either with or without the full domain
 	cnameRecordKeyParts := strings.Split(*customDomainInfo.CnameRecordKey, ".")
@@ -278,7 +278,7 @@ func (r *customDomainResource) Update(ctx context.Context, req resource.UpdateRe
 
 	// Write logs using the tflog package
 	// Documentation: https://terraform.io/plugin/log
-	tflog.Trace(ctx, "updated a custom_domain resource")
+	tflog.Trace(ctx, "updated a propelauth_custom_domain resource")
 
 	// Derive fields so they can be used either with or without the full domain
 	cnameRecordKeyParts := strings.Split(*customDomainInfo.CnameRecordKey, ".")
@@ -298,5 +298,5 @@ func (r *customDomainResource) Update(ctx context.Context, req resource.UpdateRe
 }
 
 func (r *customDomainResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	tflog.Trace(ctx, "deleted a custom_domain resource")
+	tflog.Trace(ctx, "deleted a propelauth_custom_domain resource")
 }
