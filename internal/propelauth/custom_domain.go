@@ -24,8 +24,8 @@ func (c *PropelAuthClient) GetCustomDomainInfo(environment string, isSwitching b
 // UpdateCustomDomainInfo - Updates the custom domain info for the requested environment
 func (c *PropelAuthClient) UpdateCustomDomainInfo(environment string, domain string, subdomain *string, isSwitching bool) (*CustomDomainInfoResponse, error) {
 	request := customDomainUpdateRequest{
-		Domain: domain,
-		Subdomain: subdomain,
+		Domain:      domain,
+		Subdomain:   subdomain,
 		Environment: environment,
 		IsSwitching: isSwitching,
 	}

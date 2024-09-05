@@ -250,26 +250,26 @@ type BeApiKey struct {
 }
 
 type CustomDomainInfoResponse struct {
-	Domain string `json:"domain"`
-	Subdomain *string `json:"subdomain"`
-	IsVerified bool `json:"is_verified"`
-	IsPending bool `json:"is_pending"`
-	TxtRecordKey *string `json:"txt_record_key"`
-	TxtRecordValue *string `json:"txt_record_value"`
-	CnameRecordKey *string `json:"cname_record_key"`
+	Domain           string  `json:"domain"`
+	Subdomain        *string `json:"subdomain"`
+	IsVerified       bool    `json:"is_verified"`
+	IsPending        bool    `json:"is_pending"`
+	TxtRecordKey     *string `json:"txt_record_key"`
+	TxtRecordValue   *string `json:"txt_record_value"`
+	CnameRecordKey   *string `json:"cname_record_key"`
 	CnameRecordValue *string `json:"cname_record_value"`
 }
 
 type customDomainUpdateRequest struct {
-	Domain string `json:"domain"`
-	Subdomain *string `json:"subdomain,omitempty"`
-	Environment string `json:"environment"`
-	IsSwitching bool `json:"is_switching"`
+	Domain      string  `json:"domain"`
+	Subdomain   *string `json:"subdomain,omitempty"`
+	Environment string  `json:"environment"`
+	IsSwitching bool    `json:"is_switching"`
 }
 
 type customDomainVerifyRequest struct {
 	Environment string `json:"environment"`
-	IsSwitching bool `json:"is_switching"`
+	IsSwitching bool   `json:"is_switching"`
 }
 
 type RolesAndPermissions struct {

@@ -191,17 +191,17 @@ func (p *propelauthProvider) Configure(ctx context.Context, req provider.Configu
 func (p *propelauthProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		NewProjectInfoResource,
-        NewBasicAuthConfigurationResource,
-        NewOrganizationConfigurationResource,
-        NewThemeResource,
-        NewImageResource,
-        NewUserPropertySettingsResource,
-        NewApiKeySettingsResource,
-        NewFeIntegrationResource,
-        NewBeApiKeyResource,
-        NewCustomDomainResource,
-        NewCustomDomainVerificationResource,
-        NewRolesAndPermissionsResource,
+		NewBasicAuthConfigurationResource,
+		NewOrganizationConfigurationResource,
+		NewThemeResource,
+		NewImageResource,
+		NewUserPropertySettingsResource,
+		NewApiKeySettingsResource,
+		NewFeIntegrationResource,
+		NewBeApiKeyResource,
+		NewCustomDomainResource,
+		NewCustomDomainVerificationResource,
+		NewRolesAndPermissionsResource,
 	}
 }
 
