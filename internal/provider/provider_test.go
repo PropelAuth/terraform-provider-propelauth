@@ -5,6 +5,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
 )
 
+// PROPELAUTH_TENANT_ID=e1dc8461-5d8a-4bad-a929-19745de693f4
+// PROPELAUTH_PROJECT_ID=5a5f7a4f-1a51-4312-bbbe-4126cceab59b
+// PROPELAUTH_API_KEY=c557308180b7da18d7e0e9cbd2ae3b36833c0165b5158c439efe59662df01701c2e23b00211b9c25b5223e51417f323b
+
 const (
 	// providerConfig is a shared configuration to combine with the actual
 	// test configuration so the PropelAuth client is properly configured.
