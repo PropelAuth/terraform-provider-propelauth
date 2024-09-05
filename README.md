@@ -1,39 +1,15 @@
 # PropelAuth Terraform Provider
 
-Use terraform to manage your PropelAuth integration for authentication, B2B authorization, and user management.
+Use terraform to manage your [PropelAuth](https://www.propelauth.com/) integration for authentication, B2B authorization, and user management.
+
+## Using the provider
+
+To use the provider you must first have a [PropelAuth project](https://app.propelauth.com/) where you can setup you can generate the necessary credentials. Find the latest documentation on how to use the provider [here](https://registry.terraform.io/providers/PropelAuth/propelauth/latest/docs).
 
 ## Requirements
 
 - [Terraform](https://developer.hashicorp.com/terraform/downloads) >= 1.0
 - [Go](https://golang.org/doc/install) >= 1.21
-
-## Building The Provider
-
-1. Clone the repository
-1. Enter the repository directory
-1. Build the provider using the Go `install` command:
-
-```shell
-go install
-```
-
-## Adding Dependencies
-
-This provider uses [Go modules](https://github.com/golang/go/wiki/Modules).
-Please see the Go documentation for the most up to date information about using Go modules.
-
-To add a new dependency `github.com/author/dependency` to your Terraform provider:
-
-```shell
-go get github.com/author/dependency
-go mod tidy
-```
-
-Then commit the changes to `go.mod` and `go.sum`.
-
-## Using the provider
-
-TKTK
 
 ## Developing the Provider
 
