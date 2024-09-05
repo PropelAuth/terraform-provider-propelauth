@@ -45,18 +45,21 @@ func (p *propelauthProvider) Schema(ctx context.Context, req provider.SchemaRequ
 		Description: "Manage your PropelAuth integration for authentication, B2B authorization, and user management.",
 		Attributes: map[string]schema.Attribute{
 			"tenant_id": schema.StringAttribute{
-				Optional:    true,
-				Description: "Your PropelAuth Tenant ID. This can be retrieved from Infrastructure Integration page of the PropelAuth Dashboard.",
+				Optional: true,
+				Description: "Your PropelAuth Tenant ID. This can be retrieved from Infrastructure Integration page of the PropelAuth Dashboard. " +
+					"If not provided, the provider will attempt to use the PROPELAUTH_TENANT_ID environment variable.",
 			},
 			"project_id": schema.StringAttribute{
-				Optional:    true,
-				Description: "Your PropelAuth Project ID. This can be retrieved from Infrastructure Integration page of the PropelAuth Dashboard.",
+				Optional: true,
+				Description: "Your PropelAuth Project ID. This can be retrieved from Infrastructure Integration page of the PropelAuth Dashboard. " +
+					"If not provided, the provider will attempt to use the PROPELAUTH_PROJECT_ID environment variable.",
 			},
 			"api_key": schema.StringAttribute{
 				Optional:  true,
 				Sensitive: true,
 				Description: "A PropelAuth Infrastructure Integration Key for your project. " +
-					"You can generate one on Infrastructure Integration page of the PropelAuth Dashboard.",
+					"You can generate one on the Infrastructure Integration page of the PropelAuth Dashboard. " +
+					"If not provided, the provider will attempt to use the PROPELAUTH_API_KEY environment variable.",
 			},
 		},
 	}
