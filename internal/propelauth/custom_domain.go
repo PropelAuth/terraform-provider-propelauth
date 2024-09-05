@@ -5,9 +5,9 @@ import (
 	"fmt"
 )
 
-// GetCustomDomainInfo - Returns the custom domain info for the requested environment
+// GetCustomDomainInfo - Returns the custom domain info for the requested environment.
 func (c *PropelAuthClient) GetCustomDomainInfo(environment string, isSwitching bool) (*CustomDomainInfoResponse, error) {
-	res, err := c.get(fmt.Sprintf("custom_domain?environment=%v&is_switching=%v", environment, isSwitching), nil)
+	res, err := c.get(fmt.Sprintf("custom_domain?environment=%v&is_switching=%v", environment, isSwitching))
 	if err != nil {
 		return nil, err
 	}
@@ -21,11 +21,11 @@ func (c *PropelAuthClient) GetCustomDomainInfo(environment string, isSwitching b
 	return &customDomainInfo, nil
 }
 
-// UpdateCustomDomainInfo - Updates the custom domain info for the requested environment
+// UpdateCustomDomainInfo - Updates the custom domain info for the requested environment.
 func (c *PropelAuthClient) UpdateCustomDomainInfo(environment string, domain string, subdomain *string, isSwitching bool) (*CustomDomainInfoResponse, error) {
 	request := customDomainUpdateRequest{
-		Domain: domain,
-		Subdomain: subdomain,
+		Domain:      domain,
+		Subdomain:   subdomain,
 		Environment: environment,
 		IsSwitching: isSwitching,
 	}
@@ -49,7 +49,7 @@ func (c *PropelAuthClient) UpdateCustomDomainInfo(environment string, domain str
 	return &customDomainInfo, nil
 }
 
-// VerifyCustomDomainInfo - Verifies the custom domain info for the requested environment
+// VerifyCustomDomainInfo - Verifies the custom domain info for the requested environment.
 func (c *PropelAuthClient) VerifyCustomDomainInfo(environment string, isSwitching bool) error {
 	request := customDomainVerifyRequest{
 		Environment: environment,

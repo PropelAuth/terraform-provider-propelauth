@@ -14,7 +14,7 @@ import (
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &apiKeySettingsResource{}
-var _ resource.ResourceWithConfigure   = &apiKeySettingsResource{}
+var _ resource.ResourceWithConfigure = &apiKeySettingsResource{}
 
 func NewApiKeySettingsResource() resource.Resource {
 	return &apiKeySettingsResource{}
@@ -27,10 +27,10 @@ type apiKeySettingsResource struct {
 
 // apiKeySettingsResourceModel describes the resource data model.
 type apiKeySettingsResourceModel struct {
-	PersonalApiKeysEnabled types.Bool `tfsdk:"personal_api_keys_enabled"`
-	OrgApiKeysEnabled types.Bool `tfsdk:"org_api_keys_enabled"`
-	InvalidateOrgApiKeyUponUserRemoval types.Bool `tfsdk:"invalidate_org_api_key_upon_user_removal"`
-	ApiKeyConfig *apiKeyConfigResourceModel `tfsdk:"api_key_config"`
+	PersonalApiKeysEnabled             types.Bool                 `tfsdk:"personal_api_keys_enabled"`
+	OrgApiKeysEnabled                  types.Bool                 `tfsdk:"org_api_keys_enabled"`
+	InvalidateOrgApiKeyUponUserRemoval types.Bool                 `tfsdk:"invalidate_org_api_key_upon_user_removal"`
+	ApiKeyConfig                       *apiKeyConfigResourceModel `tfsdk:"api_key_config"`
 }
 
 type apiKeyConfigResourceModel struct {
@@ -39,7 +39,7 @@ type apiKeyConfigResourceModel struct {
 
 type apiKeyExpirationOptionsResourceModel struct {
 	Options []types.String `tfsdk:"options"`
-	Default types.String `tfsdk:"default"`
+	Default types.String   `tfsdk:"default"`
 }
 
 func (r *apiKeySettingsResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -51,11 +51,11 @@ func (r *apiKeySettingsResource) Schema(ctx context.Context, req resource.Schema
 		Description: "Api Key Configurations. This is for configuring the API global settings for t.",
 		Attributes: map[string]schema.Attribute{
 			"personal_api_keys_enabled": schema.BoolAttribute{
-				Optional: true,
+				Optional:    true,
 				Description: "Allow users to create personal API keys. The default setting is false.",
 			},
 			"org_api_keys_enabled": schema.BoolAttribute{
-				Optional: true,
+				Optional:    true,
 				Description: "Allow users to create API keys for their organization. The default setting is false.",
 			},
 			"invalidate_org_api_key_upon_user_removal": schema.BoolAttribute{
@@ -64,11 +64,11 @@ func (r *apiKeySettingsResource) Schema(ctx context.Context, req resource.Schema
 					"The default setting is false.",
 			},
 			"api_key_config": schema.SingleNestedAttribute{
-				Optional: true,
+				Optional:    true,
 				Description: "API Key Configuration. This is for setting the options available to your users when creating an API key.",
 				Attributes: map[string]schema.Attribute{
 					"expiration_options": schema.SingleNestedAttribute{
-						Required: true,
+						Required:    true,
 						Description: "API Key Expiration Options. This is for setting the options available to your users when creating an API key.",
 						Attributes: map[string]schema.Attribute{
 							"options": schema.ListAttribute{
@@ -86,7 +86,6 @@ func (r *apiKeySettingsResource) Schema(ctx context.Context, req resource.Schema
 					},
 				},
 			},
-
 		},
 	}
 }
@@ -116,15 +115,15 @@ func (r *apiKeySettingsResource) Create(ctx context.Context, req resource.Create
 
 	// Read Terraform plan data into the model
 	diags := req.Plan.Get(ctx, &plan)
-    resp.Diagnostics.Append(diags...)
-    if resp.Diagnostics.HasError() {
-        return
-    }
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Update the configuration in PropelAuth
 	environmentConfigUpdate := propelauth.EnvironmentConfigUpdate{
-		PersonalApiKeysEnabled: plan.PersonalApiKeysEnabled.ValueBoolPointer(),
-		OrgApiKeysEnabled: plan.OrgApiKeysEnabled.ValueBoolPointer(),
+		PersonalApiKeysEnabled:              plan.PersonalApiKeysEnabled.ValueBoolPointer(),
+		OrgApiKeysEnabled:                   plan.OrgApiKeysEnabled.ValueBoolPointer(),
 		InvalidateOrgApiKeysUponUserRemoval: plan.InvalidateOrgApiKeyUponUserRemoval.ValueBoolPointer(),
 	}
 
@@ -141,21 +140,21 @@ func (r *apiKeySettingsResource) Create(ctx context.Context, req resource.Create
 		}
 	}
 
-    environmentConfigResponse, err := r.client.UpdateEnvironmentConfig(&environmentConfigUpdate)
-    if err != nil {
-        resp.Diagnostics.AddError(
-            "Error setting api key settings",
-            "Could not set api key settings, unexpected error: "+err.Error(),
-        )
-        return
-    }
+	environmentConfigResponse, err := r.client.UpdateEnvironmentConfig(&environmentConfigUpdate)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error setting api key settings",
+			"Could not set api key settings, unexpected error: "+err.Error(),
+		)
+		return
+	}
 
 	// Check that fields were updated to the new value if not empty
-	if plan.PersonalApiKeysEnabled.ValueBoolPointer() != nil && 
+	if plan.PersonalApiKeysEnabled.ValueBoolPointer() != nil &&
 		plan.PersonalApiKeysEnabled.ValueBool() != environmentConfigResponse.PersonalApiKeysEnabled {
 		resp.Diagnostics.AddError(
 			"Error updating api key settings",
-			"PersonalApiKeysEnabled failed to update. The `personal_api_keys_enabled` is instead " + fmt.Sprintf("%t", environmentConfigResponse.PersonalApiKeysEnabled),
+			"PersonalApiKeysEnabled failed to update. The `personal_api_keys_enabled` is instead "+fmt.Sprintf("%t", environmentConfigResponse.PersonalApiKeysEnabled),
 		)
 		return
 	}
@@ -163,7 +162,7 @@ func (r *apiKeySettingsResource) Create(ctx context.Context, req resource.Create
 		plan.OrgApiKeysEnabled.ValueBool() != environmentConfigResponse.OrgApiKeysEnabled {
 		resp.Diagnostics.AddError(
 			"Error updating api key settings",
-			"OrgApiKeysEnabled failed to update. The `org_api_keys_enabled` is instead " + fmt.Sprintf("%t", environmentConfigResponse.OrgApiKeysEnabled),
+			"OrgApiKeysEnabled failed to update. The `org_api_keys_enabled` is instead "+fmt.Sprintf("%t", environmentConfigResponse.OrgApiKeysEnabled),
 		)
 		return
 	}
@@ -171,7 +170,7 @@ func (r *apiKeySettingsResource) Create(ctx context.Context, req resource.Create
 		plan.InvalidateOrgApiKeyUponUserRemoval.ValueBool() != environmentConfigResponse.InvalidateOrgApiKeyUponUserRemoval {
 		resp.Diagnostics.AddError(
 			"Error updating api key settings",
-			"InvalidateOrgApiKeysUponUserRemoval failed to update. The `invalidate_org_api_key_upon_user_removal` is instead " + fmt.Sprintf("%t", environmentConfigResponse.InvalidateOrgApiKeyUponUserRemoval),
+			"InvalidateOrgApiKeysUponUserRemoval failed to update. The `invalidate_org_api_key_upon_user_removal` is instead "+fmt.Sprintf("%t", environmentConfigResponse.InvalidateOrgApiKeyUponUserRemoval),
 		)
 		return
 	}
@@ -195,14 +194,13 @@ func (r *apiKeySettingsResource) Read(ctx context.Context, req resource.ReadRequ
 	// retrieve the environment config from PropelAuth
 	environmentConfigResponse, err := r.client.GetEnvironmentConfig()
 	if err != nil {
-        resp.Diagnostics.AddError(
-            "Error Reading PropelAuth api key settings",
-            "Could not read PropelAuth api key settings: " + err.Error(),
-        )
-        return
-    }
+		resp.Diagnostics.AddError(
+			"Error Reading PropelAuth api key settings",
+			"Could not read PropelAuth api key settings: "+err.Error(),
+		)
+		return
+	}
 
-	
 	// Save into the Terraform state only if the value is not null in Terraform.
 	// Null, or unset values, in Terraform are left to be manually managed in the dashboard.
 	if state.PersonalApiKeysEnabled.ValueBoolPointer() != nil {
@@ -234,15 +232,15 @@ func (r *apiKeySettingsResource) Update(ctx context.Context, req resource.Update
 
 	// Read Terraform plan data into the model
 	diags := req.Plan.Get(ctx, &plan)
-    resp.Diagnostics.Append(diags...)
-    if resp.Diagnostics.HasError() {
-        return
-    }
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Update the configuration in PropelAuth
 	environmentConfigUpdate := propelauth.EnvironmentConfigUpdate{
-		PersonalApiKeysEnabled: plan.PersonalApiKeysEnabled.ValueBoolPointer(),
-		OrgApiKeysEnabled: plan.OrgApiKeysEnabled.ValueBoolPointer(),
+		PersonalApiKeysEnabled:              plan.PersonalApiKeysEnabled.ValueBoolPointer(),
+		OrgApiKeysEnabled:                   plan.OrgApiKeysEnabled.ValueBoolPointer(),
 		InvalidateOrgApiKeysUponUserRemoval: plan.InvalidateOrgApiKeyUponUserRemoval.ValueBoolPointer(),
 	}
 
@@ -259,21 +257,21 @@ func (r *apiKeySettingsResource) Update(ctx context.Context, req resource.Update
 		}
 	}
 
-    environmentConfigResponse, err := r.client.UpdateEnvironmentConfig(&environmentConfigUpdate)
-    if err != nil {
-        resp.Diagnostics.AddError(
-            "Error setting api key settings",
-            "Could not set api key settings, unexpected error: "+err.Error(),
-        )
-        return
-    }
+	environmentConfigResponse, err := r.client.UpdateEnvironmentConfig(&environmentConfigUpdate)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error setting api key settings",
+			"Could not set api key settings, unexpected error: "+err.Error(),
+		)
+		return
+	}
 
 	// Check that fields were updated to the new value if not empty
-	if plan.PersonalApiKeysEnabled.ValueBoolPointer() != nil && 
+	if plan.PersonalApiKeysEnabled.ValueBoolPointer() != nil &&
 		plan.PersonalApiKeysEnabled.ValueBool() != environmentConfigResponse.PersonalApiKeysEnabled {
 		resp.Diagnostics.AddError(
 			"Error updating api key settings",
-			"PersonalApiKeysEnabled failed to update. The `personal_api_keys_enabled` is instead " + fmt.Sprintf("%t", environmentConfigResponse.PersonalApiKeysEnabled),
+			"PersonalApiKeysEnabled failed to update. The `personal_api_keys_enabled` is instead "+fmt.Sprintf("%t", environmentConfigResponse.PersonalApiKeysEnabled),
 		)
 		return
 	}
@@ -281,7 +279,7 @@ func (r *apiKeySettingsResource) Update(ctx context.Context, req resource.Update
 		plan.OrgApiKeysEnabled.ValueBool() != environmentConfigResponse.OrgApiKeysEnabled {
 		resp.Diagnostics.AddError(
 			"Error updating api key settings",
-			"OrgApiKeysEnabled failed to update. The `org_api_keys_enabled` is instead " + fmt.Sprintf("%t", environmentConfigResponse.OrgApiKeysEnabled),
+			"OrgApiKeysEnabled failed to update. The `org_api_keys_enabled` is instead "+fmt.Sprintf("%t", environmentConfigResponse.OrgApiKeysEnabled),
 		)
 		return
 	}
@@ -289,7 +287,7 @@ func (r *apiKeySettingsResource) Update(ctx context.Context, req resource.Update
 		plan.InvalidateOrgApiKeyUponUserRemoval.ValueBool() != environmentConfigResponse.InvalidateOrgApiKeyUponUserRemoval {
 		resp.Diagnostics.AddError(
 			"Error updating api key settings",
-			"InvalidateOrgApiKeysUponUserRemoval failed to update. The `invalidate_org_api_key_upon_user_removal` is instead " + fmt.Sprintf("%t", environmentConfigResponse.InvalidateOrgApiKeyUponUserRemoval),
+			"InvalidateOrgApiKeysUponUserRemoval failed to update. The `invalidate_org_api_key_upon_user_removal` is instead "+fmt.Sprintf("%t", environmentConfigResponse.InvalidateOrgApiKeyUponUserRemoval),
 		)
 		return
 	}

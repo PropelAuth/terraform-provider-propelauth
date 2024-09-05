@@ -6,7 +6,7 @@ import (
 
 // GetEnvironmentConfig - Returns a project metadata.
 func (c *PropelAuthClient) GetEnvironmentConfig() (*EnvironmentConfigResponse, error) {
-	res, err := c.get("config", nil)
+	res, err := c.get("config")
 	if err != nil {
 		return nil, err
 	}

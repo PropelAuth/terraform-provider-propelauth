@@ -49,7 +49,10 @@ func (r *customDomainResource) Metadata(ctx context.Context, req resource.Metada
 func (r *customDomainResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the language server.
-		Description: "Custom Domain resource. This is for configuring a custom domain for Production or Staging.",
+		Description: "This resource just sets up the process of verifying the domain. " +
+			"It will return the TXT and CNAME records that you need to add to your DNS settings. " +
+			"You will need to add these records to your DNS settings manually or using Terraform. " +
+			"Then, the `propelauth_custom_domain_verification` resource will verify the domain.",
 		Attributes: map[string]schema.Attribute{
 			"environment": schema.StringAttribute{
 				Required: true,
@@ -62,12 +65,14 @@ func (r *customDomainResource) Schema(ctx context.Context, req resource.SchemaRe
 				Description: "The environment for which you are configuring the custom domain. Accepted values are `Staging` and `Prod`.",
 			},
 			"domain": schema.StringAttribute{
-				Required:    true,
-				Description: "The domain name for the custom domain.",
+				Required: true,
+				Description: "The domain name for the custom domain. Your resulting auth domain will be `auth.<domain>`. " +
+					"You can also specify a subdomain like prod.example.com which will result in auth.prod.example.com",
 			},
 			"subdomain": schema.StringAttribute{
-				Optional:    true,
-				Description: "The subdomain for the custom domain. This is optional.",
+				Optional: true,
+				Description: "The subdomain for the custom domain. This is optional, but recommended, as it will " +
+					"allow PropelAuth to automatically redirect users to your application after they login.",
 			},
 			"txt_record_key": schema.StringAttribute{
 				Computed:    true,

@@ -8,7 +8,7 @@ import (
 
 // GetTestFeIntegrationInfo - Returns the FE integration info for the test environment.
 func (c *PropelAuthClient) GetTestFeIntegrationInfo() (*TestFeIntegrationInfo, error) {
-	res, err := c.get("fe_integration", nil)
+	res, err := c.get("fe_integration")
 	if err != nil {
 		return nil, err
 	}
@@ -23,20 +23,20 @@ func (c *PropelAuthClient) GetTestFeIntegrationInfo() (*TestFeIntegrationInfo, e
 }
 
 type FeIntegrationUpdate struct {
-	ApplicationUrl string
-	LoginRedirectPath string
-	LogoutRedirectPath string
+	ApplicationUrl        string
+	LoginRedirectPath     string
+	LogoutRedirectPath    string
 	AdditionalFeLocations []AdditionalFeLocation
 }
 
 // UpdateTestFeIntegration - Updates the FE integration info for the test environment.
 func (c *PropelAuthClient) UpdateTestFeIntegration(update FeIntegrationUpdate) (*TestFeIntegrationInfo, error) {
 	request := feIntegrationUpdateRequest{
-		LoginRedirectPath: update.LoginRedirectPath,
+		LoginRedirectPath:  update.LoginRedirectPath,
 		LogoutRedirectPath: update.LogoutRedirectPath,
 		TestEnvFeIntegrationApplicationUrl: &testEnvFeIntegrationApplicationUrl{
 			ApplicationUrl: update.ApplicationUrl,
-			Type: "SchemeAndDomain",
+			Type:           "SchemeAndDomain",
 		},
 		AdditionalFeLocations: AdditionalFeLocations{
 			AdditionalFeLocations: update.AdditionalFeLocations,
@@ -60,8 +60,8 @@ func (c *PropelAuthClient) UpdateTestFeIntegration(update FeIntegrationUpdate) (
 func (c *PropelAuthClient) UpdateLiveFeIntegration(environment string, update FeIntegrationUpdate) (*FeIntegrationInfoForEnv, error) {
 	request := feIntegrationUpdateRequest{
 		ApplicationHostnameWithScheme: update.ApplicationUrl,
-		LoginRedirectPath: update.LoginRedirectPath,
-		LogoutRedirectPath: update.LogoutRedirectPath,
+		LoginRedirectPath:             update.LoginRedirectPath,
+		LogoutRedirectPath:            update.LogoutRedirectPath,
 		AdditionalFeLocations: AdditionalFeLocations{
 			AdditionalFeLocations: update.AdditionalFeLocations,
 		},
@@ -80,10 +80,9 @@ func (c *PropelAuthClient) UpdateLiveFeIntegration(environment string, update Fe
 	return c.GetLiveFeIntegrationInfo(environment)
 }
 
-
 // GetLiveFeIntegrationInfo - Returns the FE integration info for a live staging or prod environment.
 func (c *PropelAuthClient) GetLiveFeIntegrationInfo(environment string) (*FeIntegrationInfoForEnv, error) {
-	res, err := c.get("fe_integration", nil)
+	res, err := c.get("fe_integration")
 	if err != nil {
 		return nil, err
 	}
@@ -95,11 +94,11 @@ func (c *PropelAuthClient) GetLiveFeIntegrationInfo(environment string) (*FeInte
 	}
 
 	switch environment {
-		case "Staging":
-			return &feIntegration.Staging, nil
-		case "Prod":
-			return &feIntegration.Prod, nil
-		default:
-			return nil, fmt.Errorf("invalid environment when fetching FE integration info: %s", environment)
+	case "Staging":
+		return &feIntegration.Staging, nil
+	case "Prod":
+		return &feIntegration.Prod, nil
+	default:
+		return nil, fmt.Errorf("invalid environment when fetching FE integration info: %s", environment)
 	}
 }

@@ -14,12 +14,12 @@ import (
 
 // Ensure the implementation satisfies the expected interfaces.
 var (
-  _ datasource.DataSource = &beIntegrationDataSource{}
+	_ datasource.DataSource = &beIntegrationDataSource{}
 )
 
 // NewBeIntegrationDataSource is a helper function to simplify the provider implementation.
 func NewBeIntegrationDataSource() datasource.DataSource {
-  return &beIntegrationDataSource{}
+	return &beIntegrationDataSource{}
 }
 
 type beIntegrationDataSource struct {
@@ -28,14 +28,14 @@ type beIntegrationDataSource struct {
 
 type beIntegrationDataSourceModel struct {
 	Environment types.String `tfsdk:"environment"`
-	AuthUrl types.String `tfsdk:"auth_url"`
-	PublicKey types.String `tfsdk:"public_key"`
-	Issuer types.String `tfsdk:"issuer"`
+	AuthUrl     types.String `tfsdk:"auth_url"`
+	PublicKey   types.String `tfsdk:"public_key"`
+	Issuer      types.String `tfsdk:"issuer"`
 }
 
 // Metadata returns the data source type name.
 func (d *beIntegrationDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-  resp.TypeName = req.ProviderTypeName + "_be_integration"
+	resp.TypeName = req.ProviderTypeName + "_be_integration"
 }
 
 // Schema defines the schema for the data source.
@@ -51,7 +51,7 @@ func (d *beIntegrationDataSource) Schema(_ context.Context, _ datasource.SchemaR
 				Description: "The environment for which you are configuring the backend integration. Accepted values are `Test`, `Staging`, and `Prod`.",
 			},
 			"auth_url": schema.StringAttribute{
-				Computed: true,
+				Computed:    true,
 				Description: "The URL to the authentication endpoint for the environment. This is needed in PropelAuth backend libraries.",
 			},
 			"public_key": schema.StringAttribute{
@@ -93,7 +93,7 @@ func (d *beIntegrationDataSource) Read(ctx context.Context, req datasource.ReadR
 	var state beIntegrationDataSourceModel
 
 	// Read Terraform configuration data into the model
-    resp.Diagnostics.Append(req.Config.Get(ctx, &state)...)
+	resp.Diagnostics.Append(req.Config.Get(ctx, &state)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -109,5 +109,5 @@ func (d *beIntegrationDataSource) Read(ctx context.Context, req datasource.ReadR
 	state.Issuer = types.StringValue(beIntegrationInfo.Issuer)
 
 	// Write the data to the Terraform state
-    resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 }

@@ -38,63 +38,63 @@ type themeResource struct {
 
 // themeResourceModel describes the resource data model.
 type themeResourceModel struct {
-	HeaderFont types.String `tfsdk:"header_font"`
-	BodyFont types.String `tfsdk:"body_font"`
-	LoginPageTheme loginPageTheme  `tfsdk:"login_page_theme"`
-	ManagementPagesTheme managementPagesTheme  `tfsdk:"management_pages_theme"`
-	DisplayProjectName types.Bool `tfsdk:"display_project_name"`
+	HeaderFont           types.String         `tfsdk:"header_font"`
+	BodyFont             types.String         `tfsdk:"body_font"`
+	LoginPageTheme       loginPageTheme       `tfsdk:"login_page_theme"`
+	ManagementPagesTheme managementPagesTheme `tfsdk:"management_pages_theme"`
+	DisplayProjectName   types.Bool           `tfsdk:"display_project_name"`
 }
 
 type loginPageTheme struct {
-	Layout types.String `tfsdk:"layout"`
-	BackgroundType types.String `tfsdk:"background_type"`
-	SolidBackgroundParameters *solidBackgroundParameters `tfsdk:"solid_background_parameters"`
+	Layout                       types.String                  `tfsdk:"layout"`
+	BackgroundType               types.String                  `tfsdk:"background_type"`
+	SolidBackgroundParameters    *solidBackgroundParameters    `tfsdk:"solid_background_parameters"`
 	GradientBackgroundParameters *gradientBackgroundParameters `tfsdk:"gradient_background_parameters"`
-	ImageBackgroundParameters *imageBackgroundParameters `tfsdk:"image_background_parameters"`
-	FrameBackgroundColor types.String `tfsdk:"frame_background_color"`
-	FrameTextColor types.String `tfsdk:"frame_text_color"`
-	PrimaryColor types.String `tfsdk:"primary_color"`
-	PrimaryTextColor types.String `tfsdk:"primary_text_color"`
-	ErrorColor types.String `tfsdk:"error_color"`
-	ErrorButtonTextColor types.String `tfsdk:"error_button_text_color"`
-	BorderColor types.String `tfsdk:"border_color"`
-	SplitLoginPageParameters *splitLoginPageParameters `tfsdk:"split_login_page_parameters"`
+	ImageBackgroundParameters    *imageBackgroundParameters    `tfsdk:"image_background_parameters"`
+	FrameBackgroundColor         types.String                  `tfsdk:"frame_background_color"`
+	FrameTextColor               types.String                  `tfsdk:"frame_text_color"`
+	PrimaryColor                 types.String                  `tfsdk:"primary_color"`
+	PrimaryTextColor             types.String                  `tfsdk:"primary_text_color"`
+	ErrorColor                   types.String                  `tfsdk:"error_color"`
+	ErrorButtonTextColor         types.String                  `tfsdk:"error_button_text_color"`
+	BorderColor                  types.String                  `tfsdk:"border_color"`
+	SplitLoginPageParameters     *splitLoginPageParameters     `tfsdk:"split_login_page_parameters"`
 }
 
 type splitLoginPageParameters struct {
-	Direction types.String `tfsdk:"direction"`
-	ContentType types.String `tfsdk:"content_type"`
-	Header types.String `tfsdk:"header"`
-	Subheader types.String `tfsdk:"subheader"`
+	Direction                    types.String `tfsdk:"direction"`
+	ContentType                  types.String `tfsdk:"content_type"`
+	Header                       types.String `tfsdk:"header"`
+	Subheader                    types.String `tfsdk:"subheader"`
 	SecondaryBackgroundTextColor types.String `tfsdk:"secondary_background_text_color"`
 }
 
 type solidBackgroundParameters struct {
-	BackgroundColor types.String `tfsdk:"background_color"`
+	BackgroundColor     types.String `tfsdk:"background_color"`
 	BackgroundTextColor types.String `tfsdk:"background_text_color"`
 }
 
 type gradientBackgroundParameters struct {
 	BackgroundGradientStartColor types.String `tfsdk:"background_gradient_start_color"`
-	BackgroundGradientEndColor types.String `tfsdk:"background_gradient_end_color"`
-	BackgroundGradientAngle types.Int32 `tfsdk:"background_gradient_angle"`
-	BackgroundTextColor types.String `tfsdk:"background_text_color"`
+	BackgroundGradientEndColor   types.String `tfsdk:"background_gradient_end_color"`
+	BackgroundGradientAngle      types.Int32  `tfsdk:"background_gradient_angle"`
+	BackgroundTextColor          types.String `tfsdk:"background_text_color"`
 }
 
 type imageBackgroundParameters struct {
 	DefaultBackgroundColor types.String `tfsdk:"default_background_color"`
-	BackgroundTextColor types.String `tfsdk:"background_text_color"`
+	BackgroundTextColor    types.String `tfsdk:"background_text_color"`
 }
 
 type managementPagesTheme struct {
-	MainBackgroundColor types.String `tfsdk:"main_background_color"`
-	MainTextColor types.String `tfsdk:"main_text_color"`
+	MainBackgroundColor   types.String `tfsdk:"main_background_color"`
+	MainTextColor         types.String `tfsdk:"main_text_color"`
 	NavbarBackgroundColor types.String `tfsdk:"navbar_background_color"`
-	NavbarTextColor types.String `tfsdk:"navbar_text_color"`
-	ActionButtonColor types.String `tfsdk:"action_button_color"`
+	NavbarTextColor       types.String `tfsdk:"navbar_text_color"`
+	ActionButtonColor     types.String `tfsdk:"action_button_color"`
 	ActionButtonTextColor types.String `tfsdk:"action_button_text_color"`
-	BorderColor types.String `tfsdk:"border_color"`
-	DisplayNavbar types.Bool `tfsdk:"display_navbar"`
+	BorderColor           types.String `tfsdk:"border_color"`
+	DisplayNavbar         types.Bool   `tfsdk:"display_navbar"`
 }
 
 func (r *themeResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -110,7 +110,7 @@ func (r *themeResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 			"header_font": schema.StringAttribute{
 				Optional: true,
 				Computed: true,
-				Default: 		   stringdefault.StaticString("Inter"),
+				Default:  stringdefault.StaticString("Inter"),
 				Validators: []validator.String{
 					stringvalidator.OneOf(
 						"Roboto", "Inter", "OpenSans", "Montserrat", "Lato", "Poppins", "Raleway", "Jost",
@@ -125,25 +125,25 @@ func (r *themeResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 			"body_font": schema.StringAttribute{
 				Optional: true,
 				Computed: true,
-				Default: 		   stringdefault.StaticString("Inter"),
+				Default:  stringdefault.StaticString("Inter"),
 				Description: "The font used for all body text in your hosted pages. This includes both login and management pages. " +
 					"The available options are the same as for `header_font`. The default value is `Inter`",
 			},
 			"display_project_name": schema.BoolAttribute{
-				Optional: 		  true,
+				Optional: true,
 				Computed: true,
-				Default: 		   booldefault.StaticBool(true),
+				Default:  booldefault.StaticBool(true),
 				Description: "If true, the project name is displayed in the header of the login page. " +
 					"The default value is `true`",
 			},
 			"login_page_theme": schema.SingleNestedAttribute{
 				Description: "The theme for the login page",
-				Required: true,
+				Required:    true,
 				Attributes: map[string]schema.Attribute{
 					"layout": schema.StringAttribute{
 						Optional: true,
 						Computed: true,
-						Default: 		   stringdefault.StaticString("Frame"),
+						Default:  stringdefault.StaticString("Frame"),
 						Validators: []validator.String{
 							stringvalidator.OneOf("Frame", "Frameless", "Split"),
 						},
@@ -153,7 +153,7 @@ func (r *themeResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 					"background_type": schema.StringAttribute{
 						Optional: true,
 						Computed: true,
-						Default: 		   stringdefault.StaticString("Solid"),
+						Default:  stringdefault.StaticString("Solid"),
 						Validators: []validator.String{
 							stringvalidator.OneOf("Solid", "Gradient", "Image"),
 						},
@@ -161,13 +161,13 @@ func (r *themeResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 							"The default value is `Solid`",
 					},
 					"solid_background_parameters": schema.SingleNestedAttribute{
-						Optional: true,
+						Optional:    true,
 						Description: "The parameters required for a solid background in the login page",
 						Attributes: map[string]schema.Attribute{
 							"background_color": schema.StringAttribute{
 								Optional: true,
 								Computed: true,
-								Default: 		   stringdefault.StaticString("#f7f7f7"),
+								Default:  stringdefault.StaticString("#f7f7f7"),
 								Validators: []validator.String{
 									stringvalidator.RegexMatches(hexcode_regex, "background_color must be a valid hex color code with lowercase characters"),
 								},
@@ -176,7 +176,7 @@ func (r *themeResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 							"background_text_color": schema.StringAttribute{
 								Optional: true,
 								Computed: true,
-								Default: 		   stringdefault.StaticString("#363636"),
+								Default:  stringdefault.StaticString("#363636"),
 								Validators: []validator.String{
 									stringvalidator.RegexMatches(hexcode_regex, "background_text_color must be a valid hex color code with lowercase characters"),
 								},
@@ -185,13 +185,13 @@ func (r *themeResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 						},
 					},
 					"gradient_background_parameters": schema.SingleNestedAttribute{
-						Optional: true,
+						Optional:    true,
 						Description: "The parameters required for a gradient background in the login page",
 						Attributes: map[string]schema.Attribute{
 							"background_gradient_start_color": schema.StringAttribute{
 								Optional: true,
 								Computed: true,
-								Default: 		   stringdefault.StaticString("#f7f7f7"),
+								Default:  stringdefault.StaticString("#f7f7f7"),
 								Validators: []validator.String{
 									stringvalidator.RegexMatches(hexcode_regex, "background_gradient_start_color must be a valid hex color code with lowercase characters"),
 								},
@@ -200,22 +200,22 @@ func (r *themeResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 							"background_gradient_end_color": schema.StringAttribute{
 								Optional: true,
 								Computed: true,
-								Default: 		   stringdefault.StaticString("#f7f7f7"),
+								Default:  stringdefault.StaticString("#f7f7f7"),
 								Validators: []validator.String{
 									stringvalidator.RegexMatches(hexcode_regex, "background_gradient_end_color must be a valid hex color code with lowercase characters"),
 								},
 								Description: "The end color of a gradient background in the login page. The default value is `#f7f7f7`",
 							},
 							"background_gradient_angle": schema.Int32Attribute{
-								Optional: true,
-								Computed: true,
-								Default: 		   int32default.StaticInt32(135),
+								Optional:    true,
+								Computed:    true,
+								Default:     int32default.StaticInt32(135),
 								Description: "The angle of the gradient background in the login page. The default value is `135`",
 							},
 							"background_text_color": schema.StringAttribute{
 								Optional: true,
 								Computed: true,
-								Default: 		   stringdefault.StaticString("#363636"),
+								Default:  stringdefault.StaticString("#363636"),
 								Validators: []validator.String{
 									stringvalidator.RegexMatches(hexcode_regex, "background_text_color must be a valid hex color code with lowercase characters"),
 								},
@@ -224,13 +224,13 @@ func (r *themeResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 						},
 					},
 					"image_background_parameters": schema.SingleNestedAttribute{
-						Optional: true,
+						Optional:    true,
 						Description: "The parameters required for an image background in the login page",
 						Attributes: map[string]schema.Attribute{
 							"default_background_color": schema.StringAttribute{
 								Optional: true,
 								Computed: true,
-								Default: 		   stringdefault.StaticString("#f7f7f7"),
+								Default:  stringdefault.StaticString("#f7f7f7"),
 								Validators: []validator.String{
 									stringvalidator.RegexMatches(hexcode_regex, "default_background_color must be a valid hex color code with lowercase characters"),
 								},
@@ -239,7 +239,7 @@ func (r *themeResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 							"background_text_color": schema.StringAttribute{
 								Optional: true,
 								Computed: true,
-								Default: 		   stringdefault.StaticString("#363636"),
+								Default:  stringdefault.StaticString("#363636"),
 								Validators: []validator.String{
 									stringvalidator.RegexMatches(hexcode_regex, "background_text_color must be a valid hex color code with lowercase characters"),
 								},
@@ -250,7 +250,7 @@ func (r *themeResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 					"frame_background_color": schema.StringAttribute{
 						Optional: true,
 						Computed: true,
-						Default: 		   stringdefault.StaticString("#ffffff"),
+						Default:  stringdefault.StaticString("#ffffff"),
 						Validators: []validator.String{
 							stringvalidator.RegexMatches(hexcode_regex, "frame_background_color must be a valid hex color code with lowercase characters"),
 						},
@@ -260,7 +260,7 @@ func (r *themeResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 					"frame_text_color": schema.StringAttribute{
 						Optional: true,
 						Computed: true,
-						Default: 		   stringdefault.StaticString("#0f0f0f"),
+						Default:  stringdefault.StaticString("#0f0f0f"),
 						Validators: []validator.String{
 							stringvalidator.RegexMatches(hexcode_regex, "frame_text_color must be a valid hex color code with lowercase characters"),
 						},
@@ -270,7 +270,7 @@ func (r *themeResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 					"primary_color": schema.StringAttribute{
 						Optional: true,
 						Computed: true,
-						Default: 		   stringdefault.StaticString("#50c878"),
+						Default:  stringdefault.StaticString("#50c878"),
 						Validators: []validator.String{
 							stringvalidator.RegexMatches(hexcode_regex, "primary_color must be a valid hex color code with lowercase characters"),
 						},
@@ -280,7 +280,7 @@ func (r *themeResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 					"primary_text_color": schema.StringAttribute{
 						Optional: true,
 						Computed: true,
-						Default: 		   stringdefault.StaticString("#f7f7f7"),
+						Default:  stringdefault.StaticString("#f7f7f7"),
 						Validators: []validator.String{
 							stringvalidator.RegexMatches(hexcode_regex, "primary_text_color must be a valid hex color code with lowercase characters"),
 						},
@@ -289,7 +289,7 @@ func (r *themeResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 					"error_color": schema.StringAttribute{
 						Optional: true,
 						Computed: true,
-						Default: 		   stringdefault.StaticString("#cf222e"),
+						Default:  stringdefault.StaticString("#cf222e"),
 						Validators: []validator.String{
 							stringvalidator.RegexMatches(hexcode_regex, "error_color must be a valid hex color code with lowercase characters"),
 						},
@@ -299,7 +299,7 @@ func (r *themeResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 					"error_button_text_color": schema.StringAttribute{
 						Optional: true,
 						Computed: true,
-						Default: 		   stringdefault.StaticString("#ffffff"),
+						Default:  stringdefault.StaticString("#ffffff"),
 						Validators: []validator.String{
 							stringvalidator.RegexMatches(hexcode_regex, "error_button_text_color must be a valid hex color code with lowercase characters"),
 						},
@@ -309,20 +309,20 @@ func (r *themeResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 					"border_color": schema.StringAttribute{
 						Optional: true,
 						Computed: true,
-						Default: 		   stringdefault.StaticString("#e4e4e4"),
+						Default:  stringdefault.StaticString("#e4e4e4"),
 						Validators: []validator.String{
 							stringvalidator.RegexMatches(hexcode_regex, "border_color must be a valid hex color code with lowercase characters"),
 						},
 						Description: "The color of the borders in the login page. The default value is `#e4e4e4`",
 					},
 					"split_login_page_parameters": schema.SingleNestedAttribute{
-						Optional: true,
+						Optional:    true,
 						Description: "The extra parameters required to configure a split login page",
 						Attributes: map[string]schema.Attribute{
 							"direction": schema.StringAttribute{
 								Optional: true,
 								Computed: true,
-								Default: 		   stringdefault.StaticString("Left"),
+								Default:  stringdefault.StaticString("Left"),
 								Validators: []validator.String{
 									stringvalidator.OneOf("Left", "Right"),
 								},
@@ -332,7 +332,7 @@ func (r *themeResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 							"content_type": schema.StringAttribute{
 								Optional: true,
 								Computed: true,
-								Default: 		   stringdefault.StaticString("None"),
+								Default:  stringdefault.StaticString("None"),
 								Validators: []validator.String{
 									stringvalidator.OneOf("None", "Text"),
 								},
@@ -352,7 +352,7 @@ func (r *themeResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 							"secondary_background_text_color": schema.StringAttribute{
 								Optional: true,
 								Computed: true,
-								Default: 		   stringdefault.StaticString("#363636"),
+								Default:  stringdefault.StaticString("#363636"),
 								Validators: []validator.String{
 									stringvalidator.RegexMatches(hexcode_regex, "secondary_background_text_color must be a valid hex color code with lowercase characters"),
 								},
@@ -366,12 +366,12 @@ func (r *themeResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 			},
 			"management_pages_theme": schema.SingleNestedAttribute{
 				Description: "The theme for the account and organization management pages",
-				Required: true,
+				Required:    true,
 				Attributes: map[string]schema.Attribute{
 					"main_background_color": schema.StringAttribute{
 						Optional: true,
 						Computed: true,
-						Default: 		   stringdefault.StaticString("#f7f7f7"),
+						Default:  stringdefault.StaticString("#f7f7f7"),
 						Validators: []validator.String{
 							stringvalidator.RegexMatches(hexcode_regex, "main_background_color must be a valid hex color code with lowercase characters"),
 						},
@@ -380,7 +380,7 @@ func (r *themeResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 					"main_text_color": schema.StringAttribute{
 						Optional: true,
 						Computed: true,
-						Default: 		   stringdefault.StaticString("#363636"),
+						Default:  stringdefault.StaticString("#363636"),
 						Validators: []validator.String{
 							stringvalidator.RegexMatches(hexcode_regex, "main_text_color must be a valid hex color code with lowercase characters"),
 						},
@@ -389,7 +389,7 @@ func (r *themeResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 					"navbar_background_color": schema.StringAttribute{
 						Optional: true,
 						Computed: true,
-						Default: 		   stringdefault.StaticString("#ffffff"),
+						Default:  stringdefault.StaticString("#ffffff"),
 						Validators: []validator.String{
 							stringvalidator.RegexMatches(hexcode_regex, "navbar_background_color must be a valid hex color code with lowercase characters"),
 						},
@@ -398,7 +398,7 @@ func (r *themeResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 					"navbar_text_color": schema.StringAttribute{
 						Optional: true,
 						Computed: true,
-						Default: 		   stringdefault.StaticString("#0f0f0f"),
+						Default:  stringdefault.StaticString("#0f0f0f"),
 						Validators: []validator.String{
 							stringvalidator.RegexMatches(hexcode_regex, "navbar_text_color must be a valid hex color code with lowercase characters"),
 						},
@@ -407,7 +407,7 @@ func (r *themeResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 					"action_button_color": schema.StringAttribute{
 						Optional: true,
 						Computed: true,
-						Default: 		   stringdefault.StaticString("#50c878"),
+						Default:  stringdefault.StaticString("#50c878"),
 						Validators: []validator.String{
 							stringvalidator.RegexMatches(hexcode_regex, "action_button_color must be a valid hex color code with lowercase characters"),
 						},
@@ -416,7 +416,7 @@ func (r *themeResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 					"action_button_text_color": schema.StringAttribute{
 						Optional: true,
 						Computed: true,
-						Default: 		   stringdefault.StaticString("#f7f7f7"),
+						Default:  stringdefault.StaticString("#f7f7f7"),
 						Validators: []validator.String{
 							stringvalidator.RegexMatches(hexcode_regex, "action_button_text_color must be a valid hex color code with lowercase characters"),
 						},
@@ -425,7 +425,7 @@ func (r *themeResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 					"border_color": schema.StringAttribute{
 						Optional: true,
 						Computed: true,
-						Default: 		   stringdefault.StaticString("#e4e4e4"),
+						Default:  stringdefault.StaticString("#e4e4e4"),
 						Validators: []validator.String{
 							stringvalidator.RegexMatches(hexcode_regex, "border_color must be a valid hex color code with lowercase characters"),
 						},
@@ -433,9 +433,9 @@ func (r *themeResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 							"The default value is `#e4e4e4`",
 					},
 					"display_navbar": schema.BoolAttribute{
-						Optional: 		  true,
-						Computed: true,
-						Default: 		   booldefault.StaticBool(true),
+						Optional:    true,
+						Computed:    true,
+						Default:     booldefault.StaticBool(true),
 						Description: "If true, the sidebar is displayed in the management pages. The default value is `true`",
 					},
 				},
@@ -550,23 +550,23 @@ func (r *themeResource) Create(ctx context.Context, req resource.CreateRequest, 
 
 	// Read Terraform plan data into the model
 	diags := req.Plan.Get(ctx, &plan)
-    resp.Diagnostics.Append(diags...)
-    if resp.Diagnostics.HasError() {
-        return
-    }
-	
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
 	// Update the configuration in PropelAuth
 	environmentConfigUpdate := propelauth.EnvironmentConfigUpdate{
 		Theme: convertPlanToTheme(&plan),
 	}
-    environmentConfig, err := r.client.UpdateEnvironmentConfig(&environmentConfigUpdate)
-    if err != nil {
-        resp.Diagnostics.AddError(
-            "Error setting propelauth theme",
-            "Could not set propelauth theme, unexpected error: " + err.Error(),
-        )
-        return
-    }
+	environmentConfig, err := r.client.UpdateEnvironmentConfig(&environmentConfigUpdate)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error setting propelauth theme",
+			"Could not set propelauth theme, unexpected error: "+err.Error(),
+		)
+		return
+	}
 
 	// overwrite the computed state with the retrieved data
 	updateStateFromTheme(environmentConfig.Theme, &plan)
@@ -590,12 +590,12 @@ func (r *themeResource) Read(ctx context.Context, req resource.ReadRequest, resp
 	// retrieve the environment config from PropelAuth
 	environmentConfig, err := r.client.GetEnvironmentConfig()
 	if err != nil {
-        resp.Diagnostics.AddError(
-            "Error Reading PropelAuth propelauth theme",
-            "Could not read PropelAuth propelauth theme: " + err.Error(),
-        )
-        return
-    }
+		resp.Diagnostics.AddError(
+			"Error Reading PropelAuth propelauth theme",
+			"Could not read PropelAuth propelauth theme: "+err.Error(),
+		)
+		return
+	}
 
 	// overwrite the state with the retrieved data
 	updateStateFromTheme(environmentConfig.Theme, &state)
@@ -609,23 +609,23 @@ func (r *themeResource) Update(ctx context.Context, req resource.UpdateRequest, 
 
 	// Read Terraform plan data into the model
 	diags := req.Plan.Get(ctx, &plan)
-    resp.Diagnostics.Append(diags...)
-    if resp.Diagnostics.HasError() {
-        return
-    }
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Update the configuration in PropelAuth
 	environmentConfigUpdate := propelauth.EnvironmentConfigUpdate{
 		Theme: convertPlanToTheme(&plan),
 	}
-    environmentConfig, err := r.client.UpdateEnvironmentConfig(&environmentConfigUpdate)
-    if err != nil {
-        resp.Diagnostics.AddError(
-            "Error setting propelauth theme",
-            "Could not set propelauth theme, unexpected error: "+err.Error(),
-        )
-        return
-    }
+	environmentConfig, err := r.client.UpdateEnvironmentConfig(&environmentConfigUpdate)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error setting propelauth theme",
+			"Could not set propelauth theme, unexpected error: "+err.Error(),
+		)
+		return
+	}
 
 	// overwrite the computed state with the retrieved data
 	updateStateFromTheme(environmentConfig.Theme, &plan)
@@ -644,29 +644,29 @@ func (r *themeResource) Delete(ctx context.Context, req resource.DeleteRequest, 
 
 func convertPlanToTheme(plan *themeResourceModel) *propelauth.Theme {
 	theme := propelauth.Theme{
-		ThemeType: "CustomV2",
-		HeaderFont: plan.HeaderFont.ValueString(),
-		BodyFont: plan.BodyFont.ValueString(),
-		DisplayProjectName: plan.DisplayProjectName.ValueBool(),
-		LoginLayout: plan.LoginPageTheme.Layout.ValueString(),
-		BackgroundType: plan.LoginPageTheme.BackgroundType.ValueString(),
-		FrameBackgroundColor: convertHexColorToRgb(plan.LoginPageTheme.FrameBackgroundColor.ValueString()),
-		FrameTextColor: convertHexColorToRgb(plan.LoginPageTheme.FrameTextColor.ValueString()),
+		ThemeType:               "CustomV2",
+		HeaderFont:              plan.HeaderFont.ValueString(),
+		BodyFont:                plan.BodyFont.ValueString(),
+		DisplayProjectName:      plan.DisplayProjectName.ValueBool(),
+		LoginLayout:             plan.LoginPageTheme.Layout.ValueString(),
+		BackgroundType:          plan.LoginPageTheme.BackgroundType.ValueString(),
+		FrameBackgroundColor:    convertHexColorToRgb(plan.LoginPageTheme.FrameBackgroundColor.ValueString()),
+		FrameTextColor:          convertHexColorToRgb(plan.LoginPageTheme.FrameTextColor.ValueString()),
 		FrameSecondaryTextColor: convertHexColorToRgb(plan.LoginPageTheme.FrameTextColor.ValueString()),
-		PrimaryColor: convertHexColorToRgb(plan.LoginPageTheme.PrimaryColor.ValueString()),
-		PrimaryTextColor: convertHexColorToRgb(plan.LoginPageTheme.PrimaryTextColor.ValueString()),
-		ErrorButtonColor: convertHexColorToRgb(plan.LoginPageTheme.ErrorColor.ValueString()),
-		ErrorButtonTextColor: convertHexColorToRgb(plan.LoginPageTheme.ErrorButtonTextColor.ValueString()),
-		BorderColor: convertHexColorToRgb(plan.LoginPageTheme.BorderColor.ValueString()),
+		PrimaryColor:            convertHexColorToRgb(plan.LoginPageTheme.PrimaryColor.ValueString()),
+		PrimaryTextColor:        convertHexColorToRgb(plan.LoginPageTheme.PrimaryTextColor.ValueString()),
+		ErrorButtonColor:        convertHexColorToRgb(plan.LoginPageTheme.ErrorColor.ValueString()),
+		ErrorButtonTextColor:    convertHexColorToRgb(plan.LoginPageTheme.ErrorButtonTextColor.ValueString()),
+		BorderColor:             convertHexColorToRgb(plan.LoginPageTheme.BorderColor.ValueString()),
 		ManagementPagesTheme: propelauth.ManagementPagesTheme{
-			MainBackgroundColor: convertHexColorToRgb(plan.ManagementPagesTheme.MainBackgroundColor.ValueString()),
-			MainTextColor: convertHexColorToRgb(plan.ManagementPagesTheme.MainTextColor.ValueString()),
+			MainBackgroundColor:   convertHexColorToRgb(plan.ManagementPagesTheme.MainBackgroundColor.ValueString()),
+			MainTextColor:         convertHexColorToRgb(plan.ManagementPagesTheme.MainTextColor.ValueString()),
 			NavbarBackgroundColor: convertHexColorToRgb(plan.ManagementPagesTheme.NavbarBackgroundColor.ValueString()),
-			NavbarTextColor: convertHexColorToRgb(plan.ManagementPagesTheme.NavbarTextColor.ValueString()),
-			ActionButtonColor: convertHexColorToRgb(plan.ManagementPagesTheme.ActionButtonColor.ValueString()),
+			NavbarTextColor:       convertHexColorToRgb(plan.ManagementPagesTheme.NavbarTextColor.ValueString()),
+			ActionButtonColor:     convertHexColorToRgb(plan.ManagementPagesTheme.ActionButtonColor.ValueString()),
 			ActionButtonTextColor: convertHexColorToRgb(plan.ManagementPagesTheme.ActionButtonTextColor.ValueString()),
-			BorderColor: convertHexColorToRgb(plan.ManagementPagesTheme.BorderColor.ValueString()),
-			DisplayNavbar: plan.ManagementPagesTheme.DisplayNavbar.ValueBool(),
+			BorderColor:           convertHexColorToRgb(plan.ManagementPagesTheme.BorderColor.ValueString()),
+			DisplayNavbar:         plan.ManagementPagesTheme.DisplayNavbar.ValueBool(),
 		},
 	}
 
@@ -705,30 +705,30 @@ func updateStateFromTheme(theme propelauth.Theme, state *themeResourceModel) {
 	state.BodyFont = types.StringValue(theme.BodyFont)
 	state.DisplayProjectName = types.BoolValue(theme.DisplayProjectName)
 	state.LoginPageTheme = loginPageTheme{
-		Layout: types.StringValue(theme.LoginLayout),
-		BackgroundType: types.StringValue(theme.BackgroundType),
+		Layout:               types.StringValue(theme.LoginLayout),
+		BackgroundType:       types.StringValue(theme.BackgroundType),
 		FrameBackgroundColor: types.StringValue(convertRgbToHexColor(theme.FrameBackgroundColor)),
-		FrameTextColor: types.StringValue(convertRgbToHexColor(theme.FrameTextColor)),
-		PrimaryColor: types.StringValue(convertRgbToHexColor(theme.PrimaryColor)),
-		PrimaryTextColor: types.StringValue(convertRgbToHexColor(theme.PrimaryTextColor)),
-		ErrorColor: types.StringValue(convertRgbToHexColor(theme.ErrorButtonColor)),
+		FrameTextColor:       types.StringValue(convertRgbToHexColor(theme.FrameTextColor)),
+		PrimaryColor:         types.StringValue(convertRgbToHexColor(theme.PrimaryColor)),
+		PrimaryTextColor:     types.StringValue(convertRgbToHexColor(theme.PrimaryTextColor)),
+		ErrorColor:           types.StringValue(convertRgbToHexColor(theme.ErrorButtonColor)),
 		ErrorButtonTextColor: types.StringValue(convertRgbToHexColor(theme.ErrorButtonTextColor)),
-		BorderColor: types.StringValue(convertRgbToHexColor(theme.BorderColor)),
+		BorderColor:          types.StringValue(convertRgbToHexColor(theme.BorderColor)),
 	}
 	state.ManagementPagesTheme = managementPagesTheme{
-		MainBackgroundColor: types.StringValue(convertRgbToHexColor(theme.ManagementPagesTheme.MainBackgroundColor)),
-		MainTextColor: types.StringValue(convertRgbToHexColor(theme.ManagementPagesTheme.MainTextColor)),
+		MainBackgroundColor:   types.StringValue(convertRgbToHexColor(theme.ManagementPagesTheme.MainBackgroundColor)),
+		MainTextColor:         types.StringValue(convertRgbToHexColor(theme.ManagementPagesTheme.MainTextColor)),
 		NavbarBackgroundColor: types.StringValue(convertRgbToHexColor(theme.ManagementPagesTheme.NavbarBackgroundColor)),
-		NavbarTextColor: types.StringValue(convertRgbToHexColor(theme.ManagementPagesTheme.NavbarTextColor)),
-		ActionButtonColor: types.StringValue(convertRgbToHexColor(theme.ManagementPagesTheme.ActionButtonColor)),
+		NavbarTextColor:       types.StringValue(convertRgbToHexColor(theme.ManagementPagesTheme.NavbarTextColor)),
+		ActionButtonColor:     types.StringValue(convertRgbToHexColor(theme.ManagementPagesTheme.ActionButtonColor)),
 		ActionButtonTextColor: types.StringValue(convertRgbToHexColor(theme.ManagementPagesTheme.ActionButtonTextColor)),
-		BorderColor: types.StringValue(convertRgbToHexColor(theme.ManagementPagesTheme.BorderColor)),
-		DisplayNavbar: types.BoolValue(theme.ManagementPagesTheme.DisplayNavbar),
+		BorderColor:           types.StringValue(convertRgbToHexColor(theme.ManagementPagesTheme.BorderColor)),
+		DisplayNavbar:         types.BoolValue(theme.ManagementPagesTheme.DisplayNavbar),
 	}
 
 	if theme.BackgroundType == "Solid" {
 		state.LoginPageTheme.SolidBackgroundParameters = &solidBackgroundParameters{
-			BackgroundColor: types.StringValue(convertRgbToHexColor(theme.BackgroundColor)),
+			BackgroundColor:     types.StringValue(convertRgbToHexColor(theme.BackgroundColor)),
 			BackgroundTextColor: types.StringValue(convertRgbToHexColor(theme.BackgroundTextColor)),
 		}
 	}
@@ -736,9 +736,9 @@ func updateStateFromTheme(theme propelauth.Theme, state *themeResourceModel) {
 	if theme.BackgroundType == "Gradient" {
 		state.LoginPageTheme.GradientBackgroundParameters = &gradientBackgroundParameters{
 			BackgroundGradientStartColor: types.StringValue(convertRgbToHexColor(theme.BackgroundColor)),
-			BackgroundGradientEndColor: types.StringValue(convertRgbToHexColor(theme.SecondaryBackgroundColor)),
-			BackgroundGradientAngle: types.Int32Value(theme.GradientAngle),
-			BackgroundTextColor: types.StringValue(convertRgbToHexColor(theme.BackgroundTextColor)),
+			BackgroundGradientEndColor:   types.StringValue(convertRgbToHexColor(theme.SecondaryBackgroundColor)),
+			BackgroundGradientAngle:      types.Int32Value(theme.GradientAngle),
+			BackgroundTextColor:          types.StringValue(convertRgbToHexColor(theme.BackgroundTextColor)),
 		}
 	}
 
@@ -746,16 +746,16 @@ func updateStateFromTheme(theme propelauth.Theme, state *themeResourceModel) {
 		state.LoginPageTheme.ImageBackgroundParameters = &imageBackgroundParameters{
 			// TODO: once we support image content, impl populating BackgrondImage
 			DefaultBackgroundColor: types.StringValue(convertRgbToHexColor(theme.BackgroundColor)),
-			BackgroundTextColor: types.StringValue(convertRgbToHexColor(theme.BackgroundTextColor)),
+			BackgroundTextColor:    types.StringValue(convertRgbToHexColor(theme.BackgroundTextColor)),
 		}
 	}
 
 	if theme.LoginLayout == "Split" {
 		state.LoginPageTheme.SplitLoginPageParameters = &splitLoginPageParameters{
-			Direction: types.StringValue(theme.Splitscreen.Direction),
-			ContentType: types.StringValue(theme.Splitscreen.ContentType),
-			Header: types.StringValue(theme.Splitscreen.Header),
-			Subheader: types.StringValue(theme.Splitscreen.Subheader),
+			Direction:                    types.StringValue(theme.Splitscreen.Direction),
+			ContentType:                  types.StringValue(theme.Splitscreen.ContentType),
+			Header:                       types.StringValue(theme.Splitscreen.Header),
+			Subheader:                    types.StringValue(theme.Splitscreen.Subheader),
 			SecondaryBackgroundTextColor: types.StringValue(convertRgbToHexColor(theme.SecondaryBackgroundTextColor)),
 		}
 	}
@@ -767,9 +767,9 @@ func convertHexColorToRgb(hexColor string) propelauth.RgbColor {
 		return propelauth.RgbColor{} // shouldn't happen since we validate all hex color inputs
 	} else {
 		return propelauth.RgbColor{
-			Red: red,
+			Red:   red,
 			Green: green,
-			Blue: blue,
+			Blue:  blue,
 		}
 	}
 }

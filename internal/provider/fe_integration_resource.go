@@ -19,7 +19,7 @@ import (
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &feIntegrationResource{}
-var _ resource.ResourceWithConfigure   = &feIntegrationResource{}
+var _ resource.ResourceWithConfigure = &feIntegrationResource{}
 
 func NewFeIntegrationResource() resource.Resource {
 	return &feIntegrationResource{}
@@ -32,16 +32,16 @@ type feIntegrationResource struct {
 
 // feIntegrationResourceModel describes the resource data model.
 type feIntegrationResourceModel struct {
-	Environment types.String `tfsdk:"environment"`
-	ApplicationUrl types.String `tfsdk:"application_url"`
-	LoginRedirectPath types.String `tfsdk:"login_redirect_path"`
-	LogoutRedirectPath types.String `tfsdk:"logout_redirect_path"`
+	Environment           types.String                `tfsdk:"environment"`
+	ApplicationUrl        types.String                `tfsdk:"application_url"`
+	LoginRedirectPath     types.String                `tfsdk:"login_redirect_path"`
+	LogoutRedirectPath    types.String                `tfsdk:"logout_redirect_path"`
 	AdditionalFeLocations []additionalFeLocationModel `tfsdk:"additional_fe_locations"`
 }
 
 type additionalFeLocationModel struct {
-	Domain types.String `tfsdk:"domain"`
-	AllowAnySubdomain types.Bool `tfsdk:"allow_any_subdomain"`
+	Domain            types.String `tfsdk:"domain"`
+	AllowAnySubdomain types.Bool   `tfsdk:"allow_any_subdomain"`
 }
 
 func (r *feIntegrationResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -51,7 +51,7 @@ func (r *feIntegrationResource) Metadata(ctx context.Context, req resource.Metad
 func (r *feIntegrationResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the language server.
-		Description: "Front-end Integration. This is for configuring the front-end integration for one of your poject's environments.",
+		Description: "Front-end Integration. This is for configuring the front-end integration for one of your project's environments.",
 		Attributes: map[string]schema.Attribute{
 			"environment": schema.StringAttribute{
 				Required: true,
@@ -64,7 +64,7 @@ func (r *feIntegrationResource) Schema(ctx context.Context, req resource.SchemaR
 				Description: "The environment for which you are configuring the front-end integration. Accepted values are `Test`, `Staging`, and `Prod`.",
 			},
 			"application_url": schema.StringAttribute{
-				Required: true,
+				Required:   true,
 				Validators: []validator.String{
 					// validator.IsURL(), // imlement a url domain validator, there is also full validation on the BE
 				},
@@ -76,7 +76,7 @@ func (r *feIntegrationResource) Schema(ctx context.Context, req resource.SchemaR
 					"in your URL. For example, `https://any.subdomain.example.com` where `example.com` has been verified.",
 			},
 			"login_redirect_path": schema.StringAttribute{
-				Required: true,
+				Required:   true,
 				Validators: []validator.String{
 					// validator.IsURL(), // imlement a url path validator, there is also full validation on the BE
 				},
@@ -85,7 +85,7 @@ func (r *feIntegrationResource) Schema(ctx context.Context, req resource.SchemaR
 					"full URL will be `https://example.com/dashboard`.",
 			},
 			"logout_redirect_path": schema.StringAttribute{
-				Required: true,
+				Required:   true,
 				Validators: []validator.String{
 					// validator.IsURL(), // imlement a url path validator, there is also full validation on the BE
 				},
@@ -94,12 +94,12 @@ func (r *feIntegrationResource) Schema(ctx context.Context, req resource.SchemaR
 					"full URL will be `https://example.com/goodbye`.",
 			},
 			"additional_fe_locations": schema.ListNestedAttribute{
-				Optional: true,
+				Optional:    true,
 				Description: "Additional front-end locations that are allowed to integrate with PropelAuth.",
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"domain": schema.StringAttribute{
-							Required: true,
+							Required:   true,
 							Validators: []validator.String{
 								// validator.IsURL(), // imlement a url domain validator, there is also full validation on the BE
 							},
@@ -109,7 +109,7 @@ func (r *feIntegrationResource) Schema(ctx context.Context, req resource.SchemaR
 						"allow_any_subdomain": schema.BoolAttribute{
 							Optional: true,
 							Computed: true,
-							Default: booldefault.StaticBool(false),
+							Default:  booldefault.StaticBool(false),
 							Description: "If true, any subdomain of the domain to integrate with PropelAuth is also allowed to access user info. " +
 								"The default value is false.",
 						},
@@ -145,16 +145,16 @@ func (r *feIntegrationResource) Create(ctx context.Context, req resource.CreateR
 
 	// Read Terraform plan data into the model
 	diags := req.Plan.Get(ctx, &plan)
-    resp.Diagnostics.Append(diags...)
-    if resp.Diagnostics.HasError() {
-        return
-    }
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Update the front-end integration
 	environment := plan.Environment.ValueString()
 	update := convertPlanToUpdate(&plan)
 	if environment == "Test" {
-    	_, err := r.client.UpdateTestFeIntegration(update)
+		_, err := r.client.UpdateTestFeIntegration(update)
 		if err != nil {
 			resp.Diagnostics.AddError(
 				"Error setting front-end intgeration info",
@@ -171,8 +171,8 @@ func (r *feIntegrationResource) Create(ctx context.Context, req resource.CreateR
 			)
 			return
 		}
-	}	
-	
+	}
+
 	// Write logs using the tflog package
 	// Documentation: https://terraform.io/plugin/log
 	tflog.Trace(ctx, "created a propelauth_fe_integration resource")
@@ -195,17 +195,17 @@ func (r *feIntegrationResource) Read(ctx context.Context, req resource.ReadReque
 		if err != nil {
 			resp.Diagnostics.AddError(
 				"Error Reading PropelAuth front-end integration",
-				"Could not read PropelAuth front-end integration,: " + err.Error(),
+				"Could not read PropelAuth front-end integration,: "+err.Error(),
 			)
 			return
 		}
 		updateStateForTestEnvironment(&state, fe_integration)
-    } else {
+	} else {
 		fe_integration, err := r.client.GetLiveFeIntegrationInfo(state.Environment.ValueString())
 		if err != nil {
 			resp.Diagnostics.AddError(
 				"Error Reading PropelAuth front-end integration",
-				"Could not read PropelAuth front-end integration,: " + err.Error(),
+				"Could not read PropelAuth front-end integration,: "+err.Error(),
 			)
 			return
 		}
@@ -225,12 +225,12 @@ func (r *feIntegrationResource) Update(ctx context.Context, req resource.UpdateR
 	}
 
 	// Update the front-end integration
-	
+
 	// Update the project info
 	environment := plan.Environment.ValueString()
 	update := convertPlanToUpdate(&plan)
 	if environment == "Test" {
-    	_, err := r.client.UpdateTestFeIntegration(update)
+		_, err := r.client.UpdateTestFeIntegration(update)
 		if err != nil {
 			resp.Diagnostics.AddError(
 				"Error setting front-end intgeration info",
@@ -247,8 +247,8 @@ func (r *feIntegrationResource) Update(ctx context.Context, req resource.UpdateR
 			)
 			return
 		}
-	}	
-	
+	}
+
 	tflog.Trace(ctx, "updated a propelauth_fe_integration resource")
 	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
 }
@@ -259,15 +259,15 @@ func (r *feIntegrationResource) Delete(ctx context.Context, req resource.DeleteR
 
 func convertPlanToUpdate(plan *feIntegrationResourceModel) propelauth.FeIntegrationUpdate {
 	update := propelauth.FeIntegrationUpdate{
-		ApplicationUrl: plan.ApplicationUrl.ValueString(),
-		LoginRedirectPath: plan.LoginRedirectPath.ValueString(),
-		LogoutRedirectPath: plan.LogoutRedirectPath.ValueString(),
+		ApplicationUrl:        plan.ApplicationUrl.ValueString(),
+		LoginRedirectPath:     plan.LoginRedirectPath.ValueString(),
+		LogoutRedirectPath:    plan.LogoutRedirectPath.ValueString(),
 		AdditionalFeLocations: make([]propelauth.AdditionalFeLocation, len(plan.AdditionalFeLocations)),
 	}
 
 	for i, location := range plan.AdditionalFeLocations {
 		update.AdditionalFeLocations[i] = propelauth.AdditionalFeLocation{
-			Domain: location.Domain.ValueString(),
+			Domain:            location.Domain.ValueString(),
 			AllowAnySubdomain: location.AllowAnySubdomain.ValueBool(),
 		}
 	}
@@ -308,7 +308,7 @@ func updateAdditionalLocationsInState(state *feIntegrationResourceModel, additio
 	if len(state.AdditionalFeLocations) < len(additionalLocations) {
 		for i := len(state.AdditionalFeLocations); i < len(additionalLocations); i++ {
 			state.AdditionalFeLocations = append(state.AdditionalFeLocations, additionalFeLocationModel{
-				Domain: types.StringValue(additionalLocations[i].Domain),
+				Domain:            types.StringValue(additionalLocations[i].Domain),
 				AllowAnySubdomain: types.BoolValue(additionalLocations[i].AllowAnySubdomain),
 			})
 		}

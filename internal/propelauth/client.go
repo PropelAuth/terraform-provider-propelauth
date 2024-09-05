@@ -5,29 +5,27 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/url"
 	"runtime"
 	"time"
 )
 
-// TODO: FOR THE LOVE OF GOD, DON'T FORGET TO CHANGE THIS TO THE REAL URL.
 const BaseURLTemplate string = "https://api.propelauth.com/iac/%s/project/%s"
 
 // PropelAuthClient - Client for the PropelAuth API to manage an existing project and all its resources.
 type PropelAuthClient struct {
-	BaseURL    string
-	HTTPClient *http.Client
-	ApiKey     string
+	baseURL    string
+	httpClient *http.Client
+	apiKey     string
 }
 
 type PropelAuthApiError struct {
-	ErrorCode string `json:"error_code"`
-	UserFacingError string `json:"user_facing_error"`
-	FieldErrors map[string][]string `json:"field_errors"`
+	ErrorCode        string              `json:"error_code"`
+	UserFacingError  string              `json:"user_facing_error"`
+	FieldErrors      map[string][]string `json:"field_errors"`
 	UserFacingErrors map[string][]string `json:"user_facing_errors"`
 }
 
-func convertStringErrorToPropelAuthError (errBytes []byte) (*PropelAuthApiError, error) {
+func convertStringErrorToPropelAuthError(errBytes []byte) (*PropelAuthApiError, error) {
 	propelAuthApiError := PropelAuthApiError{}
 	unmarshalError := json.Unmarshal(errBytes, &propelAuthApiError)
 	if unmarshalError != nil {
@@ -42,7 +40,12 @@ func IsPropelAuthNotFoundError(err error) bool {
 		return false
 	}
 
-	return err.Error() == "not_found"
+	propelauthApiError, _ := convertStringErrorToPropelAuthError([]byte(err.Error()))
+	if propelauthApiError != nil {
+		return propelauthApiError.ErrorCode == "not_found"
+	}
+
+	return false
 }
 
 type StandardResponse struct {
@@ -54,10 +57,10 @@ type StandardResponse struct {
 
 func NewClient(tenant_id, project_id, api_key *string) (*PropelAuthClient, error) {
 	c := PropelAuthClient{
-		HTTPClient: &http.Client{Timeout: 10 * time.Second},
+		httpClient: &http.Client{Timeout: 10 * time.Second},
 		// Default Hashicups URL
-		BaseURL: fmt.Sprintf(BaseURLTemplate, *tenant_id, *project_id),
-		ApiKey:  *api_key,
+		baseURL: fmt.Sprintf(BaseURLTemplate, *tenant_id, *project_id),
+		apiKey:  *api_key,
 	}
 
 	return &c, nil
@@ -65,32 +68,32 @@ func NewClient(tenant_id, project_id, api_key *string) (*PropelAuthClient, error
 
 // public http methods
 
-func (c *PropelAuthClient) get(urlPostfix string, queryParams url.Values) (*StandardResponse, error) {
-	url := c.assembleURL(urlPostfix, queryParams)
+func (c *PropelAuthClient) get(urlPostfix string) (*StandardResponse, error) {
+	url := c.assembleURL(urlPostfix)
 
 	return c.requestHelper("GET", url, nil)
 }
 
 func (c *PropelAuthClient) patch(urlPostfix string, body []byte) (*StandardResponse, error) {
-	url := c.assembleURL(urlPostfix, nil)
+	url := c.assembleURL(urlPostfix)
 
 	return c.requestHelper("PATCH", url, body)
 }
 
 func (c *PropelAuthClient) post(urlPostfix string, body []byte) (*StandardResponse, error) {
-	url := c.assembleURL(urlPostfix, nil)
+	url := c.assembleURL(urlPostfix)
 
 	return c.requestHelper("POST", url, body)
 }
 
 func (c *PropelAuthClient) put(urlPostfix string, body []byte) (*StandardResponse, error) {
-	url := c.assembleURL(urlPostfix, nil)
+	url := c.assembleURL(urlPostfix)
 
 	return c.requestHelper("PUT", url, body)
 }
 
 func (c *PropelAuthClient) delete(urlPostfix string, body []byte) (*StandardResponse, error) {
-	url := c.assembleURL(urlPostfix, nil)
+	url := c.assembleURL(urlPostfix)
 
 	return c.requestHelper("DELETE", url, body)
 }
@@ -106,11 +109,11 @@ func (c *PropelAuthClient) requestHelper(method string, url string, body []byte)
 
 	// add headers
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+c.ApiKey)
+	req.Header.Set("Authorization", "Bearer "+c.apiKey)
 	req.Header.Set("User-Agent", "terraform-provider-propelauth/0.0 go/"+runtime.Version()+" "+runtime.GOOS+"/"+runtime.GOARCH)
 
 	// send request
-	resp, err := c.HTTPClient.Do(req)
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("error making http request: %w", err)
 	}
@@ -126,11 +129,7 @@ func (c *PropelAuthClient) requestHelper(method string, url string, body []byte)
 	respBytes := buf.Bytes()
 
 	if resp.StatusCode >= 400 {
-		propelauthApiError, _ := convertStringErrorToPropelAuthError(respBytes)
-		if propelauthApiError != nil {
-			return nil, fmt.Errorf(propelauthApiError.ErrorCode)
-		}
-		return nil, fmt.Errorf("error on response: %s", string(respBytes[:]))
+		return nil, fmt.Errorf("%s", string(respBytes[:]))
 	}
 
 	// return the response
@@ -144,11 +143,8 @@ func (c *PropelAuthClient) requestHelper(method string, url string, body []byte)
 	return &queryResponse, nil
 }
 
-func (c *PropelAuthClient) assembleURL(urlPostfix string, queryParams url.Values) string {
-	url := c.BaseURL + "/" + urlPostfix
-	if queryParams != nil {
-		url += "?" + queryParams.Encode()
-	}
+func (c *PropelAuthClient) assembleURL(urlPostfix string) string {
+	url := c.baseURL + "/" + urlPostfix
 
 	return url
 }

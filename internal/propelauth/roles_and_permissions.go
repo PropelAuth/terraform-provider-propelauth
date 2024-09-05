@@ -21,7 +21,7 @@ func (c *PropelAuthClient) ValidateRolesAndPermissions(candidateUpdate rolesAndP
 
 // GetRolesAndPermissions - Returns the roles and permissions.
 func (c *PropelAuthClient) GetRolesAndPermissions() (*RolesAndPermissions, error) {
-	res, err := c.get("roles_and_permissions", nil)
+	res, err := c.get("roles_and_permissions")
 	if err != nil {
 		return nil, err
 	}
@@ -174,7 +174,7 @@ func (r *RolesAndPermissions) GetPermission(permissionName string) (*Permission,
 	return nil, false
 }
 
-func (r *RolesAndPermissions) GetHeirarchy() []string {
+func (r *RolesAndPermissions) GetHierarchy() []string {
 	if r.OrgRoleStructure == "multi_role" {
 		return nil
 	} else {

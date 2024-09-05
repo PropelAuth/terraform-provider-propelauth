@@ -1,30 +1,19 @@
-terraform {
-  required_providers {
-    propelauth = {
-      source = "registry.terraform.io/propelauth/propelauth"
-    }
-  }
-}
-
-provider "propelauth" {
-  #   tenant_id  = "<PROPELAUTH_TENANT_ID>"  # or PROPELAUTH_TENANT_ID environment variable
-  #   project_id = "<PROPELAUTH_PROJECT_ID>" # or PROPELAUTH_PROJECT_ID environment variable
-  #   api_key    = "<PROPELAUTH_API_KEY>"    # or PROPELAUTH_API_KEY environment variable
-}
-
-resource "propelauth_image" "logo" {
+# Set the logo for your PropelAuth project.
+resource "propelauth_image" "logo_example" {
   source     = "${path.module}/git-merge.png"
   version    = "0.0.0"
   image_type = "logo"
 }
 
-resource "propelauth_image" "favicon" {
+# Set the favicon for your PropelAuth project.
+resource "propelauth_image" "favicon_example" {
   source     = "${path.module}/git-merge.png"
   version    = "0.0.0"
   image_type = "favicon"
 }
 
-resource "propelauth_theme" "my_theme" {
+# Configure the look and feel for your PropelAuth hosted pages (eg login, account management, etc).
+resource "propelauth_theme" "example" {
   header_font = "Fraunces"
   body_font   = "PlusJakartaSans"
   login_page_theme = {
@@ -53,8 +42,4 @@ resource "propelauth_theme" "my_theme" {
     action_button_text_color = "#f7f7f7"
     border_color             = "#fcfcfc"
   }
-}
-
-output "theme_result" {
-  value = propelauth_theme.my_theme
 }

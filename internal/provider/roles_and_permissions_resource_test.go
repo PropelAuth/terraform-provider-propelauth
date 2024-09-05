@@ -64,8 +64,8 @@ resource "propelauth_roles_and_permissions" "test" {
   permissions = [
 	  {
 	    name = "doc::read"
-	    display_name = "Can read documents." # optional
-	    description = "A description here." # optional
+	    display_name = "Can read documents."
+	    description = "A description here."
 	  },
 	  {
 	    name = "doc::write"
@@ -80,7 +80,6 @@ resource "propelauth_roles_and_permissions" "test" {
 	    name = %[1]q
 	  }
 	]
-	# multiple_roles_per_user = false # default is false
 	roles = {
     "Owner" = {
       can_view_other_members = true
@@ -88,8 +87,8 @@ resource "propelauth_roles_and_permissions" "test" {
       can_change_roles = true
       can_manage_api_keys = true
       can_remove_users = true
-      can_setup_saml = true # will always be true for the default_owner_role
-      can_delete_org = true # will always be true for the default_owner_role
+      can_setup_saml = true
+      can_delete_org = true
       can_edit_org_access = true
       can_update_org_metadata = true
       permissions = [
@@ -98,7 +97,6 @@ resource "propelauth_roles_and_permissions" "test" {
         "ticket::read",
         "ticket::write"
       ]
-      # roles_can_manage = ["Admin", "Member"] # only for multiple_roles_per_user = true
     }
     "Admin" = {
       can_view_other_members = true
@@ -115,10 +113,8 @@ resource "propelauth_roles_and_permissions" "test" {
         "doc::write",
         "ticket::read"
       ]
-    # roles_can_manage = ["Member"] # only for multiple_roles_per_user = true
     }
     "Member" = {
-      # the defaults for all PropelAuth permissions
       permissions = [
         "doc::read",
         "ticket::read"

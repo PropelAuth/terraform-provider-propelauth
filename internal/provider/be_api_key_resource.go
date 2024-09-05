@@ -135,7 +135,6 @@ func (r *beApiKeyResource) Create(ctx context.Context, req resource.CreateReques
 	plan.ApiKeyId = types.StringValue(beApiKeyInfo.ApiKeyId)
 	plan.ReadOnly = types.BoolValue(beApiKeyInfo.IsReadOnly)
 
-
 	// Write logs using the tflog package
 	// Documentation: https://terraform.io/plugin/log
 	tflog.Trace(ctx, "created a propelauth_be_api_key resource")
