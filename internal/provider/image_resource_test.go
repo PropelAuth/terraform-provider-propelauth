@@ -41,7 +41,7 @@ func TestAccImageResource(t *testing.T) {
 func testAccImageResourceConfig(imageType string) string {
 	return providerConfig + fmt.Sprintf(`
 resource "propelauth_image" "test" {
-  source = "${path.module}/../../examples/resources/theme/git-merge.png"
+  source = "${path.module}/../../examples/resources/propelauth_theme/git-merge.png"
   version = "0.0.0"
   image_type = %[1]q
 }
