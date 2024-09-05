@@ -40,7 +40,12 @@ func IsPropelAuthNotFoundError(err error) bool {
 		return false
 	}
 
-	return err.Error() == "not_found"
+	propelauthApiError, _ := convertStringErrorToPropelAuthError([]byte(err.Error()))
+	if propelauthApiError != nil {
+		return propelauthApiError.ErrorCode == "not_found"
+	}
+
+	return false
 }
 
 type StandardResponse struct {
@@ -124,11 +129,7 @@ func (c *PropelAuthClient) requestHelper(method string, url string, body []byte)
 	respBytes := buf.Bytes()
 
 	if resp.StatusCode >= 400 {
-		propelauthApiError, _ := convertStringErrorToPropelAuthError(respBytes)
-		if propelauthApiError != nil {
-			return nil, fmt.Errorf("%s", propelauthApiError.ErrorCode)
-		}
-		return nil, fmt.Errorf("error on response: %s", string(respBytes[:]))
+		return nil, fmt.Errorf("%s", string(respBytes[:]))
 	}
 
 	// return the response
