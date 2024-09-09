@@ -7,6 +7,7 @@ import (
 	"terraform-provider-propelauth/internal/propelauth"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -17,6 +18,7 @@ import (
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &basicAuthConfigurationResource{}
 var _ resource.ResourceWithConfigure = &basicAuthConfigurationResource{}
+var _ resource.ResourceWithValidateConfig = &basicAuthConfigurationResource{}
 
 func NewBasicAuthConfigurationResource() resource.Resource {
 	return &basicAuthConfigurationResource{}
@@ -30,9 +32,7 @@ type basicAuthConfigurationResource struct {
 // basicAuthConfigurationResourceModel describes the resource data model.
 type basicAuthConfigurationResourceModel struct {
 	AllowUsersToSignupWithPersonalEmail types.Bool     `tfsdk:"allow_users_to_signup_with_personal_email"`
-	SignupDomainAllowlistEnabled        types.Bool     `tfsdk:"signup_domain_allowlist_enabled"`
 	SignupDomainAllowlist               []types.String `tfsdk:"signup_domain_allowlist"`
-	SignupDomainBlocklistEnabled        types.Bool     `tfsdk:"signup_domain_blocklist_enabled"`
 	SignupDomainBlocklist               []types.String `tfsdk:"signup_domain_blocklist"`
 	HasPasswordLogin                    types.Bool     `tfsdk:"has_password_login"`
 	HasPasswordlessLogin                types.Bool     `tfsdk:"has_passwordless_login"`
@@ -56,26 +56,26 @@ func (r *basicAuthConfigurationResource) Schema(ctx context.Context, req resourc
 			"allow_users_to_signup_with_personal_email": schema.BoolAttribute{
 				Optional: true,
 				Description: "If true, your users will be able to sign up using personal email domains (@gmail.com, @yahoo.com, etc.)." +
-					"The default setting is true. This is only enabled if `signup_domain_allowlist_enabled` is false.",
+					"The default setting is true. This is only enabled if `signup_domain_allowlist` is empty.",
 			},
-			"signup_domain_allowlist_enabled": schema.BoolAttribute{
-				Optional:    true,
-				Description: "If true, only users with email domains in the allowlist will be able to sign up. The default setting is false.",
-			},
+			// "signup_domain_allowlist_enabled": schema.BoolAttribute{
+			// 	Optional:    true,
+			// 	Description: "If true, only users with email domains in the allowlist will be able to sign up. The default setting is false.",
+			// },
 			"signup_domain_allowlist": schema.ListAttribute{
 				ElementType: types.StringType,
 				Optional:    true,
 				Description: "A list of email domains that are allowed to sign up. This is only used if `signup_domain_allowlist_enabled` is true.",
 			},
-			"signup_domain_blocklist_enabled": schema.BoolAttribute{
-				Optional:    true,
-				Description: "If true, users with email domains in the blocklist will not be able to sign up. The default setting is false. This is only used if `signup_domain_allowlist_enabled` is false.",
-			},
 			"signup_domain_blocklist": schema.ListAttribute{
 				ElementType: types.StringType,
 				Optional:    true,
-				Description: "A list of email domains that are blocked from signing up. This is only used if `signup_domain_blocklist_enabled` is true and `signup_domain_allowlist_enabled` is false.",
+				Description: "A list of email domains that are blocked from signing up. This is only used if `signup_domain_blocklist_enabled` is true and `signup_domain_allowlist` is empty.",
 			},
+			// "signup_domain_blocklist_enabled": schema.BoolAttribute{
+			// 	Optional:    true,
+			// 	Description: "If true, users with email domains in the blocklist will not be able to sign up. The default setting is false. This is only used if `signup_domain_allowlist_enabled` is false.",
+			// },
 			"has_password_login": schema.BoolAttribute{
 				Optional:    true,
 				Description: "If true, your users will be able to log in using their email and password. The default setting is true.",
@@ -138,6 +138,27 @@ func (r *basicAuthConfigurationResource) Configure(ctx context.Context, req reso
 	r.client = client
 }
 
+func (r *basicAuthConfigurationResource) ValidateConfig(ctx context.Context, req resource.ValidateConfigRequest, resp *resource.ValidateConfigResponse) {
+	var plan basicAuthConfigurationResourceModel
+
+	// Read Terraform plan data into the model
+	diags := req.Config.Get(ctx, &plan)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// Validate the plan data
+	if plan.SignupDomainAllowlist != nil && plan.SignupDomainBlocklist != nil {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("signup_domain_allowlist"),
+			"Invalid `signup_domain_allowlist`",
+			"`signup_domain_allowlist` and `signup_domain_blocklist` cannot both be set",
+		)
+		return
+	}
+}
+
 func (r *basicAuthConfigurationResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	var plan basicAuthConfigurationResourceModel
 
@@ -151,8 +172,6 @@ func (r *basicAuthConfigurationResource) Create(ctx context.Context, req resourc
 	// Update the configuration in PropelAuth
 	environmentConfigUpdate := propelauth.EnvironmentConfigUpdate{
 		AllowUsersToSignupWithPersonalEmail: plan.AllowUsersToSignupWithPersonalEmail.ValueBoolPointer(),
-		SignupDomainAllowlistEnabled:        plan.SignupDomainAllowlistEnabled.ValueBoolPointer(),
-		SignupDomainBlocklistEnabled:        plan.SignupDomainBlocklistEnabled.ValueBoolPointer(),
 		HasPasswordLogin:                    plan.HasPasswordLogin.ValueBoolPointer(),
 		HasPasswordlessLogin:                plan.HasPasswordlessLogin.ValueBoolPointer(),
 		WaitlistUsersEnabled:                plan.WaitlistUsersEnabled.ValueBoolPointer(),
@@ -163,19 +182,29 @@ func (r *basicAuthConfigurationResource) Create(ctx context.Context, req resourc
 		IncludeLoginMethod:                  plan.IncludeLoginMethod.ValueBoolPointer(),
 	}
 
+	var signupDomainAllowlistEnabled bool
 	if plan.SignupDomainAllowlist != nil {
+		signupDomainAllowlistEnabled = true
 		environmentConfigUpdate.SignupDomainAllowlist = make([]string, len(plan.SignupDomainAllowlist))
 		for i, domain := range plan.SignupDomainAllowlist {
 			environmentConfigUpdate.SignupDomainAllowlist[i] = domain.ValueString()
 		}
+	} else {
+		signupDomainAllowlistEnabled = false
 	}
+	environmentConfigUpdate.SignupDomainAllowlistEnabled = &signupDomainAllowlistEnabled
 
+	var signupDomainBlocklistEnabled bool
 	if plan.SignupDomainBlocklist != nil {
+		signupDomainBlocklistEnabled = true
 		environmentConfigUpdate.SignupDomainBlocklist = make([]string, len(plan.SignupDomainBlocklist))
 		for i, domain := range plan.SignupDomainBlocklist {
 			environmentConfigUpdate.SignupDomainBlocklist[i] = domain.ValueString()
 		}
+	} else {
+		signupDomainBlocklistEnabled = false
 	}
+	environmentConfigUpdate.SignupDomainBlocklistEnabled = &signupDomainBlocklistEnabled
 
 	environmentConfigResponse, err := r.client.UpdateEnvironmentConfig(&environmentConfigUpdate)
 	if err != nil {
@@ -256,22 +285,6 @@ func (r *basicAuthConfigurationResource) Create(ctx context.Context, req resourc
 		resp.Diagnostics.AddError(
 			"Error updating basic auth configuration",
 			"IncludeLoginMethod failed to update. The `include_login_method` is instead "+fmt.Sprintf("%t", environmentConfigResponse.IncludeLoginMethod),
-		)
-		return
-	}
-	if plan.SignupDomainAllowlistEnabled.ValueBoolPointer() != nil &&
-		plan.SignupDomainAllowlistEnabled.ValueBool() != environmentConfigResponse.SignupDomainAllowlistEnabled {
-		resp.Diagnostics.AddError(
-			"Error updating basic auth configuration",
-			"SignupDomainAllowlistEnabled failed to update. The `signup_domain_allowlist_enabled` is instead "+fmt.Sprintf("%t", environmentConfigResponse.SignupDomainAllowlistEnabled),
-		)
-		return
-	}
-	if plan.SignupDomainBlocklistEnabled.ValueBoolPointer() != nil &&
-		plan.SignupDomainBlocklistEnabled.ValueBool() != environmentConfigResponse.SignupDomainBlocklistEnabled {
-		resp.Diagnostics.AddError(
-			"Error updating basic auth configuration",
-			"SignupDomainBlocklistEnabled failed to update. The `signup_domain_blocklist_enabled` is instead "+fmt.Sprintf("%t", environmentConfigResponse.SignupDomainBlocklistEnabled),
 		)
 		return
 	}
@@ -385,8 +398,6 @@ func (r *basicAuthConfigurationResource) Update(ctx context.Context, req resourc
 	// Update the configuration in PropelAuth
 	environmentConfigUpdate := propelauth.EnvironmentConfigUpdate{
 		AllowUsersToSignupWithPersonalEmail: plan.AllowUsersToSignupWithPersonalEmail.ValueBoolPointer(),
-		SignupDomainAllowlistEnabled:        plan.SignupDomainAllowlistEnabled.ValueBoolPointer(),
-		SignupDomainBlocklistEnabled:        plan.SignupDomainBlocklistEnabled.ValueBoolPointer(),
 		HasPasswordLogin:                    plan.HasPasswordLogin.ValueBoolPointer(),
 		HasPasswordlessLogin:                plan.HasPasswordlessLogin.ValueBoolPointer(),
 		WaitlistUsersEnabled:                plan.WaitlistUsersEnabled.ValueBoolPointer(),
@@ -397,19 +408,29 @@ func (r *basicAuthConfigurationResource) Update(ctx context.Context, req resourc
 		IncludeLoginMethod:                  plan.IncludeLoginMethod.ValueBoolPointer(),
 	}
 
+	var signupDomainAllowlistEnabled bool
 	if plan.SignupDomainAllowlist != nil {
+		signupDomainAllowlistEnabled = true
 		environmentConfigUpdate.SignupDomainAllowlist = make([]string, len(plan.SignupDomainAllowlist))
 		for i, domain := range plan.SignupDomainAllowlist {
 			environmentConfigUpdate.SignupDomainAllowlist[i] = domain.ValueString()
 		}
+	} else {
+		signupDomainAllowlistEnabled = false
 	}
+	environmentConfigUpdate.SignupDomainAllowlistEnabled = &signupDomainAllowlistEnabled
 
+	var signupDomainBlocklistEnabled bool
 	if plan.SignupDomainBlocklist != nil {
+		signupDomainBlocklistEnabled = true
 		environmentConfigUpdate.SignupDomainBlocklist = make([]string, len(plan.SignupDomainBlocklist))
 		for i, domain := range plan.SignupDomainBlocklist {
 			environmentConfigUpdate.SignupDomainBlocklist[i] = domain.ValueString()
 		}
+	} else {
+		signupDomainBlocklistEnabled = false
 	}
+	environmentConfigUpdate.SignupDomainBlocklistEnabled = &signupDomainBlocklistEnabled
 
 	environmentConfigResponse, err := r.client.UpdateEnvironmentConfig(&environmentConfigUpdate)
 	if err != nil {
@@ -490,22 +511,6 @@ func (r *basicAuthConfigurationResource) Update(ctx context.Context, req resourc
 		resp.Diagnostics.AddError(
 			"Error updating basic auth configuration",
 			"IncludeLoginMethod failed to update. The `include_login_method` is instead "+fmt.Sprintf("%t", environmentConfigResponse.IncludeLoginMethod),
-		)
-		return
-	}
-	if plan.SignupDomainAllowlistEnabled.ValueBoolPointer() != nil &&
-		plan.SignupDomainAllowlistEnabled.ValueBool() != environmentConfigResponse.SignupDomainAllowlistEnabled {
-		resp.Diagnostics.AddError(
-			"Error updating basic auth configuration",
-			"SignupDomainAllowlistEnabled failed to update. The `signup_domain_allowlist_enabled` is instead "+fmt.Sprintf("%t", environmentConfigResponse.SignupDomainAllowlistEnabled),
-		)
-		return
-	}
-	if plan.SignupDomainBlocklistEnabled.ValueBoolPointer() != nil &&
-		plan.SignupDomainBlocklistEnabled.ValueBool() != environmentConfigResponse.SignupDomainBlocklistEnabled {
-		resp.Diagnostics.AddError(
-			"Error updating basic auth configuration",
-			"SignupDomainBlocklistEnabled failed to update. The `signup_domain_blocklist_enabled` is instead "+fmt.Sprintf("%t", environmentConfigResponse.SignupDomainBlocklistEnabled),
 		)
 		return
 	}
