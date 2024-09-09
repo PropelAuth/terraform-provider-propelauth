@@ -29,19 +29,19 @@ type basicAuthConfigurationResource struct {
 
 // basicAuthConfigurationResourceModel describes the resource data model.
 type basicAuthConfigurationResourceModel struct {
-	AllowUsersToSignupWithPersonalEmail types.Bool   	`tfsdk:"allow_users_to_signup_with_personal_email"`
-	SignupDomainAllowlistEnabled		types.Bool   	`tfsdk:"signup_domain_allowlist_enabled"`
-	SignupDomainAllowlist				[]types.String 	`tfsdk:"signup_domain_allowlist"`
-	SignupDomainBlocklistEnabled		types.Bool   	`tfsdk:"signup_domain_blocklist_enabled"`
-	SignupDomainBlocklist				[]types.String 	`tfsdk:"signup_domain_blocklist"`
-	HasPasswordLogin                    types.Bool   	`tfsdk:"has_password_login"`
-	HasPasswordlessLogin                types.Bool   	`tfsdk:"has_passwordless_login"`
-	WaitlistUsersEnabled                types.Bool   	`tfsdk:"waitlist_users_enabled"`
-	UserAutologoutSeconds               types.Int64  	`tfsdk:"user_autologout_seconds"`
-	UserAutologoutType                  types.String 	`tfsdk:"user_autologout_type"`
-	UsersCanDeleteOwnAccount            types.Bool   	`tfsdk:"users_can_delete_own_account"`
-	UsersCanChangeEmail                 types.Bool   	`tfsdk:"users_can_change_email"`
-	IncludeLoginMethod                  types.Bool   	`tfsdk:"include_login_method"`
+	AllowUsersToSignupWithPersonalEmail types.Bool     `tfsdk:"allow_users_to_signup_with_personal_email"`
+	SignupDomainAllowlistEnabled        types.Bool     `tfsdk:"signup_domain_allowlist_enabled"`
+	SignupDomainAllowlist               []types.String `tfsdk:"signup_domain_allowlist"`
+	SignupDomainBlocklistEnabled        types.Bool     `tfsdk:"signup_domain_blocklist_enabled"`
+	SignupDomainBlocklist               []types.String `tfsdk:"signup_domain_blocklist"`
+	HasPasswordLogin                    types.Bool     `tfsdk:"has_password_login"`
+	HasPasswordlessLogin                types.Bool     `tfsdk:"has_passwordless_login"`
+	WaitlistUsersEnabled                types.Bool     `tfsdk:"waitlist_users_enabled"`
+	UserAutologoutSeconds               types.Int64    `tfsdk:"user_autologout_seconds"`
+	UserAutologoutType                  types.String   `tfsdk:"user_autologout_type"`
+	UsersCanDeleteOwnAccount            types.Bool     `tfsdk:"users_can_delete_own_account"`
+	UsersCanChangeEmail                 types.Bool     `tfsdk:"users_can_change_email"`
+	IncludeLoginMethod                  types.Bool     `tfsdk:"include_login_method"`
 }
 
 func (r *basicAuthConfigurationResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -151,8 +151,8 @@ func (r *basicAuthConfigurationResource) Create(ctx context.Context, req resourc
 	// Update the configuration in PropelAuth
 	environmentConfigUpdate := propelauth.EnvironmentConfigUpdate{
 		AllowUsersToSignupWithPersonalEmail: plan.AllowUsersToSignupWithPersonalEmail.ValueBoolPointer(),
-		SignupDomainAllowlistEnabled: 	  	 plan.SignupDomainAllowlistEnabled.ValueBoolPointer(),
-		SignupDomainBlocklistEnabled: 	  	 plan.SignupDomainBlocklistEnabled.ValueBoolPointer(),
+		SignupDomainAllowlistEnabled:        plan.SignupDomainAllowlistEnabled.ValueBoolPointer(),
+		SignupDomainBlocklistEnabled:        plan.SignupDomainBlocklistEnabled.ValueBoolPointer(),
 		HasPasswordLogin:                    plan.HasPasswordLogin.ValueBoolPointer(),
 		HasPasswordlessLogin:                plan.HasPasswordlessLogin.ValueBoolPointer(),
 		WaitlistUsersEnabled:                plan.WaitlistUsersEnabled.ValueBoolPointer(),
@@ -306,7 +306,7 @@ func (r *basicAuthConfigurationResource) Create(ctx context.Context, req resourc
 				resp.Diagnostics.AddError(
 					"Error updating basic auth configuration",
 					"SignupDomainBlocklist failed to update. The `signup_domain_blocklist` is instead "+fmt.Sprintf("%v", environmentConfigResponse.SignupDomainBlocklist),
-				)	
+				)
 				return
 			}
 		}
@@ -385,8 +385,8 @@ func (r *basicAuthConfigurationResource) Update(ctx context.Context, req resourc
 	// Update the configuration in PropelAuth
 	environmentConfigUpdate := propelauth.EnvironmentConfigUpdate{
 		AllowUsersToSignupWithPersonalEmail: plan.AllowUsersToSignupWithPersonalEmail.ValueBoolPointer(),
-		SignupDomainAllowlistEnabled: 	  	 plan.SignupDomainAllowlistEnabled.ValueBoolPointer(),
-		SignupDomainBlocklistEnabled: 	  	 plan.SignupDomainBlocklistEnabled.ValueBoolPointer(),
+		SignupDomainAllowlistEnabled:        plan.SignupDomainAllowlistEnabled.ValueBoolPointer(),
+		SignupDomainBlocklistEnabled:        plan.SignupDomainBlocklistEnabled.ValueBoolPointer(),
 		HasPasswordLogin:                    plan.HasPasswordLogin.ValueBoolPointer(),
 		HasPasswordlessLogin:                plan.HasPasswordlessLogin.ValueBoolPointer(),
 		WaitlistUsersEnabled:                plan.WaitlistUsersEnabled.ValueBoolPointer(),
