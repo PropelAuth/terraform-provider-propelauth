@@ -18,6 +18,10 @@ type ProjectInfoUpdateRequest struct {
 
 type EnvironmentConfigUpdate struct {
 	AllowUsersToSignupWithPersonalEmail *bool         `json:"allow_users_to_signup_with_personal_email,omitempty"`
+	SignupDomainAllowlistEnabled		*bool         `json:"signup_domain_allowlist_enabled,omitempty"`
+	SignupDomainAllowlist				[]string      `json:"signup_domain_allowlist,omitempty"`
+	SignupDomainBlocklistEnabled		*bool         `json:"signup_domain_blocklist_enabled,omitempty"`
+	SignupDomainBlocklist				[]string      `json:"signup_domain_blocklist,omitempty"`
 	HasPasswordLogin                    *bool         `json:"has_password_login,omitempty"`
 	HasPasswordlessLogin                *bool         `json:"has_passwordless_login,omitempty"`
 	WaitlistUsersEnabled                *bool         `json:"waitlist_users_enabled,omitempty"`
@@ -48,6 +52,10 @@ type EnvironmentConfigUpdate struct {
 
 type EnvironmentConfigResponse struct {
 	AllowUsersToSignupWithPersonalEmail bool         `json:"allow_users_to_signup_with_personal_email"`
+	SignupDomainAllowlistEnabled        bool         `json:"signup_domain_allowlist_enabled"`
+	SignupDomainAllowlist               []string     `json:"signup_domain_allowlist"`
+	SignupDomainBlocklistEnabled        bool         `json:"signup_domain_blocklist_enabled"`
+	SignupDomainBlocklist               []string     `json:"signup_domain_blocklist"`
 	HasPasswordLogin                    bool         `json:"has_password_login"`
 	HasPasswordlessLogin                bool         `json:"has_passwordless_login"`
 	WaitlistUsersEnabled                bool         `json:"waitlist_users_enabled"`
