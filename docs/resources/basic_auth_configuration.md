@@ -29,8 +29,8 @@ resource "propelauth_basic_auth_configuration" "example" {
 - `has_password_login` (Boolean) If true, your users will be able to log in using their email and password. The default setting is true.
 - `has_passwordless_login` (Boolean) If true, your users will be able to log in using a magic link sent to their email. The default setting is false.
 - `include_login_method` (Boolean) If true, the login method will be included in the access token. The default setting is false.See `https://docs.propelauth.com/overview/user-management/user-properties#login-method-property` for more information.
-- `signup_domain_allowlist` (List of String) A list of email domains that are allowed to sign up. This is only used if `signup_domain_allowlist_enabled` is true.
-- `signup_domain_blocklist` (List of String) A list of email domains that are blocked from signing up. This is only used if `signup_domain_blocklist_enabled` is true and `signup_domain_allowlist` is empty.
+- `signup_domain_allowlist` (List of String) A list of email domains that are allowed to sign up.
+- `signup_domain_blocklist` (List of String) A list of email domains that are blocked from signing up. This is only used if `signup_domain_allowlist` is empty.
 - `user_autologout_seconds` (Number) The number of seconds before a user is automatically logged out. The default setting is 1209600 (14 days).See also "user_autologout_type" for more information.
 - `user_autologout_type` (String) This sets the behavior for when the counting for "user_autologout_seconds" starts. Valid values are "AfterInactivity" and the stricter "AfterLogin". The default setting is "AfterInactivity".
 - `users_can_change_email` (Boolean) If true, your users will be able to change their email address. The default setting is true.
