@@ -58,24 +58,16 @@ func (r *basicAuthConfigurationResource) Schema(ctx context.Context, req resourc
 				Description: "If true, your users will be able to sign up using personal email domains (@gmail.com, @yahoo.com, etc.)." +
 					"The default setting is true. This is only enabled if `signup_domain_allowlist` is empty.",
 			},
-			// "signup_domain_allowlist_enabled": schema.BoolAttribute{
-			// 	Optional:    true,
-			// 	Description: "If true, only users with email domains in the allowlist will be able to sign up. The default setting is false.",
-			// },
 			"signup_domain_allowlist": schema.ListAttribute{
 				ElementType: types.StringType,
 				Optional:    true,
-				Description: "A list of email domains that are allowed to sign up. This is only used if `signup_domain_allowlist_enabled` is true.",
+				Description: "A list of email domains that are allowed to sign up.",
 			},
 			"signup_domain_blocklist": schema.ListAttribute{
 				ElementType: types.StringType,
 				Optional:    true,
-				Description: "A list of email domains that are blocked from signing up. This is only used if `signup_domain_blocklist_enabled` is true and `signup_domain_allowlist` is empty.",
+				Description: "A list of email domains that are blocked from signing up. This is only used if `signup_domain_allowlist` is empty.",
 			},
-			// "signup_domain_blocklist_enabled": schema.BoolAttribute{
-			// 	Optional:    true,
-			// 	Description: "If true, users with email domains in the blocklist will not be able to sign up. The default setting is false. This is only used if `signup_domain_allowlist_enabled` is false.",
-			// },
 			"has_password_login": schema.BoolAttribute{
 				Optional:    true,
 				Description: "If true, your users will be able to log in using their email and password. The default setting is true.",
