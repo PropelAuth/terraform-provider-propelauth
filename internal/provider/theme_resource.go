@@ -145,9 +145,9 @@ func (r *themeResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 						Computed: true,
 						Default:  stringdefault.StaticString("Frame"),
 						Validators: []validator.String{
-							stringvalidator.OneOf("Frame", "Frameless", "Split"),
+							stringvalidator.OneOf("Frame", "Frameless", "SplitScreen"),
 						},
-						Description: "The layout of the login page. Options include `Frame`, `Frameless`, and `Split`. " +
+						Description: "The layout of the login page. Options include `Frame`, `Frameless`, and `SplitScreen`. " +
 							"The default value is `Frame`",
 					},
 					"background_type": schema.StringAttribute{
@@ -535,11 +535,11 @@ func (r *themeResource) ValidateConfig(ctx context.Context, req resource.Validat
 		}
 	}
 
-	if plan.LoginPageTheme.Layout.ValueString() == "Split" && plan.LoginPageTheme.SplitLoginPageParameters == nil {
+	if plan.LoginPageTheme.Layout.ValueString() == "SplitScreen" && plan.LoginPageTheme.SplitLoginPageParameters == nil {
 		resp.Diagnostics.AddAttributeError(
 			path.Root("login_page_theme"),
 			"Missing `split_login_page_parameters`",
-			"`Split` login page layout requires `split_login_page_parameters` to be set",
+			"`SplitScreen` login page layout requires `split_login_page_parameters` to be set",
 		)
 		return
 	}
@@ -687,7 +687,7 @@ func convertPlanToTheme(plan *themeResourceModel) *propelauth.Theme {
 		theme.BackgroundTextColor = convertHexColorToRgb(plan.LoginPageTheme.ImageBackgroundParameters.BackgroundTextColor.ValueString())
 	}
 
-	if plan.LoginPageTheme.Layout.ValueString() == "Split" {
+	if plan.LoginPageTheme.Layout.ValueString() == "SplitScreen" {
 		var splitscreenParams propelauth.SplitscreenParams
 		splitscreenParams.Direction = plan.LoginPageTheme.SplitLoginPageParameters.Direction.ValueString()
 		splitscreenParams.ContentType = plan.LoginPageTheme.SplitLoginPageParameters.ContentType.ValueString()
@@ -750,7 +750,7 @@ func updateStateFromTheme(theme propelauth.Theme, state *themeResourceModel) {
 		}
 	}
 
-	if theme.LoginLayout == "Split" {
+	if theme.LoginLayout == "SplitScreen" {
 		state.LoginPageTheme.SplitLoginPageParameters = &splitLoginPageParameters{
 			Direction:                    types.StringValue(theme.Splitscreen.Direction),
 			ContentType:                  types.StringValue(theme.Splitscreen.ContentType),
