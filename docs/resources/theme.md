@@ -87,7 +87,7 @@ Optional:
 - `frame_text_color` (String) The color of the text within the frame in the login page.  If the the `layout` is `Frameless`, this color is applied to text within input components on the page. The default value is `#0f0f0f`
 - `gradient_background_parameters` (Attributes) The parameters required for a gradient background in the login page (see [below for nested schema](#nestedatt--login_page_theme--gradient_background_parameters))
 - `image_background_parameters` (Attributes) The parameters required for an image background in the login page (see [below for nested schema](#nestedatt--login_page_theme--image_background_parameters))
-- `layout` (String) The layout of the login page. Options include `Frame`, `Frameless`, and `Split`. The default value is `Frame`
+- `layout` (String) The layout of the login page. Options include `Frame`, `Frameless`, and `SplitScreen`. The default value is `Frame`
 - `primary_color` (String) The primary color of action buttons and links in the login page. The default value is `#50c878`
 - `primary_text_color` (String) The color of the text on action buttons in the login page. The default value is `#f7f7f7`
 - `solid_background_parameters` (Attributes) The parameters required for a solid background in the login page (see [below for nested schema](#nestedatt--login_page_theme--solid_background_parameters))
