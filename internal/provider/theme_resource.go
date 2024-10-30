@@ -341,11 +341,15 @@ func (r *themeResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 							},
 							"header": schema.StringAttribute{
 								Optional: true,
+								Computed: true,
+								Default:  stringdefault.StaticString(""),
 								Description: "The header text displayed on the side of the screen opposite the login components. " +
 									"This is only displayed if `content_type` is `Text`",
 							},
 							"subheader": schema.StringAttribute{
 								Optional: true,
+								Computed: true,
+								Default:  stringdefault.StaticString(""),
 								Description: "The subheader text displayed on the side of the screen opposite the login components. " +
 									"This is only displayed if `content_type` is `Text`",
 							},
