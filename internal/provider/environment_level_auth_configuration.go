@@ -65,13 +65,13 @@ func (r *environmentLevelAuthConfigurationResource) Schema(ctx context.Context, 
 			"require_email_confirmation": schema.BoolAttribute{
 				Optional: true,
 				Description: "If true, all users are required to have confirmed email addresses. Whenever PropelAuth doesn't know for " +
-					"certain whether a user's email adderss is in fact owned by them, PropelAuth will trigger an email confirmation flow. " +
+					"certain whether a user's email address is in fact owned by them, PropelAuth will trigger an email confirmation flow. " +
 					"The default setting is true for `Prod` and `Staging` environments but is false for `Test` for ease of development.",
 			},
 			"waitlist_users_require_email_confirmation": schema.BoolAttribute{
 				Optional: true,
 				Description: "If true, all waitlisted users are required to have confirmed email addresses. Whenever PropelAuth doesn't know for " +
-					"certain whether a waitlisted user's email adderss is in fact owned by them, PropelAuth will trigger an email confirmation flow. " +
+					"certain whether a waitlisted user's email address is in fact owned by them, PropelAuth will trigger an email confirmation flow. " +
 					"The default setting is false for all environments.",
 			},
 		},
