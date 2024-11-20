@@ -48,7 +48,7 @@ func (r *apiKeySettingsResource) Metadata(ctx context.Context, req resource.Meta
 
 func (r *apiKeySettingsResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "Api Key Configurations. This is for configuring the API global settings for t.",
+		Description: "Api Key Configurations. This is for configuring the API global settings for your project.",
 		Attributes: map[string]schema.Attribute{
 			"personal_api_keys_enabled": schema.BoolAttribute{
 				Optional:    true,

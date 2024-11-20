@@ -3,12 +3,12 @@
 page_title: "propelauth_api_key_settings Resource - propelauth"
 subcategory: ""
 description: |-
-  Api Key Configurations. This is for configuring the API global settings for t.
+  Api Key Configurations. This is for configuring the API global settings for your project.
 ---
 
 # propelauth_api_key_settings (Resource)
 
-Api Key Configurations. This is for configuring the API global settings for t.
+Api Key Configurations. This is for configuring the API global settings for your project.
 
 ## Example Usage
 
