@@ -310,5 +310,5 @@ func (r *customDomainResource) Delete(ctx context.Context, req resource.DeleteRe
 
 func (r *customDomainResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	// Retrieve import environment and save to environment attribute
-    resource.ImportStatePassthroughID(ctx, path.Root("environment"), req, resp)
+	resource.ImportStatePassthroughID(ctx, path.Root("environment"), req, resp)
 }
