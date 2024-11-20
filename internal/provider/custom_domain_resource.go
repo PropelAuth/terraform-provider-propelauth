@@ -7,6 +7,7 @@ import (
 	"terraform-provider-propelauth/internal/propelauth"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
@@ -19,6 +20,7 @@ import (
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &customDomainResource{}
 var _ resource.ResourceWithConfigure = &customDomainResource{}
+var _ resource.ResourceWithImportState = &customDomainResource{}
 
 func NewCustomDomainResource() resource.Resource {
 	return &customDomainResource{}
@@ -189,7 +191,7 @@ func (r *customDomainResource) Read(ctx context.Context, req resource.ReadReques
 
 	isDomainOrSubdomainChanged := state.Domain.ValueString() != customDomainInfo.Domain || state.Subdomain.ValueStringPointer() != customDomainInfo.Subdomain
 
-	isSwitching := isDomainOrSubdomainChanged && customDomainInfo.IsVerified
+	isSwitching := isDomainOrSubdomainChanged && customDomainInfo.IsVerified && !state.Domain.IsNull()
 	if isSwitching {
 		// If the domain is switching, fetch the pending state instead.
 		customDomainInfo, err = r.client.GetCustomDomainInfo(environment, true)
@@ -304,4 +306,9 @@ func (r *customDomainResource) Update(ctx context.Context, req resource.UpdateRe
 
 func (r *customDomainResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	tflog.Trace(ctx, "deleted a propelauth_custom_domain resource")
+}
+
+func (r *customDomainResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	// Retrieve import environment and save to environment attribute
+    resource.ImportStatePassthroughID(ctx, path.Root("environment"), req, resp)
 }
