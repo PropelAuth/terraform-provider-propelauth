@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-const BaseURLTemplate string = "https://api.propelauth.com/iac/%s/project/%s"
+const BaseURLTemplate string = "https://api.propelauth.localhost/iac/%s/project/%s"
 
 // PropelAuthClient - Client for the PropelAuth API to manage an existing project and all its resources.
 type PropelAuthClient struct {

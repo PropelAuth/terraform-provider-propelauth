@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 )
 
-// GetEnvironmentConfig - Returns a project metadata.
+// GetEnvironmentConfig - Returns the current environment configuration for a project.
 func (c *PropelAuthClient) GetEnvironmentConfig() (*EnvironmentConfigResponse, error) {
 	res, err := c.get("config")
 	if err != nil {
