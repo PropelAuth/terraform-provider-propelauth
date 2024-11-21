@@ -148,3 +148,15 @@ Optional:
 - `main_text_color` (String) The color of the text in the main content area of the management pages. The default value is `#363636`
 - `navbar_background_color` (String) The background color of the navigation bar in the management pages. The default value is `#ffffff`
 - `navbar_text_color` (String) The color of the text in the navigation bar in the management pages. The default value is `#0f0f0f`
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+# As there is only one theme per project there's no need to specify the id,
+# but terraform import requires an id to be specified, so we can use an arbitrary string here.
+terraform import propelauth_theme.example arbitrary_string_here
+# Note: The propelauth_theme resource has many default values for attributes set by the provider
+# if you do not provide them. Carefully review the plan for any unexpected changes before applying.
+```

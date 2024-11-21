@@ -20,6 +20,7 @@ import (
 var _ resource.Resource = &rolesAndPermissionsResource{}
 var _ resource.ResourceWithConfigure = &rolesAndPermissionsResource{}
 var _ resource.ResourceWithValidateConfig = &rolesAndPermissionsResource{}
+var _ resource.ResourceWithImportState = &rolesAndPermissionsResource{}
 
 func NewRolesAndPermissionsResource() resource.Resource {
 	return &rolesAndPermissionsResource{}
@@ -473,6 +474,41 @@ func (r *rolesAndPermissionsResource) Update(ctx context.Context, req resource.U
 
 func (r *rolesAndPermissionsResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	tflog.Trace(ctx, "deleted a propelauth_roles_and_permissions resource")
+}
+
+func (r *rolesAndPermissionsResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	var state rolesAndPermissionsResourceModel
+
+	// retrieve the roles and permissions from PropelAuth
+	rolesAndPermissions, err := r.client.GetRolesAndPermissions()
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error Importing PropelAuth Roles and Permissions",
+			"Could not read PropelAuth Roles and Permissions: "+err.Error(),
+		)
+		return
+	}
+
+	// update state
+	// easy ones first
+	state.MultipleRolesPerUser = types.BoolValue(rolesAndPermissions.IsMultiRole())
+	state.DefaultRole = types.StringValue(rolesAndPermissions.DefaultRole)
+	state.DefaultOwnerRole = types.StringValue(rolesAndPermissions.DefaultOwnerRole)
+	// role definitions
+	state.Roles = make(map[string]roleModel, len(rolesAndPermissions.Roles))
+	for _, role := range rolesAndPermissions.Roles {
+		updateStateForRole(&state, &role)
+	}
+	// permissions
+	reconcilePermissions(&state, rolesAndPermissions)
+	// role hierarchy
+	if !rolesAndPermissions.IsMultiRole() {
+		sourceRoleHierarchy := rolesAndPermissions.GetHierarchy()
+		state.RoleHierarchy = convertArrayOfStringsForState(sourceRoleHierarchy)
+	}
+
+	// Save updated state into Terraform state
+	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 }
 
 func convertRoleFromState(roleName string, role *roleModel) propelauth.RoleDefinition {

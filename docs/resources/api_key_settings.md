@@ -55,3 +55,13 @@ Required:
 
 - `default` (String) The default expiration option for an API key. Valid values are `TwoWeeks`, `OneMonth`, `ThreeMonths`, `SixMonths`, `OneYear`, and `Never`.
 - `options` (List of String) The options available for the expiration of an API key. Valid values are `TwoWeeks`, `OneMonth`, `ThreeMonths`, `SixMonths`, `OneYear`, and `Never`.
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+# As there is only one api_key_settings per project there's no need to specify the id,
+# but terraform import requires an id to be specified, so we can use an arbitrary string here.
+terraform import propelauth_api_key_settings.example arbitrary_string_here
+```

@@ -7,6 +7,7 @@ import (
 	"terraform-provider-propelauth/internal/propelauth"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -17,6 +18,7 @@ import (
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &imageResource{}
 var _ resource.ResourceWithConfigure = &imageResource{}
+var _ resource.ResourceWithImportState = &imageResource{}
 
 func NewImageResource() resource.Resource {
 	return &imageResource{}
@@ -240,4 +242,8 @@ func (r *imageResource) Update(ctx context.Context, req resource.UpdateRequest, 
 
 func (r *imageResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	tflog.Trace(ctx, "deleted a propelauth_image resource")
+}
+
+func (r *imageResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	resource.ImportStatePassthroughID(ctx, path.Root("image_type"), req, resp)
 }

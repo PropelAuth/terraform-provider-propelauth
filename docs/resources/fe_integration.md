@@ -52,3 +52,12 @@ Required:
 Optional:
 
 - `allow_any_subdomain` (Boolean) If true, any subdomain of the domain to integrate with PropelAuth is also allowed to access user info. The default value is false.
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+# Import using the target environment as the ID: `Test`, `Staging`, or `Prod`.
+terraform import propelauth_fe_integration.prod_example Prod
+```

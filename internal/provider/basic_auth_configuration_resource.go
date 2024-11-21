@@ -19,6 +19,7 @@ import (
 var _ resource.Resource = &basicAuthConfigurationResource{}
 var _ resource.ResourceWithConfigure = &basicAuthConfigurationResource{}
 var _ resource.ResourceWithValidateConfig = &basicAuthConfigurationResource{}
+var _ resource.ResourceWithImportState = &basicAuthConfigurationResource{}
 
 func NewBasicAuthConfigurationResource() resource.Resource {
 	return &basicAuthConfigurationResource{}
@@ -553,4 +554,32 @@ func (r *basicAuthConfigurationResource) Update(ctx context.Context, req resourc
 
 func (r *basicAuthConfigurationResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	tflog.Trace(ctx, "deleted a propelauth_basic_auth_configuration resource")
+}
+
+func (r *basicAuthConfigurationResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	var state basicAuthConfigurationResourceModel
+
+	// retrieve the environment config from PropelAuth
+	environmentConfigResponse, err := r.client.GetEnvironmentConfig()
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error Importing PropelAuth basic auth configuration",
+			"Could not read PropelAuth basic auth configuration: "+err.Error(),
+		)
+		return
+	}
+
+	// Save into the Terraform state all values from the dashboard.
+	state.AllowUsersToSignupWithPersonalEmail = types.BoolValue(environmentConfigResponse.AllowUsersToSignupWithPersonalEmail)
+	state.HasPasswordLogin = types.BoolValue(environmentConfigResponse.HasPasswordLogin)
+	state.HasPasswordlessLogin = types.BoolValue(environmentConfigResponse.HasPasswordlessLogin)
+	state.WaitlistUsersEnabled = types.BoolValue(environmentConfigResponse.WaitlistUsersEnabled)
+	state.UserAutologoutSeconds = types.Int64Value(environmentConfigResponse.UserAutologoutSeconds)
+	state.UserAutologoutType = types.StringValue(environmentConfigResponse.UserAutologoutType)
+	state.UsersCanDeleteOwnAccount = types.BoolValue(environmentConfigResponse.UsersCanDeleteOwnAccount)
+	state.UsersCanChangeEmail = types.BoolValue(environmentConfigResponse.UsersCanChangeEmail)
+	state.IncludeLoginMethod = types.BoolValue(environmentConfigResponse.IncludeLoginMethod)
+
+	// Save updated state into Terraform state
+	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 }

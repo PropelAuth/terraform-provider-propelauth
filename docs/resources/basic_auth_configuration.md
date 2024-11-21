@@ -36,3 +36,13 @@ resource "propelauth_basic_auth_configuration" "example" {
 - `users_can_change_email` (Boolean) If true, your users will be able to change their email address. The default setting is true.
 - `users_can_delete_own_account` (Boolean) If true, your users will be able to delete their own account. The default setting is false.
 - `waitlist_users_enabled` (Boolean) If true, you will be able to use the APIs to collect emails before launching. The default setting is false.
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+# As there is only one basic_auth_configuration per project there's no need to specify the id,
+# but terraform import requires an id to be specified, so we can use an arbitrary string here.
+terraform import propelauth_basic_auth_configuration.example arbitrary_string_here
+```

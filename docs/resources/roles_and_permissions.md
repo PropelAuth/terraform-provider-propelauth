@@ -155,3 +155,13 @@ Optional:
 
 - `description` (String) A description of the permission. This is a human readable description of what the permission allows.
 - `display_name` (String) The display name of the permission. This is the human readable name of the permission. If not provided, the `name` will be used.
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+# As there is only one default roles_and_permissions per project there's no need to specify the id,
+# but terraform import requires an id to be specified, so we can use an arbitrary string here.
+terraform import propelauth_roles_and_permissions.example arbitrary_string_here
+```
