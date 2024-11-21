@@ -9,6 +9,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
@@ -21,6 +22,7 @@ import (
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &customDomainVerificationResource{}
 var _ resource.ResourceWithConfigure = &customDomainVerificationResource{}
+var _ resource.ResourceWithImportState = &customDomainVerificationResource{}
 
 func NewCustomDomainVerificationResource() resource.Resource {
 	return &customDomainVerificationResource{}
@@ -208,4 +210,32 @@ func (r *customDomainVerificationResource) Update(ctx context.Context, req resou
 
 func (r *customDomainVerificationResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	tflog.Trace(ctx, "deleted a custom_domain resource")
+}
+
+func (r *customDomainVerificationResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	var state customDomainVerificationResourceModel
+
+	environment := req.ID
+	if environment != "Staging" && environment != "Prod" {
+		resp.Diagnostics.AddError("Invalid import ID", "The import ID must be either `Staging` or `Prod`.")
+		return
+	}
+
+	customDomainInfo, err := r.client.GetCustomDomainInfo(environment, false)
+	if err != nil {
+		resp.Diagnostics.AddError("Error fetching custom domain info", "Could not fetch custom domain info for the environment.")
+		return
+	}
+
+	state.Environment = types.StringValue(environment)
+	state.Domain = types.StringValue(customDomainInfo.Domain)
+	// need to manually create an empty timeout or the state will fail validation
+	state.Timeouts = timeouts.Value{
+		Object: types.ObjectNull(map[string]attr.Type{
+			"create": types.StringType,
+			"update": types.StringType,
+		}),
+	}
+
+	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 }
