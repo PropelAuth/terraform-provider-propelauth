@@ -9,7 +9,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
-	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
@@ -229,13 +229,14 @@ func (r *customDomainVerificationResource) ImportState(ctx context.Context, req 
 
 	state.Environment = types.StringValue(environment)
 	state.Domain = types.StringValue(customDomainInfo.Domain)
-	// need to manually create an empty timeout or the state will fail validation
-	state.Timeouts = timeouts.Value{
-		Object: types.ObjectNull(map[string]attr.Type{
-			"create": types.StringType,
-			"update": types.StringType,
-		}),
+	// need to manually pull timeouts from hcl to pass validation
+	var timeouts timeouts.Value
+	resp.Diagnostics.Append(resp.State.GetAttribute(ctx, path.Root("timeouts"), &timeouts)...)
+	if resp.Diagnostics.HasError() {
+		return
 	}
+
+	state.Timeouts = timeouts
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 }
