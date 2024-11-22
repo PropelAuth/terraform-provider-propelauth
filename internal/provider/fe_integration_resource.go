@@ -7,6 +7,7 @@ import (
 	"terraform-provider-propelauth/internal/propelauth"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
@@ -20,6 +21,7 @@ import (
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &feIntegrationResource{}
 var _ resource.ResourceWithConfigure = &feIntegrationResource{}
+var _ resource.ResourceWithImportState = &feIntegrationResource{}
 
 func NewFeIntegrationResource() resource.Resource {
 	return &feIntegrationResource{}
@@ -255,6 +257,10 @@ func (r *feIntegrationResource) Update(ctx context.Context, req resource.UpdateR
 
 func (r *feIntegrationResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	tflog.Trace(ctx, "deleted a propelauth_fe_integration resource")
+}
+
+func (r *feIntegrationResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	resource.ImportStatePassthroughID(ctx, path.Root("environment"), req, resp)
 }
 
 func convertPlanToUpdate(plan *feIntegrationResourceModel) propelauth.FeIntegrationUpdate {

@@ -26,6 +26,7 @@ import (
 var _ resource.Resource = &themeResource{}
 var _ resource.ResourceWithConfigure = &themeResource{}
 var _ resource.ResourceWithValidateConfig = &themeResource{}
+var _ resource.ResourceWithImportState = &themeResource{}
 
 func NewThemeResource() resource.Resource {
 	return &themeResource{}
@@ -547,6 +548,15 @@ func (r *themeResource) ValidateConfig(ctx context.Context, req resource.Validat
 		)
 		return
 	}
+
+	if plan.LoginPageTheme.SolidBackgroundParameters == nil && plan.LoginPageTheme.GradientBackgroundParameters == nil && plan.LoginPageTheme.ImageBackgroundParameters == nil {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("login_page_theme"),
+			"Missing background parameters",
+			"Either `solid_background_parameters`, `gradient_background_parameters`, or `image_background_parameters` must be set if even to an empty object",
+		)
+		return
+	}
 }
 
 func (r *themeResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
@@ -644,6 +654,24 @@ func (r *themeResource) Update(ctx context.Context, req resource.UpdateRequest, 
 
 func (r *themeResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	tflog.Trace(ctx, "deleted a propelauth_theme resource")
+}
+
+func (r *themeResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	// retrieve the environment config from PropelAuth
+	environmentConfig, err := r.client.GetEnvironmentConfig()
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error Reading PropelAuth propelauth theme",
+			"Could not read PropelAuth propelauth theme: "+err.Error(),
+		)
+		return
+	}
+
+	var state themeResourceModel
+	updateStateFromTheme(environmentConfig.Theme, &state)
+
+	// Save updated state into Terraform state
+	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 }
 
 func convertPlanToTheme(plan *themeResourceModel) *propelauth.Theme {

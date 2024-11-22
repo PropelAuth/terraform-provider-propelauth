@@ -15,6 +15,7 @@ import (
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &apiKeySettingsResource{}
 var _ resource.ResourceWithConfigure = &apiKeySettingsResource{}
+var _ resource.ResourceWithImportState = &apiKeySettingsResource{}
 
 func NewApiKeySettingsResource() resource.Resource {
 	return &apiKeySettingsResource{}
@@ -302,6 +303,38 @@ func (r *apiKeySettingsResource) Update(ctx context.Context, req resource.Update
 
 func (r *apiKeySettingsResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	tflog.Trace(ctx, "deleted a propelauth_api_key_settings resource")
+}
+
+func (r *apiKeySettingsResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	var state apiKeySettingsResourceModel
+
+	// retrieve the environment config from PropelAuth
+	environmentConfigResponse, err := r.client.GetEnvironmentConfig()
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error Importing PropelAuth api key settings",
+			"Could not read PropelAuth api key settings: "+err.Error(),
+		)
+		return
+	}
+
+	// Save into the Terraform state only if the value is not null in Terraform.
+	// Null, or unset values, in Terraform are left to be manually managed in the dashboard.
+	state.PersonalApiKeysEnabled = types.BoolValue(environmentConfigResponse.PersonalApiKeysEnabled)
+	state.OrgApiKeysEnabled = types.BoolValue(environmentConfigResponse.OrgApiKeysEnabled)
+	state.InvalidateOrgApiKeyUponUserRemoval = types.BoolValue(environmentConfigResponse.InvalidateOrgApiKeyUponUserRemoval)
+
+	apiKeyConfig := &apiKeyConfigResourceModel{}
+	apiKeyConfig.ExpirationOptions.Default = types.StringValue(environmentConfigResponse.ApiKeyConfig.ExpirationOptions.Default)
+	remoteApiKeyExpirationOptions := environmentConfigResponse.ApiKeyConfig.ExpirationOptions.GetApiKeyExpirationOptions()
+	apiKeyConfig.ExpirationOptions.Options = make([]types.String, len(remoteApiKeyExpirationOptions))
+	for i, option := range remoteApiKeyExpirationOptions {
+		apiKeyConfig.ExpirationOptions.Options[i] = types.StringValue(option)
+	}
+	state.ApiKeyConfig = apiKeyConfig
+
+	// Save updated state into Terraform state
+	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 }
 
 func diffInOptions(stateOptions []types.String, remoteOptions []string) bool {

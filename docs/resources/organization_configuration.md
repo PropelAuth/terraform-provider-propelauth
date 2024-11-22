@@ -38,3 +38,13 @@ resource "propelauth_organization_configuration" "example" {
 - `users_can_create_orgs` (Boolean) If true, users have access to the 'Create Org' UI, allowing them to create their own organizations.The default setting is true.
 - `users_can_delete_their_own_orgs` (Boolean) If true, users with the requisite permission will be able to delete their organizations. The default setting is false.
 - `users_must_be_in_an_organization` (Boolean) If true, users will be required to create or join an organization as part of the signup process. The default setting is false.
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+# As there is only one organization_configuration per project there's no need to specify the id,
+# but terraform import requires an id to be specified, so we can use an arbitrary string here.
+terraform import propelauth_organization_configuration.example arbitrary_string_here
+```

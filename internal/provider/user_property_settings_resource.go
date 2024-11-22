@@ -22,6 +22,7 @@ import (
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &userPropertySettingsResource{}
 var _ resource.ResourceWithConfigure = &userPropertySettingsResource{}
+var _ resource.ResourceWithImportState = &userPropertySettingsResource{}
 
 func NewUserPropertySettingsResource() resource.Resource {
 	return &userPropertySettingsResource{}
@@ -496,6 +497,118 @@ func (r *userPropertySettingsResource) Delete(ctx context.Context, req resource.
 	tflog.Trace(ctx, "deleted a propelauth_user_properties_settings resource")
 }
 
+func (r *userPropertySettingsResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	var state userPropertySettingsResourceModel
+
+	// Fetch the current user property settings from PropelAuth
+	userPropertySettings, err := r.client.GetUserProperties()
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error Importing PropelAuth user properties settings",
+			"Could not read PropelAuth user properties settings: "+err.Error(),
+		)
+		return
+	}
+
+	// Update the configuration in PropelAuth
+	if userPropertySettings.NamePropertyEnabled() {
+		namePropertySettings := userPropertySettings.GetNamePropertySettings()
+		state.NameProperty = &namePropertyModel{
+			InJwt: types.BoolValue(namePropertySettings.InJwt),
+		}
+	} else {
+		state.NameProperty = nil
+	}
+
+	if userPropertySettings.MetadataPropertyEnabled() {
+		metadataPropertySettings := userPropertySettings.GetMetadataPropertySettings()
+		state.MetadataProperty = &metadataPropertyModel{
+			InJwt:          types.BoolValue(metadataPropertySettings.InJwt),
+			CollectViaSaml: types.BoolValue(metadataPropertySettings.CollectViaSaml),
+		}
+	} else {
+		state.MetadataProperty = nil
+	}
+
+	if userPropertySettings.UsernamePropertyEnabled() {
+		usernamePropertySettings := userPropertySettings.GetUsernamePropertySettings()
+		state.UsernameProperty = &usernamePropertyModel{
+			DisplayName: types.StringValue(usernamePropertySettings.DisplayName),
+			InJwt:       types.BoolValue(usernamePropertySettings.InJwt),
+		}
+	} else {
+		state.UsernameProperty = nil
+	}
+
+	if userPropertySettings.PictureUrlPropertyEnabled() {
+		pictureUrlPropertySettings := userPropertySettings.GetPictureUrlPropertySettings()
+		state.PictureUrlProperty = &pictureUrlPropertyModel{
+			InJwt: types.BoolValue(pictureUrlPropertySettings.InJwt),
+		}
+	} else {
+		state.PictureUrlProperty = nil
+	}
+
+	if userPropertySettings.PhoneNumberPropertyEnabled() {
+		phoneNumberPropertySettings := userPropertySettings.GetPhoneNumberPropertySettings()
+		state.PhoneNumberProperty = &phoneNumberPropertyModel{
+			DisplayName:    types.StringValue(phoneNumberPropertySettings.DisplayName),
+			ShowInAccount:  types.BoolValue(phoneNumberPropertySettings.ShowInAccount),
+			CollectViaSaml: types.BoolValue(phoneNumberPropertySettings.CollectViaSaml),
+			Required:       types.BoolValue(phoneNumberPropertySettings.Required),
+			RequiredBy:     types.Int64Value(phoneNumberPropertySettings.RequiredBy),
+			UserWritable:   types.StringValue(phoneNumberPropertySettings.UserWritable),
+			InJwt:          types.BoolValue(phoneNumberPropertySettings.InJwt),
+		}
+	} else {
+		state.PhoneNumberProperty = nil
+	}
+
+	if userPropertySettings.TosPropertyEnabled() {
+		tosPropertySettings := userPropertySettings.GetTosPropertySettings()
+		tosLinks := make([]tosLinkModel, len(tosPropertySettings.TosLinks))
+		for i, tosLink := range tosPropertySettings.TosLinks {
+			tosLinks[i] = tosLinkModel{
+				Url:  types.StringValue(tosLink.Url),
+				Name: types.StringValue(tosLink.Name),
+			}
+		}
+		state.TosProperty = &tosPropertyModel{
+			InJwt:      types.BoolValue(tosPropertySettings.InJwt),
+			Required:   types.BoolValue(tosPropertySettings.Required),
+			RequiredBy: types.Int64Value(tosPropertySettings.RequiredBy),
+			TosLinks:   tosLinks,
+		}
+	} else {
+		state.TosProperty = nil
+	}
+
+	if userPropertySettings.ReferralSourcePropertyEnabled() {
+		referralSourcePropertySettings := userPropertySettings.GetReferralSourcePropertySettings()
+		options := make([]types.String, len(referralSourcePropertySettings.Options))
+		for i, option := range referralSourcePropertySettings.Options {
+			options[i] = types.StringValue(option)
+		}
+		state.ReferralSourceProperty = &referralSourcePropertyModel{
+			DisplayName:    types.StringValue(referralSourcePropertySettings.DisplayName),
+			InJwt:          types.BoolValue(referralSourcePropertySettings.InJwt),
+			Required:       types.BoolValue(referralSourcePropertySettings.Required),
+			RequiredBy:     types.Int64Value(referralSourcePropertySettings.RequiredBy),
+			UserWriteable:  types.StringValue(referralSourcePropertySettings.UserWritable),
+			Options:        options,
+			ShowInAccount:  types.BoolValue(referralSourcePropertySettings.ShowInAccount),
+			CollectViaSaml: types.BoolValue(referralSourcePropertySettings.CollectViaSaml),
+		}
+	} else {
+		state.ReferralSourceProperty = nil
+	}
+
+	importCustomProperties(&state, userPropertySettings)
+
+	// Save updated state into Terraform state
+	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
+}
+
 func updateDefaultPropertiesFromPlan(plan *userPropertySettingsResourceModel, userPropertySettings *propelauth.UserProperties) {
 	if plan.NameProperty != nil {
 		userPropertySettings.UpdateAndEnableNameProperty(propelauth.NamePropertySettings{
@@ -631,6 +744,18 @@ func reconcileCustomProperties(state *userPropertySettingsResourceModel, userPro
 	}
 
 	hangingCustomProperties := userPropertySettings.GetHangingCustomProperties(customPropertyNamesInState)
+	convertedCustomPropertiesFromHanging := make([]customPropertyModel, 0, len(hangingCustomProperties))
+
+	for _, hangingCustomProperty := range hangingCustomProperties {
+		convertedCustomProperty := convertCustomPropertyToModel(&hangingCustomProperty)
+		convertedCustomPropertiesFromHanging = append(convertedCustomPropertiesFromHanging, convertedCustomProperty)
+	}
+
+	state.CustomProperties = append(state.CustomProperties, convertedCustomPropertiesFromHanging...)
+}
+
+func importCustomProperties(state *userPropertySettingsResourceModel, userPropertySettings *propelauth.UserProperties) {
+	hangingCustomProperties := userPropertySettings.GetHangingCustomProperties([]string{})
 	convertedCustomPropertiesFromHanging := make([]customPropertyModel, 0, len(hangingCustomProperties))
 
 	for _, hangingCustomProperty := range hangingCustomProperties {

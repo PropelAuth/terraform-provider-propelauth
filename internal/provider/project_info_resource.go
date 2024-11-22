@@ -15,6 +15,7 @@ import (
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &projectInfoResource{}
 var _ resource.ResourceWithConfigure = &projectInfoResource{}
+var _ resource.ResourceWithImportState = &projectInfoResource{}
 
 func NewProjectInfoResource() resource.Resource {
 	return &projectInfoResource{}
@@ -158,4 +159,23 @@ func (r *projectInfoResource) Update(ctx context.Context, req resource.UpdateReq
 
 func (r *projectInfoResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	tflog.Trace(ctx, "deleted a propelauth_project_info resource")
+}
+
+func (r *projectInfoResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	var state projectInfoResourceModel
+
+	// retrieve the project info from PropelAuth
+	project_info, err := r.client.GetProjectInfo()
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error Importing PropelAuth Project Info",
+			"Could not read PropelAuth Project Info: "+err.Error(),
+		)
+		return
+	}
+
+	// overwrite project info
+	state.Name = types.StringValue(project_info.Name)
+	// Save updated state into Terraform state
+	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 }

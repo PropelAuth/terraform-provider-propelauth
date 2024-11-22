@@ -17,6 +17,7 @@ import (
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &organizationConfigurationResource{}
 var _ resource.ResourceWithConfigure = &organizationConfigurationResource{}
+var _ resource.ResourceWithImportState = &organizationConfigurationResource{}
 
 func NewOrganizationConfigurationResource() resource.Resource {
 	return &organizationConfigurationResource{}
@@ -435,4 +436,33 @@ func (r *organizationConfigurationResource) Update(ctx context.Context, req reso
 
 func (r *organizationConfigurationResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	tflog.Trace(ctx, "deleted a propelauth_organization_configuration resource")
+}
+
+func (r *organizationConfigurationResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	var state organizationConfigurationResourceModel
+
+	// retrieve the environment config from PropelAuth
+	environmentConfigResponse, err := r.client.GetEnvironmentConfig()
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error Importing PropelAuth organization configuration",
+			"Could not read PropelAuth organization configuration: "+err.Error(),
+		)
+		return
+	}
+
+	// Save into the Terraform state all values from the dashboard.
+	state.HasOrgs = types.BoolValue(environmentConfigResponse.HasOrgs)
+	state.OrgsMetaname = types.StringValue(environmentConfigResponse.OrgsMetaname)
+	state.MaxNumOrgsUsersCanBeIn = types.Int32Value(environmentConfigResponse.MaxNumOrgsUsersCanBeIn)
+	state.UsersCanCreateOrgs = types.BoolValue(environmentConfigResponse.UsersCanCreateOrgs)
+	state.UsersCanDeleteTheirOwnOrgs = types.BoolValue(environmentConfigResponse.UsersCanDeleteTheirOwnOrgs)
+	state.UsersMustBeInAnOrganization = types.BoolValue(environmentConfigResponse.UsersMustBeInAnOrganization)
+	state.OrgsCanSetupSaml = types.BoolValue(environmentConfigResponse.OrgsCanSetupSaml)
+	state.UseOrgNameForSaml = types.BoolValue(environmentConfigResponse.UseOrgNameForSaml)
+	state.DefaultToSamlLogin = types.BoolValue(environmentConfigResponse.DefaultToSamlLogin)
+	state.OrgsCanRequire2fa = types.BoolValue(environmentConfigResponse.OrgsCanRequire2fa)
+
+	// Save updated state into Terraform state
+	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 }
