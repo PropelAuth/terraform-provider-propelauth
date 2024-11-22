@@ -113,9 +113,9 @@ func (r *rolesAndPermissionsResource) Schema(ctx context.Context, req resource.S
 			"roles": schema.MapNestedAttribute{
 				Required: true,
 				Description: "A map of roles that can be assigned to members of an organization. This provides the the permissions " +
-					"in the default mapping. For overrides (ie custom mappings) that can be applied on top of this, see the " +
-					"`propelauth_role_permissions_override` resource. in the default mapping. For overrides (ie custom mappings) " +
-					"that can be applied on top of this, see the `propelauth_role_permissions_override` resource.",
+					"in the default role mapping. Additional custom role mappings are not yet configurable in terraform " +
+					"and can only be managed in the PropelAuth dashboard. If you are interested in managing additional custom role mappings " +
+					"in terraform, please write us at support@propelauth.com.",
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"can_view_other_members": schema.BoolAttribute{

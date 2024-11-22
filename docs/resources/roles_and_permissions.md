@@ -111,7 +111,7 @@ resource "propelauth_roles_and_permissions" "example" {
 
 - `default_owner_role` (String) The `default_owner_role` is the role automatically assigned to the user who creates the organization.
 - `default_role` (String) The `default_role` is the role assigned to a user if they join an organization and no other role is assigned to them. It is also the fallback role in the instance their role is deleted from the configuration without a replacement.
-- `roles` (Attributes Map) A map of roles that can be assigned to members of an organization. This provides the the permissions in the default mapping. For overrides (ie custom mappings) that can be applied on top of this, see the `propelauth_role_permissions_override` resource. in the default mapping. For overrides (ie custom mappings) that can be applied on top of this, see the `propelauth_role_permissions_override` resource. (see [below for nested schema](#nestedatt--roles))
+- `roles` (Attributes Map) A map of roles that can be assigned to members of an organization. This provides the the permissions in the default role mapping. Additional custom role mappings are not yet configurable in terraform and can only be managed in the PropelAuth dashboard. If you are interested in managing additional custom role mappings in terraform, please write us at support@propelauth.com. (see [below for nested schema](#nestedatt--roles))
 
 ### Optional
 
