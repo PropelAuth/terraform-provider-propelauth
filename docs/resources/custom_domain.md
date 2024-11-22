@@ -42,3 +42,14 @@ resource "propelauth_custom_domain" "my_custom_domain" {
 - `txt_record_key` (String) The TXT record key for the custom domain.
 - `txt_record_key_without_domain` (String) The TXT record key for the custom domain without the domain (e.g. just auth instead of auth.example.com) .
 - `txt_record_value` (String) The TXT record value for the custom domain.
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+# Custom domains can be imported by which environment they are in
+terraform import propelauth_custom_domain.example Prod
+# or
+terraform import propelauth_custom_domain.example Staging
+```

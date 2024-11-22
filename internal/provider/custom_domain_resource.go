@@ -19,6 +19,7 @@ import (
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &customDomainResource{}
 var _ resource.ResourceWithConfigure = &customDomainResource{}
+var _ resource.ResourceWithImportState = &customDomainResource{}
 
 func NewCustomDomainResource() resource.Resource {
 	return &customDomainResource{}
@@ -304,4 +305,58 @@ func (r *customDomainResource) Update(ctx context.Context, req resource.UpdateRe
 
 func (r *customDomainResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	tflog.Trace(ctx, "deleted a propelauth_custom_domain resource")
+}
+
+func (r *customDomainResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	var state customDomainResourceModel
+
+	// Get the main env's custom domain info
+	environment := req.ID
+	if environment != "Staging" && environment != "Prod" {
+		resp.Diagnostics.AddError(
+			"Invalid import ID",
+			"Import ID must be either `Staging` or `Prod`.",
+		)
+		return
+	}
+
+	customDomainInfo, err := r.client.GetCustomDomainInfo(environment, false)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error importing custom domain info",
+			"Could not get custom domain info, unexpected error: "+err.Error(),
+		)
+		return
+	}
+
+	// Set the state data from the response
+	state.Environment = types.StringValue(environment)
+	state.Domain = types.StringValue(customDomainInfo.Domain)
+	state.Subdomain = types.StringPointerValue(customDomainInfo.Subdomain)
+
+	// So as not to need an update after verification of a domain,
+	// these fields are only updated if the domain is not verified, which is when they are
+	// returned.
+	if customDomainInfo.TxtRecordKey != nil {
+		state.TxtRecordKey = types.StringPointerValue(customDomainInfo.TxtRecordKey)
+
+		txtRecordKeyParts := strings.Split(*customDomainInfo.TxtRecordKey, ".")
+		txtRecordKeyWithoutDomain := strings.Join(txtRecordKeyParts[:len(txtRecordKeyParts)-2], ".")
+		state.TxtRecordKeyWithoutDomain = types.StringValue(txtRecordKeyWithoutDomain)
+	}
+	if customDomainInfo.TxtRecordValue != nil {
+		state.TxtRecordValue = types.StringPointerValue(customDomainInfo.TxtRecordValue)
+	}
+	if customDomainInfo.CnameRecordKey != nil {
+		state.CnameRecordKey = types.StringPointerValue(customDomainInfo.CnameRecordKey)
+
+		cnameRecordKeyParts := strings.Split(*customDomainInfo.CnameRecordKey, ".")
+		cnameRecordKeyWithoutDomain := strings.Join(cnameRecordKeyParts[:len(cnameRecordKeyParts)-2], ".")
+		state.CnameRecordKeyWithoutDomain = types.StringValue(cnameRecordKeyWithoutDomain)
+	}
+	if customDomainInfo.CnameRecordValue != nil {
+		state.CnameRecordValue = types.StringPointerValue(customDomainInfo.CnameRecordValue)
+	}
+
+	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 }
