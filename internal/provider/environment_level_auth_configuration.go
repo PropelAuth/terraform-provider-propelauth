@@ -19,6 +19,7 @@ import (
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &environmentLevelAuthConfigurationResource{}
 var _ resource.ResourceWithConfigure = &environmentLevelAuthConfigurationResource{}
+var _ resource.ResourceWithImportState = &environmentLevelAuthConfigurationResource{}
 
 func NewEnvironmentLevelAuthConfigurationResource() resource.Resource {
 	return &environmentLevelAuthConfigurationResource{}
@@ -255,4 +256,36 @@ func (r *environmentLevelAuthConfigurationResource) Update(ctx context.Context, 
 
 func (r *environmentLevelAuthConfigurationResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	tflog.Trace(ctx, "deleted a propelauth_environment_level_auth_configuration resource")
+}
+
+func (r *environmentLevelAuthConfigurationResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	var state environmentLevelAuthConfigurationResourceModel
+	environment := req.ID
+
+	if environment != "Test" && environment != "Staging" && environment != "Prod" {
+		resp.Diagnostics.AddError(
+			"Invalid Environment",
+			"Invalid environment value for import. Accepted values are `Test`, `Staging`, and `Prod`.",
+		)
+		return
+	}
+
+	// retrieve the environment config from PropelAuth
+	realmConfigResponse, err := r.client.GetRealmConfig(environment)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error Importing PropelAuth environment-level auth configuration",
+			"Could not read PropelAuth environment-level auth configuration: "+err.Error(),
+		)
+		return
+	}
+
+	// Save into the Terraform state all values from the dashboard
+	state.Environment = types.StringValue(environment)
+	state.AllowPublicSignups = types.BoolValue(realmConfigResponse.AllowPublicSignups)
+	state.RequireEmailConfirmation = types.BoolValue(!realmConfigResponse.AutoConfirmEmails)
+	state.WaitlistUsersRequireEmailConfirmation = types.BoolValue(realmConfigResponse.WaitlistUsersRequireEmailConfirmation)
+
+	// Save updated state into Terraform state
+	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
 }

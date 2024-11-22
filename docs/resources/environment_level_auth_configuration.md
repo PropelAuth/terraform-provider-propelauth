@@ -49,3 +49,14 @@ resource "propelauth_environment_level_auth_configuration" "prod_example" {
 - `allow_public_signups` (Boolean) If true, new users will be able to sign up for your product directly in the PropelAuth hosted pages.The default setting is true for all environments.
 - `require_email_confirmation` (Boolean) If true, all users are required to have confirmed email addresses. Whenever PropelAuth doesn't know for certain whether a user's email address is in fact owned by them, PropelAuth will trigger an email confirmation flow. The default setting is true for `Prod` and `Staging` environments but is false for `Test` for ease of development.
 - `waitlist_users_require_email_confirmation` (Boolean) If true, all waitlisted users are required to have confirmed email addresses. Whenever PropelAuth doesn't know for certain whether a waitlisted user's email address is in fact owned by them, PropelAuth will trigger an email confirmation flow. The default setting is false for all environments.
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+# Import using the target environment as the ID: `Test`, `Staging`, or `Prod`. For example:
+terraform import propelauth_environment_level_auth_configuration.test_env_auth_config Test
+# or
+terraform import propelauth_environment_level_auth_configuration.prod_env_auth_config Prod
+```
