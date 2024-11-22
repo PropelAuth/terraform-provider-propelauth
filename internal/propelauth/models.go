@@ -154,6 +154,25 @@ type ApiKeyExpirationOptions struct {
 	Never       bool `json:"Never"`
 }
 
+type RealmConfigUpdate struct {
+	AutoConfirmEmails                     *bool `json:"auto_confirm_emails,omitempty"`
+	AllowPublicSignups                    *bool `json:"allow_public_signups,omitempty"`
+	WaitlistUsersRequireEmailConfirmation *bool `json:"waitlist_users_require_email_confirmation,omitempty"`
+}
+
+type RealmConfigsResponse struct {
+	Test    RealmConfigResponse  `json:"test"`
+	Staging *RealmConfigResponse `json:"staging"`
+	Prod    *RealmConfigResponse `json:"prod"`
+}
+
+type RealmConfigResponse struct {
+	AutoConfirmEmails                     bool   `json:"auto_confirm_emails"`
+	AllowPublicSignups                    bool   `json:"allow_public_signups"`
+	WaitlistUsersRequireEmailConfirmation bool   `json:"waitlist_users_require_email_confirmation"`
+	AuthHostname                          string `json:"auth_hostname"`
+}
+
 type UserProperties struct {
 	Fields []UserProperty `json:"fields"`
 }
