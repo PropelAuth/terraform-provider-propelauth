@@ -320,3 +320,25 @@ type rolesAndPermissionsUpdate struct {
 type RoleMigrationMap struct {
 	OldToNewRoleMapping map[string]*string `json:"role_map"`
 }
+
+type AllSocialLoginInfoResponse struct {
+	Google     SocialLoginInfo `json:"google"`
+	GitHub     SocialLoginInfo `json:"github"`
+	Slack      SocialLoginInfo `json:"slack"`
+	Microsoft  SocialLoginInfo `json:"microsoft"`
+	LinkedIn   SocialLoginInfo `json:"linkedin"`
+	Salesforce SocialLoginInfo `json:"salesforce"`
+	Outreach   SocialLoginInfo `json:"outreach"`
+	QuickBooks SocialLoginInfo `json:"quickbooks"`
+	Xero       SocialLoginInfo `json:"xero"`
+	Salesloft  SocialLoginInfo `json:"salesloft"`
+	Atlassian  SocialLoginInfo `json:"atlassian"`
+	Apple      SocialLoginInfo `json:"apple"`
+}
+
+type SocialLoginInfo struct {
+	ClientId           string `json:"client_id"`
+	TestRedirectUrl    string `json:"test_redirect_url"`
+	StagingRedirectUrl string `json:"stage_redirect_url"`
+	ProdRedirectUrl    string `json:"prod_redirect_url"`
+}

@@ -211,6 +211,7 @@ func (p *propelauthProvider) Resources(ctx context.Context) []func() resource.Re
 func (p *propelauthProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
 		NewBeIntegrationDataSource,
+		NewSocialLoginRedirectDataSource,
 	}
 }
 
