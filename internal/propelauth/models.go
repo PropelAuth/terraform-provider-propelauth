@@ -342,3 +342,9 @@ type SocialLoginInfo struct {
 	StagingRedirectUrl string `json:"stage_redirect_url"`
 	ProdRedirectUrl    string `json:"prod_redirect_url"`
 }
+
+type SocialLoginUpdateRequest struct {
+	ClientId     string `json:"client_id"`
+	ClientSecret string `json:"client_secret"`
+	Enabled      bool   `json:"enabled"`
+}

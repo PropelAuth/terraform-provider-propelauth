@@ -3,9 +3,10 @@ package propelauth
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 )
 
-// GetAllSocialLoginInfo - Returns all the social login info for environments and providers.
+// GetAllSocialLoginInfo - Returns all the social login info for environments and sso providers.
 func (c *PropelAuthClient) GetAllSocialLoginInfo() (*AllSocialLoginInfoResponse, error) {
 	res, err := c.get("social")
 	if err != nil {
@@ -21,14 +22,14 @@ func (c *PropelAuthClient) GetAllSocialLoginInfo() (*AllSocialLoginInfoResponse,
 	return &allSocialLoginInfo, nil
 }
 
-// GetSocialLoginInfo - Returns the social login redirect info for the requested environment + provider.
-func (c *PropelAuthClient) GetSocialLoginInfo(provider string) (*SocialLoginInfo, error) {
+// GetSocialLoginInfo - Returns the social login redirect info for the requested environment + sso provider.
+func (c *PropelAuthClient) GetSocialLoginInfo(sso_provider string) (*SocialLoginInfo, error) {
 	allSocialLoginInfo, err := c.GetAllSocialLoginInfo()
 	if err != nil {
 		return nil, err
 	}
 
-	switch provider {
+	switch sso_provider {
 	case "Google":
 		return &allSocialLoginInfo.Google, nil
 	case "Microsoft":
@@ -54,13 +55,13 @@ func (c *PropelAuthClient) GetSocialLoginInfo(provider string) (*SocialLoginInfo
 	case "Outreach":
 		return &allSocialLoginInfo.Outreach, nil
 	default:
-		return nil, fmt.Errorf("invalid social login provider: %s", provider)
+		return nil, fmt.Errorf("invalid social login sso_provider: %s", sso_provider)
 	}
 }
 
-// GetSocialLoginRedirectUrl - Returns the authorized redirect for the requested environment and provider.
-func (c *PropelAuthClient) GetSocialLoginRedirectUrl(environment string, provider string) (*string, error) {
-	socialLoginInfo, err := c.GetSocialLoginInfo(provider)
+// GetSocialLoginRedirectUrl - Returns the authorized redirect for the requested environment and sso provider.
+func (c *PropelAuthClient) GetSocialLoginRedirectUrl(environment string, sso_provider string) (*string, error) {
+	socialLoginInfo, err := c.GetSocialLoginInfo(sso_provider)
 	if err != nil {
 		return nil, err
 	}
@@ -75,4 +76,46 @@ func (c *PropelAuthClient) GetSocialLoginRedirectUrl(environment string, provide
 	default:
 		return nil, fmt.Errorf("invalid environment when fetching social login redirect URL: %s", environment)
 	}
+}
+
+// UpsertSocialLoginInfo - Upserts the social login info for the requested social sso provider.
+func (c *PropelAuthClient) UpsertSocialLoginInfo(sso_provider string, clientId string, clientSecret string) error {
+	request := SocialLoginUpdateRequest{
+		ClientId:     clientId,
+		ClientSecret: clientSecret,
+		Enabled:      true,
+	}
+
+	body, err := json.Marshal(request)
+	if err != nil {
+		return err
+	}
+
+	_, err = c.put(fmt.Sprintf("social/%s", strings.ToLower(sso_provider)), body)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// DeleteSocialLogin - Deletes the social login info for the requested social sso provider and disables the integration.
+func (c *PropelAuthClient) DeleteSocialLogin(sso_provider string) error {
+	request := SocialLoginUpdateRequest{
+		ClientId:     "DELETED",
+		ClientSecret: "DELETED",
+		Enabled:      false,
+	}
+
+	body, err := json.Marshal(request)
+	if err != nil {
+		return err
+	}
+
+	_, err = c.put(fmt.Sprintf("social/%s", strings.ToLower(sso_provider)), body)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
