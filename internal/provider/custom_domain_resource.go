@@ -63,7 +63,8 @@ func (r *customDomainResource) Schema(ctx context.Context, req resource.SchemaRe
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},
-				Description: "The environment for which you are configuring the custom domain. Accepted values are `Staging` and `Prod`.",
+				Description: "The environment for which you are configuring the custom domain. Accepted values are `Staging` and `Prod`. " +
+					"Note: Staging environments are only available on some pricing plans.",
 			},
 			"domain": schema.StringAttribute{
 				Required: true,

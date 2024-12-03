@@ -3,12 +3,15 @@
 page_title: "propelauth_api_key_settings Resource - propelauth"
 subcategory: ""
 description: |-
-  Api Key Configurations. This is for configuring the API global settings for your project.
+  Api Key Configurations. API Key authentication allows you to create API Keys for your end users as well as your organizations in order to protect requests they make to your product. This resource is for configuring the API key settings in your project.
+  Note: API Keys are only available for use in non-test environments for some pricing plans.
 ---
 
 # propelauth_api_key_settings (Resource)
 
-Api Key Configurations. This is for configuring the API global settings for your project.
+Api Key Configurations. API Key authentication allows you to create API Keys for your end users as well as your organizations in order to protect requests they make to your product. This resource is for configuring the API key settings in your project.
+
+Note: API Keys are only available for use in non-test environments for some pricing plans.
 
 ## Example Usage
 

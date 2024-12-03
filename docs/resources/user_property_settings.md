@@ -113,7 +113,7 @@ resource "propelauth_user_property_settings" "example" {
 
 ### Optional
 
-- `custom_properties` (Attributes List) Custom properties for the user. If no blocks are provided, no custom properties will be enabled. (see [below for nested schema](#nestedatt--custom_properties))
+- `custom_properties` (Attributes List) Custom properties for the user. If no blocks are provided, no custom properties will be enabled. Note: Custom properties are only available on some pricing plans. (see [below for nested schema](#nestedatt--custom_properties))
 - `metadata_property` (Attributes) Settings for the user's metadata property. If no block is provided, the metadata property will be disabled. (see [below for nested schema](#nestedatt--metadata_property))
 - `name_property` (Attributes) Settings for the user's name property. If no block is provided, the name property will be disabled. (see [below for nested schema](#nestedatt--name_property))
 - `phone_number_property` (Attributes) Settings for the user's phone number property. If no block is provided, the phone number property will be disabled. (see [below for nested schema](#nestedatt--phone_number_property))

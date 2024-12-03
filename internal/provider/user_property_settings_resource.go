@@ -221,8 +221,9 @@ func (r *userPropertySettingsResource) Schema(ctx context.Context, req resource.
 				},
 			},
 			"custom_properties": schema.ListNestedAttribute{
-				Optional:    true,
-				Description: "Custom properties for the user. If no blocks are provided, no custom properties will be enabled.",
+				Optional: true,
+				Description: "Custom properties for the user. If no blocks are provided, no custom properties will be enabled. " +
+					"Note: Custom properties are only available on some pricing plans.",
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"name": schema.StringAttribute{

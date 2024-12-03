@@ -28,7 +28,7 @@ resource "propelauth_custom_domain" "my_custom_domain" {
 ### Required
 
 - `domain` (String) The domain name for the custom domain. Your resulting auth domain will be `auth.<domain>`. You can also specify a subdomain like prod.example.com which will result in auth.prod.example.com
-- `environment` (String) The environment for which you are configuring the custom domain. Accepted values are `Staging` and `Prod`.
+- `environment` (String) The environment for which you are configuring the custom domain. Accepted values are `Staging` and `Prod`. Note: Staging environments are only available on some pricing plans.
 
 ### Optional
 
