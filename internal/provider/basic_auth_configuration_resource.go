@@ -62,12 +62,13 @@ func (r *basicAuthConfigurationResource) Schema(ctx context.Context, req resourc
 			"signup_domain_allowlist": schema.ListAttribute{
 				ElementType: types.StringType,
 				Optional:    true,
-				Description: "A list of email domains that are allowed to sign up.",
+				Description: "A list of email domains that are allowed to sign up. Note: This feature is only available on some pricing plans.",
 			},
 			"signup_domain_blocklist": schema.ListAttribute{
 				ElementType: types.StringType,
 				Optional:    true,
-				Description: "A list of email domains that are blocked from signing up. This is only used if `signup_domain_allowlist` is empty.",
+				Description: "A list of email domains that are blocked from signing up. This is only used if `signup_domain_allowlist` is empty." +
+					"Note: This feature is only available on some pricing plans.",
 			},
 			"has_password_login": schema.BoolAttribute{
 				Optional:    true,
