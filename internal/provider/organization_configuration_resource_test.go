@@ -36,7 +36,7 @@ func testAccOrganizationConfigurationResourceConfig(usersCanDeleteTheirOwnOrgs b
 resource "propelauth_organization_configuration" "test" {
   users_can_delete_their_own_orgs = %[1]t
   customer_org_audit_log_settings = {
-	orgs_can_view_their_audit_log = true
+	enabled = true
 	all_orgs_can_view_their_audit_log = false
 	include_impersonation = true
 	include_employee_actions = false
