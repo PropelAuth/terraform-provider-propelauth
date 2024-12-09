@@ -48,6 +48,11 @@ type EnvironmentConfigUpdate struct {
 	OrgApiKeysEnabled                   *bool         `json:"org_api_keys_enabled,omitempty"`
 	InvalidateOrgApiKeysUponUserRemoval *bool         `json:"invalidate_org_api_key_upon_user_removal,omitempty"`
 	ApiKeyConfig                        *ApiKeyConfig `json:"api_key_config,omitempty"`
+	OrgsCanViewOrgAuditLog              *bool         `json:"orgs_can_view_org_audit_log,omitempty"`
+	AllOrgsCanViewOrgAuditLog           *bool         `json:"all_orgs_can_view_org_audit_log,omitempty"`
+	OrgAuditLogIncludesImpersonation    *bool         `json:"org_audit_log_includes_impersonation,omitempty"`
+	OrgAuditLogIncludesApiKeys          *bool         `json:"org_audit_log_includes_api_keys,omitempty"`
+	OrgAuditLogIncludesEmployees        *bool         `json:"org_audit_log_includes_employees,omitempty"`
 }
 
 type EnvironmentConfigResponse struct {
@@ -82,6 +87,11 @@ type EnvironmentConfigResponse struct {
 	OrgApiKeysEnabled                   bool         `json:"org_api_keys_enabled"`
 	InvalidateOrgApiKeyUponUserRemoval  bool         `json:"invalidate_org_api_key_upon_user_removal"`
 	ApiKeyConfig                        ApiKeyConfig `json:"api_key_config"`
+	OrgsCanViewOrgAuditLog              bool         `json:"orgs_can_view_org_audit_log"`
+	AllOrgsCanViewOrgAuditLog           bool         `json:"all_orgs_can_view_org_audit_log"`
+	OrgAuditLogIncludesImpersonation    bool         `json:"org_audit_log_includes_impersonation"`
+	OrgAuditLogIncludesApiKeys          bool         `json:"org_audit_log_includes_api_keys"`
+	OrgAuditLogIncludesEmployees        bool         `json:"org_audit_log_includes_employees"`
 }
 
 type Theme struct {
