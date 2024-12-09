@@ -13,14 +13,14 @@ func TestAccOrganizationConfigurationResource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create and Read testing
 			{
-				Config: testAccOrganizationConfigurationResourceConfig(true),
+				Config: testAccOrganizationConfigurationResourceConfig(true, false),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("propelauth_organization_configuration.test", "users_can_delete_their_own_orgs", "true"),
 				),
 			},
 			// Update and Read testing
 			{
-				Config: testAccOrganizationConfigurationResourceConfig(false),
+				Config: testAccOrganizationConfigurationResourceConfig(false, true),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("propelauth_organization_configuration.test", "users_can_delete_their_own_orgs", "false"),
 				),
@@ -30,10 +30,25 @@ func TestAccOrganizationConfigurationResource(t *testing.T) {
 	})
 }
 
-func testAccOrganizationConfigurationResourceConfig(users_can_delete_their_own_orgs bool) string {
-	return providerConfig + fmt.Sprintf(`
+func testAccOrganizationConfigurationResourceConfig(usersCanDeleteTheirOwnOrgs bool, orgsCanViewTheirAuditLog bool) string {
+	if orgsCanViewTheirAuditLog {
+		return providerConfig + fmt.Sprintf(`
 resource "propelauth_organization_configuration" "test" {
-  users_can_delete_their_own_orgs = %v
+  users_can_delete_their_own_orgs = %[1]t
+  customer_org_audit_log_settings = {
+	orgs_can_view_their_audit_log = true
+	all_orgs_can_view_their_audit_log = false
+	include_impersonation = true
+	include_employee_actions = false
+	include_api_key_actions = false
+  }
 }
-`, users_can_delete_their_own_orgs)
+`, usersCanDeleteTheirOwnOrgs)
+	} else {
+		return providerConfig + fmt.Sprintf(`
+resource "propelauth_organization_configuration" "test" {
+  users_can_delete_their_own_orgs = %[1]t
+}
+`, usersCanDeleteTheirOwnOrgs)
+	}
 }

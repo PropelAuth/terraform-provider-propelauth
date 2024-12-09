@@ -30,16 +30,25 @@ type organizationConfigurationResource struct {
 
 // organizationConfigurationResourceModel describes the resource data model.
 type organizationConfigurationResourceModel struct {
-	HasOrgs                     types.Bool   `tfsdk:"has_orgs"`
-	MaxNumOrgsUsersCanBeIn      types.Int32  `tfsdk:"max_num_orgs_users_can_be_in"`
-	OrgsMetaname                types.String `tfsdk:"orgs_metaname"`
-	UsersCanCreateOrgs          types.Bool   `tfsdk:"users_can_create_orgs"`
-	UsersCanDeleteTheirOwnOrgs  types.Bool   `tfsdk:"users_can_delete_their_own_orgs"`
-	UsersMustBeInAnOrganization types.Bool   `tfsdk:"users_must_be_in_an_organization"`
-	OrgsCanSetupSaml            types.Bool   `tfsdk:"orgs_can_setup_saml"`
-	UseOrgNameForSaml           types.Bool   `tfsdk:"use_org_name_for_saml"`
-	DefaultToSamlLogin          types.Bool   `tfsdk:"default_to_saml_login"`
-	OrgsCanRequire2fa           types.Bool   `tfsdk:"orgs_can_require_2fa"`
+	HasOrgs                     types.Bool                        `tfsdk:"has_orgs"`
+	MaxNumOrgsUsersCanBeIn      types.Int32                       `tfsdk:"max_num_orgs_users_can_be_in"`
+	OrgsMetaname                types.String                      `tfsdk:"orgs_metaname"`
+	UsersCanCreateOrgs          types.Bool                        `tfsdk:"users_can_create_orgs"`
+	UsersCanDeleteTheirOwnOrgs  types.Bool                        `tfsdk:"users_can_delete_their_own_orgs"`
+	UsersMustBeInAnOrganization types.Bool                        `tfsdk:"users_must_be_in_an_organization"`
+	OrgsCanSetupSaml            types.Bool                        `tfsdk:"orgs_can_setup_saml"`
+	UseOrgNameForSaml           types.Bool                        `tfsdk:"use_org_name_for_saml"`
+	DefaultToSamlLogin          types.Bool                        `tfsdk:"default_to_saml_login"`
+	OrgsCanRequire2fa           types.Bool                        `tfsdk:"orgs_can_require_2fa"`
+	CustomerOrgAuditLogSettings *CustomerOrgAuditLogSettingsModel `tfsdk:"customer_org_audit_log_settings"`
+}
+
+type CustomerOrgAuditLogSettingsModel struct {
+	Enabled                     types.Bool `tfsdk:"enabled"`
+	AllOrgsCanViewTheirAuditLog types.Bool `tfsdk:"all_orgs_can_view_their_audit_log"`
+	IncludeImpersonation        types.Bool `tfsdk:"include_impersonation"`
+	IncludeEmployeeActions      types.Bool `tfsdk:"include_employee_actions"`
+	IncludeApiKeyActions        types.Bool `tfsdk:"include_api_key_actions"`
 }
 
 func (r *organizationConfigurationResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -109,6 +118,38 @@ func (r *organizationConfigurationResource) Schema(ctx context.Context, req reso
 					"The default setting is false. " +
 					"Warning: This is only applied in prod for some billing plans",
 			},
+			"customer_org_audit_log_settings": schema.SingleNestedAttribute{
+				Optional: true,
+				Description: "Settings for enabling whether and configuring how your customer organizations will have access to " +
+					"their own audit log.\n\nNote: This feature is only available for use by your customer organizations in " +
+					"non-test environments for some pricing plans.",
+				Attributes: map[string]schema.Attribute{
+					"enabled": schema.BoolAttribute{
+						Required:    true,
+						Description: "If enabled, your customer organizations will have access to their own audit log.",
+					},
+					"all_orgs_can_view_their_audit_log": schema.BoolAttribute{
+						Required: true,
+						Description: "If true, all of your customer organization will automatically have access to this feature. " +
+							"Otherwise, you will need to enable it for each organization individually.",
+					},
+					"include_impersonation": schema.BoolAttribute{
+						Required: true,
+						Description: "If true, the audit log will include actions that were triggered by a member of your team " +
+							"impersonating one of their organization members. The impersonator will be anonymous to your customer.",
+					},
+					"include_api_key_actions": schema.BoolAttribute{
+						Required: true,
+						Description: "If true, the audit log will include actions that were triggered by your BE service utilizing " +
+							"PropelAuth APIs.",
+					},
+					"include_employee_actions": schema.BoolAttribute{
+						Required: true,
+						Description: "If true, the audit log will include actions that were triggered by a member of your team " +
+							"using the PropelAuth dashboard. The person who triggered the action will be anonymous to your customer.",
+					},
+				},
+			},
 		},
 	}
 }
@@ -155,6 +196,14 @@ func (r *organizationConfigurationResource) Create(ctx context.Context, req reso
 		UseOrgNameForSaml:           plan.UseOrgNameForSaml.ValueBoolPointer(),
 		DefaultToSamlLogin:          plan.DefaultToSamlLogin.ValueBoolPointer(),
 		OrgsCanRequire2fa:           plan.OrgsCanRequire2fa.ValueBoolPointer(),
+	}
+
+	if plan.CustomerOrgAuditLogSettings != nil {
+		environmentConfigUpdate.OrgsCanViewOrgAuditLog = plan.CustomerOrgAuditLogSettings.Enabled.ValueBoolPointer()
+		environmentConfigUpdate.AllOrgsCanViewOrgAuditLog = plan.CustomerOrgAuditLogSettings.AllOrgsCanViewTheirAuditLog.ValueBoolPointer()
+		environmentConfigUpdate.OrgAuditLogIncludesImpersonation = plan.CustomerOrgAuditLogSettings.IncludeImpersonation.ValueBoolPointer()
+		environmentConfigUpdate.OrgAuditLogIncludesEmployees = plan.CustomerOrgAuditLogSettings.IncludeEmployeeActions.ValueBoolPointer()
+		environmentConfigUpdate.OrgAuditLogIncludesApiKeys = plan.CustomerOrgAuditLogSettings.IncludeApiKeyActions.ValueBoolPointer()
 	}
 
 	environmentConfigResponse, err := r.client.UpdateEnvironmentConfig(&environmentConfigUpdate)
@@ -246,6 +295,43 @@ func (r *organizationConfigurationResource) Create(ctx context.Context, req reso
 			"OrgsCanRequire2fa failed to update. The `orgs_can_require_2fa` is instead "+fmt.Sprintf("%t", environmentConfigResponse.OrgsCanRequire2fa),
 		)
 		return
+	}
+	if plan.CustomerOrgAuditLogSettings != nil {
+		if plan.CustomerOrgAuditLogSettings.Enabled.ValueBool() != environmentConfigResponse.OrgsCanViewOrgAuditLog {
+			resp.Diagnostics.AddError(
+				"Error updating organization configuration",
+				"CustomerOrgAuditLogSettings.Enabled failed to update. The `customer_org_audit_log_settings.enabled` is instead "+fmt.Sprintf("%t", environmentConfigResponse.OrgsCanViewOrgAuditLog),
+			)
+			return
+		}
+		if plan.CustomerOrgAuditLogSettings.AllOrgsCanViewTheirAuditLog.ValueBool() != environmentConfigResponse.AllOrgsCanViewOrgAuditLog {
+			resp.Diagnostics.AddError(
+				"Error updating organization configuration",
+				"CustomerOrgAuditLogSettings.AllOrgsCanViewTheirAuditLog failed to update. The `customer_org_audit_log_settings.all_orgs_can_view_their_audit_log` is instead "+fmt.Sprintf("%t", environmentConfigResponse.AllOrgsCanViewOrgAuditLog),
+			)
+			return
+		}
+		if plan.CustomerOrgAuditLogSettings.IncludeImpersonation.ValueBool() != environmentConfigResponse.OrgAuditLogIncludesImpersonation {
+			resp.Diagnostics.AddError(
+				"Error updating organization configuration",
+				"CustomerOrgAuditLogSettings.IncludeImpersonation failed to update. The `customer_org_audit_log_settings.include_impersonation` is instead "+fmt.Sprintf("%t", environmentConfigResponse.OrgAuditLogIncludesImpersonation),
+			)
+			return
+		}
+		if plan.CustomerOrgAuditLogSettings.IncludeEmployeeActions.ValueBool() != environmentConfigResponse.OrgAuditLogIncludesEmployees {
+			resp.Diagnostics.AddError(
+				"Error updating organization configuration",
+				"CustomerOrgAuditLogSettings.IncludeEmployeeActions failed to update. The `customer_org_audit_log_settings.include_employee_actions` is instead "+fmt.Sprintf("%t", environmentConfigResponse.OrgAuditLogIncludesEmployees),
+			)
+			return
+		}
+		if plan.CustomerOrgAuditLogSettings.IncludeApiKeyActions.ValueBool() != environmentConfigResponse.OrgAuditLogIncludesApiKeys {
+			resp.Diagnostics.AddError(
+				"Error updating organization configuration",
+				"CustomerOrgAuditLogSettings.IncludeApiKeyActions failed to update. The `customer_org_audit_log_settings.include_api_key_actions` is instead "+fmt.Sprintf("%t", environmentConfigResponse.OrgAuditLogIncludesApiKeys),
+			)
+			return
+		}
 	}
 
 	// Write logs using the tflog package
@@ -306,6 +392,13 @@ func (r *organizationConfigurationResource) Read(ctx context.Context, req resour
 	if state.OrgsCanRequire2fa.ValueBoolPointer() != nil {
 		state.OrgsCanRequire2fa = types.BoolValue(environmentConfigResponse.OrgsCanRequire2fa)
 	}
+	if state.CustomerOrgAuditLogSettings != nil {
+		state.CustomerOrgAuditLogSettings.Enabled = types.BoolValue(environmentConfigResponse.OrgsCanViewOrgAuditLog)
+		state.CustomerOrgAuditLogSettings.AllOrgsCanViewTheirAuditLog = types.BoolValue(environmentConfigResponse.AllOrgsCanViewOrgAuditLog)
+		state.CustomerOrgAuditLogSettings.IncludeImpersonation = types.BoolValue(environmentConfigResponse.OrgAuditLogIncludesImpersonation)
+		state.CustomerOrgAuditLogSettings.IncludeEmployeeActions = types.BoolValue(environmentConfigResponse.OrgAuditLogIncludesEmployees)
+		state.CustomerOrgAuditLogSettings.IncludeApiKeyActions = types.BoolValue(environmentConfigResponse.OrgAuditLogIncludesApiKeys)
+	}
 
 	// Save updated state into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
@@ -333,6 +426,14 @@ func (r *organizationConfigurationResource) Update(ctx context.Context, req reso
 		UseOrgNameForSaml:           plan.UseOrgNameForSaml.ValueBoolPointer(),
 		DefaultToSamlLogin:          plan.DefaultToSamlLogin.ValueBoolPointer(),
 		OrgsCanRequire2fa:           plan.OrgsCanRequire2fa.ValueBoolPointer(),
+	}
+
+	if plan.CustomerOrgAuditLogSettings != nil {
+		environmentConfigUpdate.OrgsCanViewOrgAuditLog = plan.CustomerOrgAuditLogSettings.Enabled.ValueBoolPointer()
+		environmentConfigUpdate.AllOrgsCanViewOrgAuditLog = plan.CustomerOrgAuditLogSettings.AllOrgsCanViewTheirAuditLog.ValueBoolPointer()
+		environmentConfigUpdate.OrgAuditLogIncludesImpersonation = plan.CustomerOrgAuditLogSettings.IncludeImpersonation.ValueBoolPointer()
+		environmentConfigUpdate.OrgAuditLogIncludesEmployees = plan.CustomerOrgAuditLogSettings.IncludeEmployeeActions.ValueBoolPointer()
+		environmentConfigUpdate.OrgAuditLogIncludesApiKeys = plan.CustomerOrgAuditLogSettings.IncludeApiKeyActions.ValueBoolPointer()
 	}
 
 	environmentConfigResponse, err := r.client.UpdateEnvironmentConfig(&environmentConfigUpdate)
@@ -425,6 +526,43 @@ func (r *organizationConfigurationResource) Update(ctx context.Context, req reso
 		)
 		return
 	}
+	if plan.CustomerOrgAuditLogSettings != nil {
+		if plan.CustomerOrgAuditLogSettings.Enabled.ValueBool() != environmentConfigResponse.OrgsCanViewOrgAuditLog {
+			resp.Diagnostics.AddError(
+				"Error updating organization configuration",
+				"CustomerOrgAuditLogSettings.Enabled failed to update. The `customer_org_audit_log_settings.enabled` is instead "+fmt.Sprintf("%t", environmentConfigResponse.OrgsCanViewOrgAuditLog),
+			)
+			return
+		}
+		if plan.CustomerOrgAuditLogSettings.AllOrgsCanViewTheirAuditLog.ValueBool() != environmentConfigResponse.AllOrgsCanViewOrgAuditLog {
+			resp.Diagnostics.AddError(
+				"Error updating organization configuration",
+				"CustomerOrgAuditLogSettings.AllOrgsCanViewTheirAuditLog failed to update. The `customer_org_audit_log_settings.all_orgs_can_view_their_audit_log` is instead "+fmt.Sprintf("%t", environmentConfigResponse.AllOrgsCanViewOrgAuditLog),
+			)
+			return
+		}
+		if plan.CustomerOrgAuditLogSettings.IncludeImpersonation.ValueBool() != environmentConfigResponse.OrgAuditLogIncludesImpersonation {
+			resp.Diagnostics.AddError(
+				"Error updating organization configuration",
+				"CustomerOrgAuditLogSettings.IncludeImpersonation failed to update. The `customer_org_audit_log_settings.include_impersonation` is instead "+fmt.Sprintf("%t", environmentConfigResponse.OrgAuditLogIncludesImpersonation),
+			)
+			return
+		}
+		if plan.CustomerOrgAuditLogSettings.IncludeEmployeeActions.ValueBool() != environmentConfigResponse.OrgAuditLogIncludesEmployees {
+			resp.Diagnostics.AddError(
+				"Error updating organization configuration",
+				"CustomerOrgAuditLogSettings.IncludeEmployeeActions failed to update. The `customer_org_audit_log_settings.include_employee_actions` is instead "+fmt.Sprintf("%t", environmentConfigResponse.OrgAuditLogIncludesEmployees),
+			)
+			return
+		}
+		if plan.CustomerOrgAuditLogSettings.IncludeApiKeyActions.ValueBool() != environmentConfigResponse.OrgAuditLogIncludesApiKeys {
+			resp.Diagnostics.AddError(
+				"Error updating organization configuration",
+				"CustomerOrgAuditLogSettings.IncludeApiKeyActions failed to update. The `customer_org_audit_log_settings.include_api_key_actions` is instead "+fmt.Sprintf("%t", environmentConfigResponse.OrgAuditLogIncludesApiKeys),
+			)
+			return
+		}
+	}
 
 	// Write logs using the tflog package
 	// Documentation: https://terraform.io/plugin/log
@@ -462,6 +600,13 @@ func (r *organizationConfigurationResource) ImportState(ctx context.Context, req
 	state.UseOrgNameForSaml = types.BoolValue(environmentConfigResponse.UseOrgNameForSaml)
 	state.DefaultToSamlLogin = types.BoolValue(environmentConfigResponse.DefaultToSamlLogin)
 	state.OrgsCanRequire2fa = types.BoolValue(environmentConfigResponse.OrgsCanRequire2fa)
+	state.CustomerOrgAuditLogSettings = &CustomerOrgAuditLogSettingsModel{
+		Enabled:                     types.BoolValue(environmentConfigResponse.OrgsCanViewOrgAuditLog),
+		AllOrgsCanViewTheirAuditLog: types.BoolValue(environmentConfigResponse.AllOrgsCanViewOrgAuditLog),
+		IncludeImpersonation:        types.BoolValue(environmentConfigResponse.OrgAuditLogIncludesImpersonation),
+		IncludeEmployeeActions:      types.BoolValue(environmentConfigResponse.OrgAuditLogIncludesEmployees),
+		IncludeApiKeyActions:        types.BoolValue(environmentConfigResponse.OrgAuditLogIncludesApiKeys),
+	}
 
 	// Save updated state into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
