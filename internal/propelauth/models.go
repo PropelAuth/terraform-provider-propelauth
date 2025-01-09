@@ -218,12 +218,12 @@ type TestFeIntegrationInfo struct {
 }
 
 type FeIntegrationInfoForEnv struct {
-	AuthUrl              string                `json:"auth_url_origin"`
-	ApplicationUrl       string                `json:"application_hostname_with_scheme"`
-	LoginRedirectPath    string                `json:"login_redirect_path"`
-	LogoutRedirectPath   string                `json:"logout_redirect_path"`
-	AdditonalFeLocations AdditionalFeLocations `json:"allowed_urls"`
-	VerifiedDomain       string                `json:"verified_domain"`
+	AuthUrl               string                `json:"auth_url_origin"`
+	ApplicationUrl        string                `json:"application_hostname_with_scheme"`
+	LoginRedirectPath     string                `json:"login_redirect_path"`
+	LogoutRedirectPath    string                `json:"logout_redirect_path"`
+	AdditionalFeLocations AdditionalFeLocations `json:"allowed_urls"`
+	VerifiedDomain        string                `json:"verified_domain"`
 }
 
 type AdditionalFeLocations struct {

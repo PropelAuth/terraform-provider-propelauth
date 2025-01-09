@@ -322,7 +322,7 @@ func updateStateForLiveEnvironment(state *feIntegrationResourceModel, feIntegrat
 	state.LoginRedirectPath = types.StringValue(feIntegrationInfo.LoginRedirectPath)
 	state.LogoutRedirectPath = types.StringValue(feIntegrationInfo.LogoutRedirectPath)
 
-	updateAdditionalLocationsInState(state, feIntegrationInfo.AdditonalFeLocations.AdditionalFeLocations)
+	updateAdditionalLocationsInState(state, feIntegrationInfo.AdditionalFeLocations.AdditionalFeLocations)
 }
 
 func updateAdditionalLocationsInState(state *feIntegrationResourceModel, additionalLocations []propelauth.AdditionalFeLocation) {
