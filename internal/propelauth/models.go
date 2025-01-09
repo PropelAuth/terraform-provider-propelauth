@@ -205,7 +205,7 @@ type TosLink struct {
 
 type FeIntegrationInfoResponse struct {
 	Test    TestFeIntegrationInfo   `json:"test"`
-	Staging FeIntegrationInfoForEnv `json:"staging"`
+	Staging FeIntegrationInfoForEnv `json:"stage"`
 	Prod    FeIntegrationInfoForEnv `json:"prod"`
 }
 
