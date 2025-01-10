@@ -3,6 +3,7 @@ package propelauth
 import (
 	"fmt"
 	"net/url"
+	"strconv"
 	"strings"
 )
 
@@ -60,4 +61,27 @@ func IsValidUrl(inputUrl string) (bool, error) {
 	}
 
 	return true, nil
+}
+
+func GetPortFromLocalhost(inputUrl string) (bool, int) {
+	// Parse the inputUrl string into a URL
+	parsedURL, err := url.Parse(inputUrl)
+	if err != nil {
+		return false, 0
+	}
+
+	fmt.Println(parsedURL.Hostname())
+
+	// Check if the URL is localhost
+	if parsedURL.Hostname() == "localhost" {
+		fmt.Println(parsedURL.Port())
+		port, err := strconv.Atoi(parsedURL.Port())
+		if err == nil {
+			return true, port
+		} else {
+			return false, 0
+		}
+	}
+
+	return false, 0
 }

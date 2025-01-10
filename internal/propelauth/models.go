@@ -245,6 +245,7 @@ type feIntegrationUpdateRequest struct {
 
 type testEnvFeIntegrationApplicationUrl struct {
 	ApplicationUrl string `json:"scheme_and_domain"`
+	Port           int    `json:"port,omitempty"`
 	Type           string `json:"type"`
 }
 

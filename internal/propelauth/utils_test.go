@@ -153,3 +153,51 @@ func TestIsValidUrl(t *testing.T) {
 		})
 	}
 }
+
+func TestGetPortFromLocalhost(t *testing.T) {
+	type args struct {
+		inputUrl string
+	}
+	tests := []struct {
+		name  string
+		args  args
+		want  bool
+		want1 int
+	}{
+		{
+			name: "Test localhost URL",
+			args: args{
+				inputUrl: "http://localhost:3001",
+			},
+			want:  true,
+			want1: 3001,
+		},
+		{
+			name: "Test invalid URL",
+			args: args{
+				inputUrl: "example.com",
+			},
+			want:  false,
+			want1: 0,
+		},
+		{
+			name: "Test URL without port",
+			args: args{
+				inputUrl: "https://example.com",
+			},
+			want:  false,
+			want1: 0,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, got1 := GetPortFromLocalhost(tt.args.inputUrl)
+			if got != tt.want {
+				t.Errorf("GetPortFromLocalhost() got = %v, want %v", got, tt.want)
+			}
+			if got1 != tt.want1 {
+				t.Errorf("GetPortFromLocalhost() got1 = %v, want %v", got1, tt.want1)
+			}
+		})
+	}
+}
