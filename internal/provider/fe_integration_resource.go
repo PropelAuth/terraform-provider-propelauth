@@ -310,7 +310,12 @@ func convertPlanToUpdate(plan *feIntegrationResourceModel) propelauth.FeIntegrat
 }
 
 func updateStateForTestEnvironment(state *feIntegrationResourceModel, feIntegrationInfo *propelauth.TestFeIntegrationInfo) {
-	state.ApplicationUrl = types.StringValue(feIntegrationInfo.TestEnvFeIntegrationApplicationUrl.ApplicationUrl)
+	switch feIntegrationInfo.TestEnvFeIntegrationApplicationUrl.Type {
+	case "Localhost":
+		state.ApplicationUrl = types.StringValue(fmt.Sprintf("http://localhost:%d", feIntegrationInfo.TestEnvFeIntegrationApplicationUrl.Port))
+	case "SchemeAndDomain":
+		state.ApplicationUrl = types.StringValue(feIntegrationInfo.TestEnvFeIntegrationApplicationUrl.ApplicationUrl)
+	}
 	state.LoginRedirectPath = types.StringValue(feIntegrationInfo.LoginRedirectPath)
 	state.LogoutRedirectPath = types.StringValue(feIntegrationInfo.LogoutRedirectPath)
 
