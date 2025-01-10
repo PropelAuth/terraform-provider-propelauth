@@ -81,6 +81,7 @@ jobs:
           terraform_version: ${{ matrix.terraform }}
           terraform_wrapper: false
       - run: go mod download
+      - run: go test -v ./internal/propelauth/...
       - env:
           TF_ACC: "1"
           PROPELAUTH_TENANT_ID: ${{ secrets.PROPELAUTH_TENANT_ID }}

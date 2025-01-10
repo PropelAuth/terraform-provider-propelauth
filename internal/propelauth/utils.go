@@ -40,7 +40,7 @@ func IsValidUrlWithoutTrailingSlash(inputUrl string) (bool, error) {
 	}
 
 	// Check if the URL has a trailing slash in the path
-	if strings.HasSuffix(parsedURL.Path, "/") && parsedURL.Path != "/" {
+	if strings.HasSuffix(parsedURL.Path, "/") {
 		return false, fmt.Errorf("URL has a trailing slash")
 	}
 

@@ -71,7 +71,7 @@ func (r *feIntegrationResource) Schema(ctx context.Context, req resource.SchemaR
 			},
 			"application_url": schema.StringAttribute{
 				Required: true,
-				Description: "The URL of the application that will be integrated with PropelAuth. This is url is used in combination with " +
+				Description: "The URL of the application that will be integrated with PropelAuth. This url is used in combination with " +
 					"the `login_redirect_path` and `logout_redirect_path` to redirect users to your application after logging in or out. " +
 					"`application_url` must be a valid URL and can only be set for `Test` environments. For `Staging` and `Prod` environments, " +
 					"the `application_url` must be the verified domain for the environment or a subdomain of it. See " +
