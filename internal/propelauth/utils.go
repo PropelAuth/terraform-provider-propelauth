@@ -73,7 +73,7 @@ func GetPortFromLocalhost(inputUrl string) (bool, int) {
 	fmt.Println(parsedURL.Hostname())
 
 	// Check if the URL is localhost
-	if parsedURL.Hostname() == "localhost" {
+	if parsedURL.Hostname() == "localhost" && parsedURL.Scheme == "http" {
 		fmt.Println(parsedURL.Port())
 		port, err := strconv.Atoi(parsedURL.Port())
 		if err == nil {
