@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"strings"
 	"terraform-provider-propelauth/internal/propelauth"
 
@@ -48,6 +49,13 @@ func (r *customDomainResource) Metadata(ctx context.Context, req resource.Metada
 }
 
 func (r *customDomainResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+	// a lower case only domain name, with TLD of at least 2 characters
+	// We force this to be lower case since the BE coerces it to lower case
+	// and we don't want TF to think the state is inconsistent.
+	domainNameRegex := regexp.MustCompile(`^[a-z0-9][a-z0-9\-\.]*\.[a-z0-9]{2,}$`)
+	subdomainNameRegexCheckStart := regexp.MustCompile(`^[a-z0-9][a-z0-9\-\.]*$`)
+	subdomainNameRegexCheckEnd := regexp.MustCompile(`^[a-z0-9\-\.]*[a-z0-9]$`)
+
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the language server.
 		Description: "This resource just sets up the process of verifying the domain. " +
@@ -68,13 +76,31 @@ func (r *customDomainResource) Schema(ctx context.Context, req resource.SchemaRe
 			},
 			"domain": schema.StringAttribute{
 				Required: true,
+				Validators: []validator.String{
+					stringvalidator.RegexMatches(
+						domainNameRegex,
+						"`domain` must be a valid domain name with lowercase characters such as 'your.site.com'.",
+					),
+				},
 				Description: "The domain name for the custom domain. Your resulting auth domain will be `auth.<domain>`. " +
 					"You can also specify a subdomain like prod.example.com which will result in auth.prod.example.com",
 			},
 			"subdomain": schema.StringAttribute{
 				Optional: true,
+				Validators: []validator.String{
+					stringvalidator.RegexMatches(
+						subdomainNameRegexCheckStart,
+						"`subdomain` must be a valid subdomain name with lowercase characters and no preceding `.`.",
+					),
+					stringvalidator.RegexMatches(
+						subdomainNameRegexCheckEnd,
+						"`subdomain` must be a valid subdomain name with lowercase characters and no `.` at the end.",
+					),
+				},
 				Description: "The subdomain for the custom domain. This is optional, but recommended, as it will " +
-					"allow PropelAuth to automatically redirect users to your application after they login.",
+					"allow PropelAuth to automatically redirect users to your application after they login. " +
+					"Your resulting auth domain will be `auth.<subdomain>.<domain>`. " +
+					"The value must not begin or end with a period.",
 			},
 			"txt_record_key": schema.StringAttribute{
 				Computed:    true,
