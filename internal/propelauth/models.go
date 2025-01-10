@@ -215,7 +215,7 @@ type TosLink struct {
 
 type FeIntegrationInfoResponse struct {
 	Test    TestFeIntegrationInfo   `json:"test"`
-	Staging FeIntegrationInfoForEnv `json:"staging"`
+	Staging FeIntegrationInfoForEnv `json:"stage"`
 	Prod    FeIntegrationInfoForEnv `json:"prod"`
 }
 
@@ -228,12 +228,12 @@ type TestFeIntegrationInfo struct {
 }
 
 type FeIntegrationInfoForEnv struct {
-	AuthUrl              string                `json:"auth_url_origin"`
-	ApplicationUrl       string                `json:"application_hostname_with_scheme"`
-	LoginRedirectPath    string                `json:"login_redirect_path"`
-	LogoutRedirectPath   string                `json:"logout_redirect_path"`
-	AdditonalFeLocations AdditionalFeLocations `json:"allowed_urls"`
-	VerifiedDomain       string                `json:"verified_domain"`
+	AuthUrl               string                `json:"auth_url_origin"`
+	ApplicationUrl        string                `json:"application_hostname_with_scheme"`
+	LoginRedirectPath     string                `json:"login_redirect_path"`
+	LogoutRedirectPath    string                `json:"logout_redirect_path"`
+	AdditionalFeLocations AdditionalFeLocations `json:"allowed_urls"`
+	VerifiedDomain        string                `json:"verified_domain"`
 }
 
 type AdditionalFeLocations struct {
@@ -255,6 +255,7 @@ type feIntegrationUpdateRequest struct {
 
 type testEnvFeIntegrationApplicationUrl struct {
 	ApplicationUrl string `json:"scheme_and_domain"`
+	Port           int    `json:"port,omitempty"`
 	Type           string `json:"type"`
 }
 
