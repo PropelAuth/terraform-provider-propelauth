@@ -32,7 +32,7 @@ resource "propelauth_custom_domain" "my_custom_domain" {
 
 ### Optional
 
-- `subdomain` (String) The subdomain for the custom domain. This is optional, but recommended, as it will allow PropelAuth to automatically redirect users to your application after they login.
+- `subdomain` (String) The subdomain for the custom domain. This is optional, but recommended, as it will allow PropelAuth to automatically redirect users to your application after they login. Your resulting auth domain will be `auth.<subdomain>.<domain>`. The value must not begin or end with a period.
 
 ### Read-Only
 
