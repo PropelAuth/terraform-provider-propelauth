@@ -31,12 +31,19 @@ type FeIntegrationUpdate struct {
 
 // UpdateTestFeIntegration - Updates the FE integration info for the test environment.
 func (c *PropelAuthClient) UpdateTestFeIntegration(update FeIntegrationUpdate) (*TestFeIntegrationInfo, error) {
+	var applicationUrlType string
+	if strings.Contains(update.ApplicationUrl, "localhost") {
+		applicationUrlType = "Localhost"
+	} else {
+		applicationUrlType = "SchemeAndDomain"
+	}
+
 	request := feIntegrationUpdateRequest{
 		LoginRedirectPath:  update.LoginRedirectPath,
 		LogoutRedirectPath: update.LogoutRedirectPath,
 		TestEnvFeIntegrationApplicationUrl: &testEnvFeIntegrationApplicationUrl{
 			ApplicationUrl: update.ApplicationUrl,
-			Type:           "SchemeAndDomain",
+			Type:           applicationUrlType,
 		},
 		AdditionalFeLocations: AdditionalFeLocations{
 			AdditionalFeLocations: update.AdditionalFeLocations,
