@@ -77,7 +77,10 @@ func (r *customDomainResource) Schema(ctx context.Context, req resource.SchemaRe
 			"domain": schema.StringAttribute{
 				Required: true,
 				Validators: []validator.String{
-					stringvalidator.RegexMatches(domainNameRegex, "`domain` must be a valid domain name with lowercase characters."),
+					stringvalidator.RegexMatches(
+						domainNameRegex,
+						"`domain` must be a valid domain name with lowercase characters such as 'your.site.com'.",
+					),
 				},
 				Description: "The domain name for the custom domain. Your resulting auth domain will be `auth.<domain>`. " +
 					"You can also specify a subdomain like prod.example.com which will result in auth.prod.example.com",
