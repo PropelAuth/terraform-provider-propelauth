@@ -6,8 +6,13 @@ import (
 
 	"terraform-provider-propelauth/internal/propelauth"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/int32validator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -16,6 +21,7 @@ import (
 var _ resource.Resource = &apiKeySettingsResource{}
 var _ resource.ResourceWithConfigure = &apiKeySettingsResource{}
 var _ resource.ResourceWithImportState = &apiKeySettingsResource{}
+var _ resource.ResourceWithValidateConfig = &apiKeySettingsResource{}
 
 func NewApiKeySettingsResource() resource.Resource {
 	return &apiKeySettingsResource{}
@@ -32,6 +38,8 @@ type apiKeySettingsResourceModel struct {
 	OrgApiKeysEnabled                  types.Bool                 `tfsdk:"org_api_keys_enabled"`
 	InvalidateOrgApiKeyUponUserRemoval types.Bool                 `tfsdk:"invalidate_org_api_key_upon_user_removal"`
 	ApiKeyConfig                       *apiKeyConfigResourceModel `tfsdk:"api_key_config"`
+	PersonalApiKeyRateLimit            *rateLimitConfigModel      `tfsdk:"personal_api_key_rate_limit"`
+	OrgApiKeyRateLimit                 *rateLimitConfigModel      `tfsdk:"org_api_key_rate_limit"`
 }
 
 type apiKeyConfigResourceModel struct {
@@ -41,6 +49,12 @@ type apiKeyConfigResourceModel struct {
 type apiKeyExpirationOptionsResourceModel struct {
 	Options []types.String `tfsdk:"options"`
 	Default types.String   `tfsdk:"default"`
+}
+
+type rateLimitConfigModel struct {
+	PeriodType     types.String `tfsdk:"period_type"`
+	PeriodSize     types.Int32  `tfsdk:"period_size"`
+	AllowPerPeriod types.Int64  `tfsdk:"allow_per_period"`
 }
 
 func (r *apiKeySettingsResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -90,6 +104,66 @@ func (r *apiKeySettingsResource) Schema(ctx context.Context, req resource.Schema
 					},
 				},
 			},
+			"personal_api_key_rate_limit": schema.SingleNestedAttribute{
+				Optional: true,
+				Description: "Personal API Key Rate Limit. This sets the rate limit that will be applied to validations on your " +
+					"end users' personal API keys. This is calculated and applied per user for all keys they own as opposed to per key." +
+					"Note: Rate limits are only available on some pricing plans.",
+				Attributes: map[string]schema.Attribute{
+					"period_type": schema.StringAttribute{
+						Required: true,
+						Description: "The unit of time for time for calculating and applying your rate limit. Valid values are " +
+							"`seconds`, `minutes`, `hours`, or `days`.",
+						Validators: []validator.String{
+							stringvalidator.OneOf("seconds", "minutes", "hours", "days"),
+						},
+					},
+					"period_size": schema.Int32Attribute{
+						Required:    true,
+						Description: "The number of `period_type` units for calculating and applying your rate limit.",
+						Validators: []validator.Int32{
+							int32validator.AtLeast(1),
+						},
+					},
+					"allow_per_period": schema.Int64Attribute{
+						Required:    true,
+						Description: "The number of requests allowed per period.",
+						Validators: []validator.Int64{
+							int64validator.AtLeast(1),
+						},
+					},
+				},
+			},
+			"org_api_key_rate_limit": schema.SingleNestedAttribute{
+				Optional: true,
+				Description: "Organization API Key Rate Limit. This sets the rate limit that will be applied to validations on your " +
+					"end users' organizations' API keys. This is calculated and applied per organization for all keys the organization " +
+					"owns as opposed to per key. Note: Rate limits are only available on some pricing plans.",
+				Attributes: map[string]schema.Attribute{
+					"period_type": schema.StringAttribute{
+						Required: true,
+						Description: "The unit of time for time for calculating and applying your rate limit. Valid values are " +
+							"`seconds`, `minutes`, `hours`, or `days`.",
+						Validators: []validator.String{
+							stringvalidator.OneOf("seconds", "minutes", "hours", "days"),
+						},
+					},
+					"period_size": schema.Int32Attribute{
+						Required:    true,
+						Description: "The number of `period_type` units for calculating and applying your rate limit.",
+						Validators: []validator.Int32{
+							int32validator.AtLeast(1),
+						},
+					},
+					"allow_per_period": schema.Int64Attribute{
+						Required:    true,
+						Description: "The number of requests allowed per period.",
+						Validators: []validator.Int64{
+							int64validator.AtLeast(1),
+						},
+					},
+				},
+			},
 		},
 	}
 }
@@ -112,6 +186,36 @@ func (r *apiKeySettingsResource) Configure(ctx context.Context, req resource.Con
 	}
 
 	r.client = client
+}
+
+func (r *apiKeySettingsResource) ValidateConfig(ctx context.Context, req resource.ValidateConfigRequest, resp *resource.ValidateConfigResponse) {
+	var plan apiKeySettingsResourceModel
+
+	// Read Terraform plan data into the model
+	diags := req.Config.Get(ctx, &plan)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// Validate the plan data
+	if !plan.PersonalApiKeysEnabled.ValueBool() && plan.PersonalApiKeyRateLimit != nil {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("personal_api_key_rate_limit"),
+			"Rate limit cannot be set when personal API keys are disabled",
+			"Cannot set `personal_api_key_rate_limit` when `personal_api_keys_enabled` is false",
+		)
+		return
+	}
+
+	if !plan.OrgApiKeysEnabled.ValueBool() && plan.OrgApiKeyRateLimit != nil {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("org_api_key_rate_limit"),
+			"Rate limit cannot be set when org API keys are disabled",
+			"Cannot set `org_api_key_rate_limit` when `org_api_keys_enabled` is false",
+		)
+		return
+	}
 }
 
 func (r *apiKeySettingsResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
@@ -141,6 +245,22 @@ func (r *apiKeySettingsResource) Create(ctx context.Context, req resource.Create
 				Options: propelauth.CreateApiKeyExpirationOptions(expirationOptions),
 				Default: plan.ApiKeyConfig.ExpirationOptions.Default.ValueString(),
 			},
+		}
+	}
+
+	if plan.PersonalApiKeyRateLimit != nil {
+		environmentConfigUpdate.PersonalApiKeyRateLimit = &propelauth.RateLimitConfig{
+			PeriodType:     plan.PersonalApiKeyRateLimit.PeriodType.ValueString(),
+			PeriodSize:     plan.PersonalApiKeyRateLimit.PeriodSize.ValueInt32(),
+			AllowPerPeriod: plan.PersonalApiKeyRateLimit.AllowPerPeriod.ValueInt64(),
+		}
+	}
+
+	if plan.OrgApiKeyRateLimit != nil {
+		environmentConfigUpdate.OrgApiKeyRateLimit = &propelauth.RateLimitConfig{
+			PeriodType:     plan.OrgApiKeyRateLimit.PeriodType.ValueString(),
+			PeriodSize:     plan.OrgApiKeyRateLimit.PeriodSize.ValueInt32(),
+			AllowPerPeriod: plan.OrgApiKeyRateLimit.AllowPerPeriod.ValueInt64(),
 		}
 	}
 
@@ -226,6 +346,16 @@ func (r *apiKeySettingsResource) Read(ctx context.Context, req resource.ReadRequ
 			}
 		}
 	}
+	if state.PersonalApiKeyRateLimit != nil {
+		state.PersonalApiKeyRateLimit.PeriodType = types.StringValue(environmentConfigResponse.PersonalApiKeyRateLimit.PeriodType)
+		state.PersonalApiKeyRateLimit.PeriodSize = types.Int32Value(environmentConfigResponse.PersonalApiKeyRateLimit.PeriodSize)
+		state.PersonalApiKeyRateLimit.AllowPerPeriod = types.Int64Value(environmentConfigResponse.PersonalApiKeyRateLimit.AllowPerPeriod)
+	}
+	if state.OrgApiKeyRateLimit != nil {
+		state.OrgApiKeyRateLimit.PeriodType = types.StringValue(environmentConfigResponse.OrgApiKeyRateLimit.PeriodType)
+		state.OrgApiKeyRateLimit.PeriodSize = types.Int32Value(environmentConfigResponse.OrgApiKeyRateLimit.PeriodSize)
+		state.OrgApiKeyRateLimit.AllowPerPeriod = types.Int64Value(environmentConfigResponse.OrgApiKeyRateLimit.AllowPerPeriod)
+	}
 
 	// Save updated state into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
@@ -258,6 +388,22 @@ func (r *apiKeySettingsResource) Update(ctx context.Context, req resource.Update
 				Options: propelauth.CreateApiKeyExpirationOptions(expirationOptions),
 				Default: plan.ApiKeyConfig.ExpirationOptions.Default.ValueString(),
 			},
+		}
+	}
+
+	if plan.PersonalApiKeyRateLimit != nil {
+		environmentConfigUpdate.PersonalApiKeyRateLimit = &propelauth.RateLimitConfig{
+			PeriodType:     plan.PersonalApiKeyRateLimit.PeriodType.ValueString(),
+			PeriodSize:     plan.PersonalApiKeyRateLimit.PeriodSize.ValueInt32(),
+			AllowPerPeriod: plan.PersonalApiKeyRateLimit.AllowPerPeriod.ValueInt64(),
+		}
+	}
+
+	if plan.OrgApiKeyRateLimit != nil {
+		environmentConfigUpdate.OrgApiKeyRateLimit = &propelauth.RateLimitConfig{
+			PeriodType:     plan.OrgApiKeyRateLimit.PeriodType.ValueString(),
+			PeriodSize:     plan.OrgApiKeyRateLimit.PeriodSize.ValueInt32(),
+			AllowPerPeriod: plan.OrgApiKeyRateLimit.AllowPerPeriod.ValueInt64(),
 		}
 	}
 
