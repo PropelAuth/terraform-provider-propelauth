@@ -63,17 +63,11 @@ func (c *PropelAuthClient) UpdateOauthClient(environment string, oauthClientId s
 		return err
 	}
 
-	res, err := c.patch(
+	_, err = c.put(
 		fmt.Sprintf("%v/oauth_client/%v", strings.ToLower(environment), oauthClientId),
 		body,
 	)
 
-	if err != nil {
-		return err
-	}
-
-	oauthClient := OauthClientInfo{}
-	err = json.Unmarshal(res.BodyBytes, &oauthClient)
 	if err != nil {
 		return err
 	}

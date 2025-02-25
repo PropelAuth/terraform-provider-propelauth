@@ -57,12 +57,18 @@ func (r *oauthClientResource) Schema(ctx context.Context, req resource.SchemaReq
 				Description: "The environment for which you are integrating. Accepted values are `Test`, `Staging`, and `Prod`.",
 			},
 			"client_id": schema.StringAttribute{
-				Computed:    true,
+				Computed: true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 				Description: "The client ID set by PropelAuth.",
 			},
 			"client_secret": schema.StringAttribute{
-				Computed:    true,
-				Sensitive:   true,
+				Computed:  true,
+				Sensitive: true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 				Description: "The client secret set by PropelAuth.",
 			},
 			"redirect_uris": schema.ListAttribute{

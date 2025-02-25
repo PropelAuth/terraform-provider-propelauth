@@ -16,6 +16,7 @@ func TestAccOauthClientResource(t *testing.T) {
 				Config: testAccOauthClientResourceConfig("https://*.redirect.com/path", "Test"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("propelauth_oauth_client.test", "redirect_uris.0", "https://*.redirect.com/path"),
+					resource.TestCheckResourceAttr("propelauth_oauth_client.test", "environment", "Test"),
 				),
 			},
 			// Update and Read testing
@@ -23,12 +24,21 @@ func TestAccOauthClientResource(t *testing.T) {
 				Config: testAccOauthClientResourceConfig("https://*.redirect.com/path/v2", "Test"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("propelauth_oauth_client.test", "redirect_uris.0", "https://*.redirect.com/path/v2"),
+					resource.TestCheckResourceAttr("propelauth_oauth_client.test", "environment", "Test"),
 				),
 			},
 			{
 				Config: testAccOauthClientResourceConfig("https://exact.redirect.com/path/v2", "Test"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("propelauth_oauth_client.test", "redirect_uris.0", "https://exact.redirect.com/path/v2"),
+					resource.TestCheckResourceAttr("propelauth_oauth_client.test", "environment", "Test"),
+				),
+			},
+			{
+				Config: testAccOauthClientResourceConfig("https://exact.redirect.com/path/v2", "Prod"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("propelauth_oauth_client.test", "redirect_uris.0", "https://exact.redirect.com/path/v2"),
+					resource.TestCheckResourceAttr("propelauth_oauth_client.test", "environment", "Prod"),
 				),
 			},
 			// Delete testing automatically occurs in TestCase
