@@ -378,3 +378,17 @@ type SocialLoginUpdateRequest struct {
 	ClientSecret string `json:"client_secret"`
 	Enabled      bool   `json:"enabled"`
 }
+
+type OauthClientRequest struct {
+	RedirectUris []string `json:"redirect_uris"`
+}
+
+type OauthClientCreationResponse struct {
+	ClientId     string `json:"client_id"`
+	ClientSecret string `json:"client_secret"`
+}
+
+type OauthClientInfo struct {
+	ClientId     string   `json:"client_id"`
+	RedirectUris []string `json:"redirect_uris"`
+}
