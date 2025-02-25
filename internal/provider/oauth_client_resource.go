@@ -67,7 +67,7 @@ func (r *oauthClientResource) Schema(ctx context.Context, req resource.SchemaReq
 			},
 			"redirect_uris": schema.ListAttribute{
 				Required:    true,
-				ElementType: types.ListType{ElemType: types.StringType},
+				ElementType: types.StringType,
 				Description: "A list of redirect URIs that are whitelisted for this client. Must be a valid URL including a " +
 					"scheme and hostname. You may specify a wildcard (*) in the hostname to allow any subdomain.",
 			},

@@ -40,7 +40,7 @@ output "oauth_client_secret_result" {
 ### Required
 
 - `environment` (String) The environment for which you are integrating. Accepted values are `Test`, `Staging`, and `Prod`.
-- `redirect_uris` (List of List of String) A list of redirect URIs that are whitelisted for this client. Must be a valid URL including a scheme and hostname. You may specify a wildcard (*) in the hostname to allow any subdomain.
+- `redirect_uris` (List of String) A list of redirect URIs that are whitelisted for this client. Must be a valid URL including a scheme and hostname. You may specify a wildcard (*) in the hostname to allow any subdomain.
 
 ### Read-Only
 
