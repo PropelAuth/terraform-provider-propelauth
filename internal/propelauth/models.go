@@ -404,3 +404,8 @@ type OauthClientInfo struct {
 	ClientId     string   `json:"client_id"`
 	RedirectUris []string `json:"redirect_uris"`
 }
+
+type ApiKeyAlert struct {
+	Enabled           bool  `json:"enabled"`
+	AdvanceNoticeDays int32 `json:"advance_notice_days"`
+}
