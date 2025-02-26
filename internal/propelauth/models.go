@@ -378,3 +378,8 @@ type SocialLoginUpdateRequest struct {
 	ClientSecret string `json:"client_secret"`
 	Enabled      bool   `json:"enabled"`
 }
+
+type ApiKeyAlert struct {
+	Enabled           bool  `json:"enabled"`
+	AdvanceNoticeDays int32 `json:"advance_notice_days"`
+}
