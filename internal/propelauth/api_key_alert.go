@@ -43,7 +43,8 @@ func (c *PropelAuthClient) UpdateApiKeyAlert(advancedNoticeDays int32) error {
 // DeleteApiKeyAlert - Disables API key alerting.
 func (c *PropelAuthClient) DeleteApiKeyAlert() error {
 	deleteReq := ApiKeyAlert{
-		Enabled: false,
+		Enabled:           false,
+		AdvanceNoticeDays: 1, // Need to provide a dummy value since the go default of 0 doesn't pass validation.
 	}
 
 	body, err := json.Marshal(deleteReq)
