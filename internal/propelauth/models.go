@@ -17,81 +17,85 @@ type ProjectInfoUpdateRequest struct {
 }
 
 type EnvironmentConfigUpdate struct {
-	AllowUsersToSignupWithPersonalEmail *bool         `json:"allow_users_to_signup_with_personal_email,omitempty"`
-	SignupDomainAllowlistEnabled        *bool         `json:"signup_domain_allowlist_enabled,omitempty"`
-	SignupDomainAllowlist               []string      `json:"signup_domain_allowlist,omitempty"`
-	SignupDomainBlocklistEnabled        *bool         `json:"signup_domain_blocklist_enabled,omitempty"`
-	SignupDomainBlocklist               []string      `json:"signup_domain_blocklist,omitempty"`
-	HasPasswordLogin                    *bool         `json:"has_password_login,omitempty"`
-	HasPasswordlessLogin                *bool         `json:"has_passwordless_login,omitempty"`
-	WaitlistUsersEnabled                *bool         `json:"waitlist_users_enabled,omitempty"`
-	UserAutologoutSeconds               *int64        `json:"user_autologout_seconds,omitempty"`
-	UserAutologoutType                  string        `json:"user_autologout_type,omitempty"`
-	UsersCanDeleteOwnAccount            *bool         `json:"users_can_delete_own_account,omitempty"`
-	UsersCanChangeEmail                 *bool         `json:"users_can_change_email,omitempty"`
-	IncludeLoginMethod                  *bool         `json:"include_login_method,omitempty"`
-	HasOrgs                             *bool         `json:"has_orgs,omitempty"`
-	MaxNumOrgsUsersCanBeIn              *int32        `json:"max_num_orgs_users_can_be_in,omitempty"`
-	OrgsMetaname                        string        `json:"orgs_metaname,omitempty"`
-	UsersCanCreateOrgs                  *bool         `json:"users_can_create_orgs,omitempty"`
-	UsersCanDeleteTheirOwnOrgs          *bool         `json:"users_can_delete_their_own_orgs,omitempty"`
-	UsersMustBeInAnOrganization         *bool         `json:"users_must_be_in_an_organization,omitempty"`
-	OrgsCanSetupSaml                    *bool         `json:"orgs_can_setup_saml,omitempty"`
-	UseOrgNameForSaml                   *bool         `json:"use_org_name_for_saml,omitempty"`
-	DefaultToSamlLogin                  *bool         `json:"default_to_saml_login,omitempty"`
-	OrgsCanRequire2fa                   *bool         `json:"orgs_can_require_2fa,omitempty"`
-	Theme                               *Theme        `json:"theme,omitempty"`
-	LogoImageId                         string        `json:"logo_image_id,omitempty"`
-	FaviconImageId                      string        `json:"favicon_image_id,omitempty"`
-	BackgroundImageId                   string        `json:"background_image_id,omitempty"`
-	PersonalApiKeysEnabled              *bool         `json:"personal_api_keys_enabled,omitempty"`
-	OrgApiKeysEnabled                   *bool         `json:"org_api_keys_enabled,omitempty"`
-	InvalidateOrgApiKeysUponUserRemoval *bool         `json:"invalidate_org_api_key_upon_user_removal,omitempty"`
-	ApiKeyConfig                        *ApiKeyConfig `json:"api_key_config,omitempty"`
-	OrgsCanViewOrgAuditLog              *bool         `json:"orgs_can_view_org_audit_log,omitempty"`
-	AllOrgsCanViewOrgAuditLog           *bool         `json:"all_orgs_can_view_org_audit_log,omitempty"`
-	OrgAuditLogIncludesImpersonation    *bool         `json:"org_audit_log_includes_impersonation,omitempty"`
-	OrgAuditLogIncludesApiKeys          *bool         `json:"org_audit_log_includes_api_keys,omitempty"`
-	OrgAuditLogIncludesEmployees        *bool         `json:"org_audit_log_includes_employees,omitempty"`
+	AllowUsersToSignupWithPersonalEmail *bool            `json:"allow_users_to_signup_with_personal_email,omitempty"`
+	SignupDomainAllowlistEnabled        *bool            `json:"signup_domain_allowlist_enabled,omitempty"`
+	SignupDomainAllowlist               []string         `json:"signup_domain_allowlist,omitempty"`
+	SignupDomainBlocklistEnabled        *bool            `json:"signup_domain_blocklist_enabled,omitempty"`
+	SignupDomainBlocklist               []string         `json:"signup_domain_blocklist,omitempty"`
+	HasPasswordLogin                    *bool            `json:"has_password_login,omitempty"`
+	HasPasswordlessLogin                *bool            `json:"has_passwordless_login,omitempty"`
+	WaitlistUsersEnabled                *bool            `json:"waitlist_users_enabled,omitempty"`
+	UserAutologoutSeconds               *int64           `json:"user_autologout_seconds,omitempty"`
+	UserAutologoutType                  string           `json:"user_autologout_type,omitempty"`
+	UsersCanDeleteOwnAccount            *bool            `json:"users_can_delete_own_account,omitempty"`
+	UsersCanChangeEmail                 *bool            `json:"users_can_change_email,omitempty"`
+	IncludeLoginMethod                  *bool            `json:"include_login_method,omitempty"`
+	HasOrgs                             *bool            `json:"has_orgs,omitempty"`
+	MaxNumOrgsUsersCanBeIn              *int32           `json:"max_num_orgs_users_can_be_in,omitempty"`
+	OrgsMetaname                        string           `json:"orgs_metaname,omitempty"`
+	UsersCanCreateOrgs                  *bool            `json:"users_can_create_orgs,omitempty"`
+	UsersCanDeleteTheirOwnOrgs          *bool            `json:"users_can_delete_their_own_orgs,omitempty"`
+	UsersMustBeInAnOrganization         *bool            `json:"users_must_be_in_an_organization,omitempty"`
+	OrgsCanSetupSaml                    *bool            `json:"orgs_can_setup_saml,omitempty"`
+	UseOrgNameForSaml                   *bool            `json:"use_org_name_for_saml,omitempty"`
+	DefaultToSamlLogin                  *bool            `json:"default_to_saml_login,omitempty"`
+	OrgsCanRequire2fa                   *bool            `json:"orgs_can_require_2fa,omitempty"`
+	Theme                               *Theme           `json:"theme,omitempty"`
+	LogoImageId                         string           `json:"logo_image_id,omitempty"`
+	FaviconImageId                      string           `json:"favicon_image_id,omitempty"`
+	BackgroundImageId                   string           `json:"background_image_id,omitempty"`
+	PersonalApiKeysEnabled              *bool            `json:"personal_api_keys_enabled,omitempty"`
+	PersonalApiKeyRateLimit             *RateLimitConfig `json:"personal_api_key_rate_limit,omitempty"`
+	OrgApiKeysEnabled                   *bool            `json:"org_api_keys_enabled,omitempty"`
+	OrgApiKeyRateLimit                  *RateLimitConfig `json:"org_api_key_rate_limit,omitempty"`
+	InvalidateOrgApiKeysUponUserRemoval *bool            `json:"invalidate_org_api_key_upon_user_removal,omitempty"`
+	ApiKeyConfig                        *ApiKeyConfig    `json:"api_key_config,omitempty"`
+	OrgsCanViewOrgAuditLog              *bool            `json:"orgs_can_view_org_audit_log,omitempty"`
+	AllOrgsCanViewOrgAuditLog           *bool            `json:"all_orgs_can_view_org_audit_log,omitempty"`
+	OrgAuditLogIncludesImpersonation    *bool            `json:"org_audit_log_includes_impersonation,omitempty"`
+	OrgAuditLogIncludesApiKeys          *bool            `json:"org_audit_log_includes_api_keys,omitempty"`
+	OrgAuditLogIncludesEmployees        *bool            `json:"org_audit_log_includes_employees,omitempty"`
 }
 
 type EnvironmentConfigResponse struct {
-	AllowUsersToSignupWithPersonalEmail bool         `json:"allow_users_to_signup_with_personal_email"`
-	SignupDomainAllowlistEnabled        bool         `json:"signup_domain_allowlist_enabled"`
-	SignupDomainAllowlist               []string     `json:"signup_domain_allowlist"`
-	SignupDomainBlocklistEnabled        bool         `json:"signup_domain_blocklist_enabled"`
-	SignupDomainBlocklist               []string     `json:"signup_domain_blocklist"`
-	HasPasswordLogin                    bool         `json:"has_password_login"`
-	HasPasswordlessLogin                bool         `json:"has_passwordless_login"`
-	WaitlistUsersEnabled                bool         `json:"waitlist_users_enabled"`
-	UserAutologoutSeconds               int64        `json:"user_autologout_seconds"`
-	UserAutologoutType                  string       `json:"user_autologout_type"`
-	UsersCanDeleteOwnAccount            bool         `json:"users_can_delete_own_account"`
-	UsersCanChangeEmail                 bool         `json:"users_can_change_email"`
-	IncludeLoginMethod                  bool         `json:"include_login_method"`
-	HasOrgs                             bool         `json:"has_orgs"`
-	MaxNumOrgsUsersCanBeIn              int32        `json:"max_num_orgs_users_can_be_in"`
-	OrgsMetaname                        string       `json:"orgs_metaname"`
-	UsersCanCreateOrgs                  bool         `json:"users_can_create_orgs"`
-	UsersCanDeleteTheirOwnOrgs          bool         `json:"users_can_delete_their_own_orgs"`
-	UsersMustBeInAnOrganization         bool         `json:"users_must_be_in_an_organization"`
-	OrgsCanSetupSaml                    bool         `json:"orgs_can_setup_saml"`
-	UseOrgNameForSaml                   bool         `json:"use_org_name_for_saml"`
-	DefaultToSamlLogin                  bool         `json:"default_to_saml_login"`
-	OrgsCanRequire2fa                   bool         `json:"orgs_can_require_2fa"`
-	Theme                               Theme        `json:"theme"`
-	LogoUrl                             string       `json:"logo_url"`
-	FaviconUrl                          string       `json:"favicon_url"`
-	BackgroundUrl                       string       `json:"background_url"`
-	PersonalApiKeysEnabled              bool         `json:"personal_api_keys_enabled"`
-	OrgApiKeysEnabled                   bool         `json:"org_api_keys_enabled"`
-	InvalidateOrgApiKeyUponUserRemoval  bool         `json:"invalidate_org_api_key_upon_user_removal"`
-	ApiKeyConfig                        ApiKeyConfig `json:"api_key_config"`
-	OrgsCanViewOrgAuditLog              bool         `json:"orgs_can_view_org_audit_log"`
-	AllOrgsCanViewOrgAuditLog           bool         `json:"all_orgs_can_view_org_audit_log"`
-	OrgAuditLogIncludesImpersonation    bool         `json:"org_audit_log_includes_impersonation"`
-	OrgAuditLogIncludesApiKeys          bool         `json:"org_audit_log_includes_api_keys"`
-	OrgAuditLogIncludesEmployees        bool         `json:"org_audit_log_includes_employees"`
+	AllowUsersToSignupWithPersonalEmail bool            `json:"allow_users_to_signup_with_personal_email"`
+	SignupDomainAllowlistEnabled        bool            `json:"signup_domain_allowlist_enabled"`
+	SignupDomainAllowlist               []string        `json:"signup_domain_allowlist"`
+	SignupDomainBlocklistEnabled        bool            `json:"signup_domain_blocklist_enabled"`
+	SignupDomainBlocklist               []string        `json:"signup_domain_blocklist"`
+	HasPasswordLogin                    bool            `json:"has_password_login"`
+	HasPasswordlessLogin                bool            `json:"has_passwordless_login"`
+	WaitlistUsersEnabled                bool            `json:"waitlist_users_enabled"`
+	UserAutologoutSeconds               int64           `json:"user_autologout_seconds"`
+	UserAutologoutType                  string          `json:"user_autologout_type"`
+	UsersCanDeleteOwnAccount            bool            `json:"users_can_delete_own_account"`
+	UsersCanChangeEmail                 bool            `json:"users_can_change_email"`
+	IncludeLoginMethod                  bool            `json:"include_login_method"`
+	HasOrgs                             bool            `json:"has_orgs"`
+	MaxNumOrgsUsersCanBeIn              int32           `json:"max_num_orgs_users_can_be_in"`
+	OrgsMetaname                        string          `json:"orgs_metaname"`
+	UsersCanCreateOrgs                  bool            `json:"users_can_create_orgs"`
+	UsersCanDeleteTheirOwnOrgs          bool            `json:"users_can_delete_their_own_orgs"`
+	UsersMustBeInAnOrganization         bool            `json:"users_must_be_in_an_organization"`
+	OrgsCanSetupSaml                    bool            `json:"orgs_can_setup_saml"`
+	UseOrgNameForSaml                   bool            `json:"use_org_name_for_saml"`
+	DefaultToSamlLogin                  bool            `json:"default_to_saml_login"`
+	OrgsCanRequire2fa                   bool            `json:"orgs_can_require_2fa"`
+	Theme                               Theme           `json:"theme"`
+	LogoUrl                             string          `json:"logo_url"`
+	FaviconUrl                          string          `json:"favicon_url"`
+	BackgroundUrl                       string          `json:"background_url"`
+	PersonalApiKeysEnabled              bool            `json:"personal_api_keys_enabled"`
+	PersonalApiKeyRateLimit             RateLimitConfig `json:"personal_api_key_rate_limit"`
+	OrgApiKeysEnabled                   bool            `json:"org_api_keys_enabled"`
+	OrgApiKeyRateLimit                  RateLimitConfig `json:"org_api_key_rate_limit"`
+	InvalidateOrgApiKeyUponUserRemoval  bool            `json:"invalidate_org_api_key_upon_user_removal"`
+	ApiKeyConfig                        ApiKeyConfig    `json:"api_key_config"`
+	OrgsCanViewOrgAuditLog              bool            `json:"orgs_can_view_org_audit_log"`
+	AllOrgsCanViewOrgAuditLog           bool            `json:"all_orgs_can_view_org_audit_log"`
+	OrgAuditLogIncludesImpersonation    bool            `json:"org_audit_log_includes_impersonation"`
+	OrgAuditLogIncludesApiKeys          bool            `json:"org_audit_log_includes_api_keys"`
+	OrgAuditLogIncludesEmployees        bool            `json:"org_audit_log_includes_employees"`
 }
 
 type Theme struct {
@@ -162,6 +166,12 @@ type ApiKeyExpirationOptions struct {
 	SixMonths   bool `json:"SixMonths"`
 	OneYear     bool `json:"OneYear"`
 	Never       bool `json:"Never"`
+}
+
+type RateLimitConfig struct {
+	PeriodType     string `json:"period_type"`
+	PeriodSize     int32  `json:"period_size"`
+	AllowPerPeriod int64  `json:"allow_per_period"`
 }
 
 type RealmConfigUpdate struct {
@@ -377,6 +387,20 @@ type SocialLoginUpdateRequest struct {
 	ClientId     string `json:"client_id"`
 	ClientSecret string `json:"client_secret"`
 	Enabled      bool   `json:"enabled"`
+}
+
+type OauthClientRequest struct {
+	RedirectUris []string `json:"redirect_uris"`
+}
+
+type OauthClientCreationResponse struct {
+	ClientId     string `json:"client_id"`
+	ClientSecret string `json:"client_secret"`
+}
+
+type OauthClientInfo struct {
+	ClientId     string   `json:"client_id"`
+	RedirectUris []string `json:"redirect_uris"`
 }
 
 type ApiKeyAlert struct {

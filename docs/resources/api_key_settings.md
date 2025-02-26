@@ -41,7 +41,9 @@ resource "propelauth_api_key_settings" "example" {
 
 - `api_key_config` (Attributes) API Key Configuration. This is for setting the options available to your users when creating an API key. (see [below for nested schema](#nestedatt--api_key_config))
 - `invalidate_org_api_key_upon_user_removal` (Boolean) If true, invalidate org API keys when the user that created them is removed from the organization. The default setting is false.
+- `org_api_key_rate_limit` (Attributes) Organization API Key Rate Limit. This sets the rate limit that will be applied to validations on your end users' organizations' API keys. This is calculated and applied per organization for all keys the organization owns as opposed to per key. Note: Rate limits are only available on some pricing plans. (see [below for nested schema](#nestedatt--org_api_key_rate_limit))
 - `org_api_keys_enabled` (Boolean) Allow users to create API keys for their organization. The default setting is false.
+- `personal_api_key_rate_limit` (Attributes) Personal API Key Rate Limit. This sets the rate limit that will be applied to validations on your end users' personal API keys. This is calculated and applied per user for all keys they own as opposed to per key.Note: Rate limits are only available on some pricing plans. (see [below for nested schema](#nestedatt--personal_api_key_rate_limit))
 - `personal_api_keys_enabled` (Boolean) Allow users to create personal API keys. The default setting is false.
 
 <a id="nestedatt--api_key_config"></a>
@@ -58,6 +60,27 @@ Required:
 
 - `default` (String) The default expiration option for an API key. Valid values are `TwoWeeks`, `OneMonth`, `ThreeMonths`, `SixMonths`, `OneYear`, and `Never`.
 - `options` (List of String) The options available for the expiration of an API key. Valid values are `TwoWeeks`, `OneMonth`, `ThreeMonths`, `SixMonths`, `OneYear`, and `Never`.
+
+
+
+<a id="nestedatt--org_api_key_rate_limit"></a>
+### Nested Schema for `org_api_key_rate_limit`
+
+Required:
+
+- `allow_per_period` (Number) The number of requests allowed per period.
+- `period_size` (Number) The number of `period_type` units for calculating and applying your rate limit.
+- `period_type` (String) The unit of time for time for calculating and applying your rate limit. Valid values are `seconds`, `minutes`, `hours`, or `days`.
+
+
+<a id="nestedatt--personal_api_key_rate_limit"></a>
+### Nested Schema for `personal_api_key_rate_limit`
+
+Required:
+
+- `allow_per_period` (Number) The number of requests allowed per period.
+- `period_size` (Number) The number of `period_type` units for calculating and applying your rate limit.
+- `period_type` (String) The unit of time for time for calculating and applying your rate limit. Valid values are `seconds`, `minutes`, `hours`, or `days`.
 
 ## Import
 
