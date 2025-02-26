@@ -39,6 +39,7 @@ type EnvironmentConfigUpdate struct {
 	OrgsCanSetupSaml                    *bool         `json:"orgs_can_setup_saml,omitempty"`
 	UseOrgNameForSaml                   *bool         `json:"use_org_name_for_saml,omitempty"`
 	DefaultToSamlLogin                  *bool         `json:"default_to_saml_login,omitempty"`
+	SkipSamlRoleMappingStep             *bool         `json:"skip_saml_role_mapping_step,omitempty"`
 	OrgsCanRequire2fa                   *bool         `json:"orgs_can_require_2fa,omitempty"`
 	Theme                               *Theme        `json:"theme,omitempty"`
 	LogoImageId                         string        `json:"logo_image_id,omitempty"`
@@ -78,6 +79,7 @@ type EnvironmentConfigResponse struct {
 	OrgsCanSetupSaml                    bool         `json:"orgs_can_setup_saml"`
 	UseOrgNameForSaml                   bool         `json:"use_org_name_for_saml"`
 	DefaultToSamlLogin                  bool         `json:"default_to_saml_login"`
+	SkipSamlRoleMappingStep             bool         `json:"skip_saml_role_mapping_step"`
 	OrgsCanRequire2fa                   bool         `json:"orgs_can_require_2fa"`
 	Theme                               Theme        `json:"theme"`
 	LogoUrl                             string       `json:"logo_url"`
