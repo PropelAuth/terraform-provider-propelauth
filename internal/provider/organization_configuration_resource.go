@@ -39,6 +39,7 @@ type organizationConfigurationResourceModel struct {
 	OrgsCanSetupSaml            types.Bool                        `tfsdk:"orgs_can_setup_saml"`
 	UseOrgNameForSaml           types.Bool                        `tfsdk:"use_org_name_for_saml"`
 	DefaultToSamlLogin          types.Bool                        `tfsdk:"default_to_saml_login"`
+	SkipSamlRoleMappingStep     types.Bool                        `tfsdk:"skip_saml_role_mapping_step"`
 	OrgsCanRequire2fa           types.Bool                        `tfsdk:"orgs_can_require_2fa"`
 	CustomerOrgAuditLogSettings *CustomerOrgAuditLogSettingsModel `tfsdk:"customer_org_audit_log_settings"`
 }
@@ -110,6 +111,12 @@ func (r *organizationConfigurationResource) Schema(ctx context.Context, req reso
 				Optional: true,
 				Description: "This is an advanced setting that only applies if SAML is enabled. If true, " +
 					"affected users will be directed to SAML by default in the hosted pages." +
+					"The default setting is false.",
+			},
+			"skip_saml_role_mapping_step": schema.BoolAttribute{
+				Optional: true,
+				Description: "This is an advanced setting that only applies if SAML is enabled. If true, " +
+					"end users setting up SAML for their organization will not see the role-mapping step. " +
 					"The default setting is false.",
 			},
 			"orgs_can_require_2fa": schema.BoolAttribute{
@@ -195,6 +202,7 @@ func (r *organizationConfigurationResource) Create(ctx context.Context, req reso
 		OrgsCanSetupSaml:            plan.OrgsCanSetupSaml.ValueBoolPointer(),
 		UseOrgNameForSaml:           plan.UseOrgNameForSaml.ValueBoolPointer(),
 		DefaultToSamlLogin:          plan.DefaultToSamlLogin.ValueBoolPointer(),
+		SkipSamlRoleMappingStep:     plan.SkipSamlRoleMappingStep.ValueBoolPointer(),
 		OrgsCanRequire2fa:           plan.OrgsCanRequire2fa.ValueBoolPointer(),
 	}
 
@@ -285,6 +293,14 @@ func (r *organizationConfigurationResource) Create(ctx context.Context, req reso
 		resp.Diagnostics.AddError(
 			"Error updating organization configuration",
 			"DefaultToSamlLogin failed to update. The `default_to_saml_login` is instead "+fmt.Sprintf("%t", environmentConfigResponse.DefaultToSamlLogin),
+		)
+		return
+	}
+	if plan.SkipSamlRoleMappingStep.ValueBoolPointer() != nil &&
+		plan.SkipSamlRoleMappingStep.ValueBool() != environmentConfigResponse.SkipSamlRoleMappingStep {
+		resp.Diagnostics.AddError(
+			"Error updating organization configuration",
+			"SkipSamlRoleMappingStep failed to update. The `skip_saml_role_mapping_step` is instead "+fmt.Sprintf("%t", environmentConfigResponse.SkipSamlRoleMappingStep),
 		)
 		return
 	}
@@ -389,6 +405,9 @@ func (r *organizationConfigurationResource) Read(ctx context.Context, req resour
 	if state.DefaultToSamlLogin.ValueBoolPointer() != nil {
 		state.DefaultToSamlLogin = types.BoolValue(environmentConfigResponse.DefaultToSamlLogin)
 	}
+	if state.SkipSamlRoleMappingStep.ValueBoolPointer() != nil {
+		state.SkipSamlRoleMappingStep = types.BoolValue(environmentConfigResponse.SkipSamlRoleMappingStep)
+	}
 	if state.OrgsCanRequire2fa.ValueBoolPointer() != nil {
 		state.OrgsCanRequire2fa = types.BoolValue(environmentConfigResponse.OrgsCanRequire2fa)
 	}
@@ -425,6 +444,7 @@ func (r *organizationConfigurationResource) Update(ctx context.Context, req reso
 		OrgsCanSetupSaml:            plan.OrgsCanSetupSaml.ValueBoolPointer(),
 		UseOrgNameForSaml:           plan.UseOrgNameForSaml.ValueBoolPointer(),
 		DefaultToSamlLogin:          plan.DefaultToSamlLogin.ValueBoolPointer(),
+		SkipSamlRoleMappingStep:     plan.SkipSamlRoleMappingStep.ValueBoolPointer(),
 		OrgsCanRequire2fa:           plan.OrgsCanRequire2fa.ValueBoolPointer(),
 	}
 
@@ -518,6 +538,14 @@ func (r *organizationConfigurationResource) Update(ctx context.Context, req reso
 		)
 		return
 	}
+	if plan.SkipSamlRoleMappingStep.ValueBoolPointer() != nil &&
+		plan.SkipSamlRoleMappingStep.ValueBool() != environmentConfigResponse.SkipSamlRoleMappingStep {
+		resp.Diagnostics.AddError(
+			"Error updating organization configuration",
+			"SkipSamlRoleMappingStep failed to update. The `skip_saml_role_mapping_step` is instead "+fmt.Sprintf("%t", environmentConfigResponse.SkipSamlRoleMappingStep),
+		)
+		return
+	}
 	if plan.OrgsCanRequire2fa.ValueBoolPointer() != nil &&
 		plan.OrgsCanRequire2fa.ValueBool() != environmentConfigResponse.OrgsCanRequire2fa {
 		resp.Diagnostics.AddError(
@@ -599,6 +627,7 @@ func (r *organizationConfigurationResource) ImportState(ctx context.Context, req
 	state.OrgsCanSetupSaml = types.BoolValue(environmentConfigResponse.OrgsCanSetupSaml)
 	state.UseOrgNameForSaml = types.BoolValue(environmentConfigResponse.UseOrgNameForSaml)
 	state.DefaultToSamlLogin = types.BoolValue(environmentConfigResponse.DefaultToSamlLogin)
+	state.SkipSamlRoleMappingStep = types.BoolValue(environmentConfigResponse.SkipSamlRoleMappingStep)
 	state.OrgsCanRequire2fa = types.BoolValue(environmentConfigResponse.OrgsCanRequire2fa)
 	state.CustomerOrgAuditLogSettings = &CustomerOrgAuditLogSettingsModel{
 		Enabled:                     types.BoolValue(environmentConfigResponse.OrgsCanViewOrgAuditLog),
