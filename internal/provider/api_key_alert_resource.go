@@ -46,7 +46,7 @@ func (r *apiKeyAlertResource) Schema(ctx context.Context, req resource.SchemaReq
 				Validators: []validator.Int32{
 					int32validator.Between(1, 90),
 				},
-				Description: "The number of days before an API key expires by which time end users will recieve an email alert.",
+				Description: "The number of days before an API key expires by which time end users will receive an email alert.",
 			},
 		},
 	}

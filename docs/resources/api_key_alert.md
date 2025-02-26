@@ -26,7 +26,7 @@ resource "propelauth_api_key_alert" "example" {
 
 ### Required
 
-- `advance_notice_days` (Number) The number of days before an API key expires by which time end users will recieve an email alert.
+- `advance_notice_days` (Number) The number of days before an API key expires by which time end users will receive an email alert.
 
 ## Import
 
