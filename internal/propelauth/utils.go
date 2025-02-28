@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/url"
 	"strconv"
-	"strings"
 )
 
 func Contains(slice []string, target string) bool {
@@ -26,41 +25,6 @@ func FlipBoolRef(b *bool) *bool {
 		new_b := true
 		return &new_b
 	}
-}
-
-func IsValidUrlWithoutTrailingSlash(inputUrl string) (bool, error) {
-	// Parse the inputUrl string into a URL
-	parsedURL, err := url.Parse(inputUrl)
-	if err != nil {
-		return false, err
-	}
-
-	// Check if the URL has a scheme (http, https, etc.)
-	if parsedURL.Scheme == "" || parsedURL.Host == "" {
-		return false, fmt.Errorf("invalid URL: missing scheme or host")
-	}
-
-	// Check if the URL has a trailing slash in the path
-	if strings.HasSuffix(parsedURL.Path, "/") {
-		return false, fmt.Errorf("URL has a trailing slash")
-	}
-
-	return true, nil
-}
-
-func IsValidUrl(inputUrl string) (bool, error) {
-	// Parse the inputUrl string into a URL
-	parsedURL, err := url.Parse(inputUrl)
-	if err != nil {
-		return false, err
-	}
-
-	// Check if the URL has a scheme (http, https, etc.)
-	if parsedURL.Scheme == "" || parsedURL.Host == "" {
-		return false, fmt.Errorf("invalid URL: missing scheme or host")
-	}
-
-	return true, nil
 }
 
 func GetPortFromLocalhost(inputUrl string) (bool, int) {

@@ -22,7 +22,6 @@ import (
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &feIntegrationResource{}
 var _ resource.ResourceWithConfigure = &feIntegrationResource{}
-var _ resource.ResourceWithValidateConfig = &feIntegrationResource{}
 var _ resource.ResourceWithImportState = &feIntegrationResource{}
 
 func NewFeIntegrationResource() resource.Resource {
@@ -54,6 +53,8 @@ func (r *feIntegrationResource) Metadata(ctx context.Context, req resource.Metad
 
 func (r *feIntegrationResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	urlPathRegex := regexp.MustCompile(`^\/[a-zA-Z0-9_\-\/]*$`)
+	hasSchemeRegex := regexp.MustCompile(`^https?://.*$`)
+	noTrailingSlashRegex := regexp.MustCompile(`^.*[^/]$`)
 
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the language server.
@@ -71,6 +72,10 @@ func (r *feIntegrationResource) Schema(ctx context.Context, req resource.SchemaR
 			},
 			"application_url": schema.StringAttribute{
 				Required: true,
+				Validators: []validator.String{
+					stringvalidator.RegexMatches(hasSchemeRegex, "Must be a valid URL with either http or https scheme"),
+					stringvalidator.RegexMatches(noTrailingSlashRegex, "Must not have a trailing slash"),
+				},
 				Description: "The URL of the application that will be integrated with PropelAuth. This url is used in combination with " +
 					"the `login_redirect_path` and `logout_redirect_path` to redirect users to your application after logging in or out. " +
 					"`application_url` must be a valid URL and can only be set for `Test` environments. For `Staging` and `Prod` environments, " +
@@ -81,7 +86,7 @@ func (r *feIntegrationResource) Schema(ctx context.Context, req resource.SchemaR
 			"login_redirect_path": schema.StringAttribute{
 				Required: true,
 				Validators: []validator.String{
-					stringvalidator.RegexMatches(urlPathRegex, "Must be a valid URL path."),
+					stringvalidator.RegexMatches(urlPathRegex, "Must be a valid URL path"),
 				},
 				Description: "The URL path to redirect users to after they log in. This path is appended to the `application_url` to form the " +
 					"full URL. For example, if `application_url` is `https://example.com` and `login_redirect_path` is `/dashboard`, the " +
@@ -90,7 +95,7 @@ func (r *feIntegrationResource) Schema(ctx context.Context, req resource.SchemaR
 			"logout_redirect_path": schema.StringAttribute{
 				Required: true,
 				Validators: []validator.String{
-					stringvalidator.RegexMatches(urlPathRegex, "Must be a valid URL path."),
+					stringvalidator.RegexMatches(urlPathRegex, "Must be a valid URL path"),
 				},
 				Description: "The URL path to redirect users to after they log out. This path is appended to the `application_url` to form the " +
 					"full URL. For example, if `application_url` is `https://example.com` and `logout_redirect_path` is `/goodbye`, the " +
@@ -103,6 +108,9 @@ func (r *feIntegrationResource) Schema(ctx context.Context, req resource.SchemaR
 					Attributes: map[string]schema.Attribute{
 						"domain": schema.StringAttribute{
 							Required: true,
+							Validators: []validator.String{
+								stringvalidator.RegexMatches(hasSchemeRegex, "Must be a valid URL with either http or https scheme"),
+							},
 							Description: "A domain that will also be allowed to access user information. The domain must include a scheme. " +
 								"For example, `https://example.com`.",
 						},
@@ -138,36 +146,6 @@ func (r *feIntegrationResource) Configure(ctx context.Context, req resource.Conf
 	}
 
 	r.client = client
-}
-
-func (r *feIntegrationResource) ValidateConfig(ctx context.Context, req resource.ValidateConfigRequest, resp *resource.ValidateConfigResponse) {
-	var plan feIntegrationResourceModel
-
-	// Read Terraform plan data into the model
-	diags := req.Config.Get(ctx, &plan)
-	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
-	// Validate the plan data
-	isValidUrl, err := propelauth.IsValidUrlWithoutTrailingSlash(plan.ApplicationUrl.ValueString())
-	if !isValidUrl {
-		resp.Diagnostics.AddError(
-			"Invalid application_url",
-			"application_url must be a valid URL and cannot have a trailing slash. "+err.Error(),
-		)
-	}
-
-	for i, location := range plan.AdditionalFeLocations {
-		isValidUrl, err := propelauth.IsValidUrl(location.Domain.ValueString())
-		if !isValidUrl {
-			resp.Diagnostics.AddError(
-				fmt.Sprintf("Invalid domain for additional_fe_locations[%d]", i),
-				"domain must be a valid URL. "+err.Error(),
-			)
-		}
-	}
 }
 
 func (r *feIntegrationResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
