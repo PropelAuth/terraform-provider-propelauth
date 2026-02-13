@@ -47,6 +47,8 @@ resource "propelauth_environment_level_auth_configuration" "prod_example" {
 ### Optional
 
 - `allow_public_signups` (Boolean) If true, new users will be able to sign up for your product directly in the PropelAuth hosted pages.The default setting is true for all environments.
+- `magic_link_expire_after_first_use` (Boolean) If true, an interstitial page to confirm the user is human when using magic link log in will be shown. We recommend having this setting enabled and is enabled by default for all new projects.
+- `magic_link_requires_interstitial` (Boolean) If true, the magic link a user receives will expire after the first time it is used. We recommend having this setting enabled and is enabled by default for all new projects.
 - `require_email_confirmation` (Boolean) If true, all users are required to have confirmed email addresses. Whenever PropelAuth doesn't know for certain whether a user's email address is in fact owned by them, PropelAuth will trigger an email confirmation flow. The default setting is true for `Prod` and `Staging` environments but is false for `Test` for ease of development.
 - `waitlist_users_require_email_confirmation` (Boolean) If true, all waitlisted users are required to have confirmed email addresses. Whenever PropelAuth doesn't know for certain whether a waitlisted user's email address is in fact owned by them, PropelAuth will trigger an email confirmation flow. The default setting is false for all environments.
 

@@ -36,6 +36,8 @@ type environmentLevelAuthConfigurationResourceModel struct {
 	AllowPublicSignups                    types.Bool   `tfsdk:"allow_public_signups"`
 	RequireEmailConfirmation              types.Bool   `tfsdk:"require_email_confirmation"`
 	WaitlistUsersRequireEmailConfirmation types.Bool   `tfsdk:"waitlist_users_require_email_confirmation"`
+	MagicLinkRequiresInterstitial         types.Bool   `tfsdk:"magic_link_requires_interstitial"`
+	MagicLinkExpireAfterFirstUse          types.Bool   `tfsdk:"magic_link_expire_after_first_use"`
 }
 
 func (r *environmentLevelAuthConfigurationResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -74,6 +76,16 @@ func (r *environmentLevelAuthConfigurationResource) Schema(ctx context.Context, 
 				Description: "If true, all waitlisted users are required to have confirmed email addresses. Whenever PropelAuth doesn't know for " +
 					"certain whether a waitlisted user's email address is in fact owned by them, PropelAuth will trigger an email confirmation flow. " +
 					"The default setting is false for all environments.",
+			},
+			"magic_link_requires_interstitial": schema.BoolAttribute{
+				Optional: true,
+				Description: "If true, the magic link a user receives will expire after the first time it is used. " +
+					"We recommend having this setting enabled and is enabled by default for all new projects.",
+			},
+			"magic_link_expire_after_first_use": schema.BoolAttribute{
+				Optional: true,
+				Description: "If true, an interstitial page to confirm the user is human when using magic link log in will be shown. " +
+					"We recommend having this setting enabled and is enabled by default for all new projects.",
 			},
 		},
 	}
@@ -115,6 +127,8 @@ func (r *environmentLevelAuthConfigurationResource) Create(ctx context.Context, 
 		AllowPublicSignups:                    plan.AllowPublicSignups.ValueBoolPointer(),
 		AutoConfirmEmails:                     propelauth.FlipBoolRef(plan.RequireEmailConfirmation.ValueBoolPointer()),
 		WaitlistUsersRequireEmailConfirmation: plan.WaitlistUsersRequireEmailConfirmation.ValueBoolPointer(),
+		MagicLinkRequiresInterstitial:         plan.MagicLinkRequiresInterstitial.ValueBoolPointer(),
+		MagicLinkExpireAfterFirstUse:          plan.MagicLinkExpireAfterFirstUse.ValueBoolPointer(),
 	}
 
 	realmConfigResponse, err := r.client.UpdateRealmConfig(environment, realmConfigUpdate)
@@ -148,6 +162,22 @@ func (r *environmentLevelAuthConfigurationResource) Create(ctx context.Context, 
 		resp.Diagnostics.AddError(
 			"Error updating environment-level auth configuration",
 			"WaitlistUsersRequireEmailConfirmation failed to update. The `waitlist_users_require_email_confirmation` is instead "+fmt.Sprintf("%t", realmConfigResponse.WaitlistUsersRequireEmailConfirmation),
+		)
+		return
+	}
+	if plan.MagicLinkRequiresInterstitial.ValueBoolPointer() != nil &&
+		plan.MagicLinkRequiresInterstitial.ValueBool() != realmConfigResponse.MagicLinkRequiresInterstitial {
+		resp.Diagnostics.AddError(
+			"Error updating environment-level auth configuration",
+			"MagicLinkRequiresInterstitial failed to update. The `magic_link_requires_interstitial` is instead "+fmt.Sprintf("%t", realmConfigResponse.MagicLinkRequiresInterstitial),
+		)
+		return
+	}
+	if plan.MagicLinkExpireAfterFirstUse.ValueBoolPointer() != nil &&
+		plan.MagicLinkExpireAfterFirstUse.ValueBool() != realmConfigResponse.MagicLinkExpireAfterFirstUse {
+		resp.Diagnostics.AddError(
+			"Error updating environment-level auth configuration",
+			"MagicLinkExpireAfterFirstUse failed to update. The `magic_link_expire_after_first_use` is instead "+fmt.Sprintf("%t", realmConfigResponse.MagicLinkExpireAfterFirstUse),
 		)
 		return
 	}
@@ -189,6 +219,12 @@ func (r *environmentLevelAuthConfigurationResource) Read(ctx context.Context, re
 	if state.WaitlistUsersRequireEmailConfirmation.ValueBoolPointer() != nil {
 		state.WaitlistUsersRequireEmailConfirmation = types.BoolValue(realmConfigResponse.WaitlistUsersRequireEmailConfirmation)
 	}
+	if state.MagicLinkRequiresInterstitial.ValueBoolPointer() != nil {
+		state.MagicLinkRequiresInterstitial = types.BoolValue(realmConfigResponse.MagicLinkRequiresInterstitial)
+	}
+	if state.MagicLinkExpireAfterFirstUse.ValueBoolPointer() != nil {
+		state.MagicLinkExpireAfterFirstUse = types.BoolValue(realmConfigResponse.MagicLinkExpireAfterFirstUse)
+	}
 
 	// Save updated state into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
@@ -209,6 +245,8 @@ func (r *environmentLevelAuthConfigurationResource) Update(ctx context.Context, 
 		AllowPublicSignups:                    plan.AllowPublicSignups.ValueBoolPointer(),
 		AutoConfirmEmails:                     propelauth.FlipBoolRef(plan.RequireEmailConfirmation.ValueBoolPointer()),
 		WaitlistUsersRequireEmailConfirmation: plan.WaitlistUsersRequireEmailConfirmation.ValueBoolPointer(),
+		MagicLinkRequiresInterstitial:         plan.MagicLinkRequiresInterstitial.ValueBoolPointer(),
+		MagicLinkExpireAfterFirstUse:          plan.MagicLinkExpireAfterFirstUse.ValueBoolPointer(),
 	}
 
 	realmConfigResponse, err := r.client.UpdateRealmConfig(plan.Environment.ValueString(), realmConfigUpdate)
@@ -242,6 +280,22 @@ func (r *environmentLevelAuthConfigurationResource) Update(ctx context.Context, 
 		resp.Diagnostics.AddError(
 			"Error updating environment-level auth configuration",
 			"WaitlistUsersRequireEmailConfirmation failed to update. The `waitlist_users_require_email_confirmation` is instead "+fmt.Sprintf("%t", realmConfigResponse.WaitlistUsersRequireEmailConfirmation),
+		)
+		return
+	}
+	if plan.MagicLinkRequiresInterstitial.ValueBoolPointer() != nil &&
+		plan.MagicLinkRequiresInterstitial.ValueBool() != realmConfigResponse.MagicLinkRequiresInterstitial {
+		resp.Diagnostics.AddError(
+			"Error updating environment-level auth configuration",
+			"MagicLinkRequiresInterstitial failed to update. The `magic_link_requires_interstitial` is instead "+fmt.Sprintf("%t", realmConfigResponse.MagicLinkRequiresInterstitial),
+		)
+		return
+	}
+	if plan.MagicLinkExpireAfterFirstUse.ValueBoolPointer() != nil &&
+		plan.MagicLinkExpireAfterFirstUse.ValueBool() != realmConfigResponse.MagicLinkExpireAfterFirstUse {
+		resp.Diagnostics.AddError(
+			"Error updating environment-level auth configuration",
+			"MagicLinkExpireAfterFirstUse failed to update. The `magic_link_expire_after_first_use` is instead "+fmt.Sprintf("%t", realmConfigResponse.MagicLinkExpireAfterFirstUse),
 		)
 		return
 	}
@@ -285,6 +339,8 @@ func (r *environmentLevelAuthConfigurationResource) ImportState(ctx context.Cont
 	state.AllowPublicSignups = types.BoolValue(realmConfigResponse.AllowPublicSignups)
 	state.RequireEmailConfirmation = types.BoolValue(!realmConfigResponse.AutoConfirmEmails)
 	state.WaitlistUsersRequireEmailConfirmation = types.BoolValue(realmConfigResponse.WaitlistUsersRequireEmailConfirmation)
+	state.MagicLinkRequiresInterstitial = types.BoolValue(realmConfigResponse.MagicLinkRequiresInterstitial)
+	state.MagicLinkExpireAfterFirstUse = types.BoolValue(realmConfigResponse.MagicLinkExpireAfterFirstUse)
 
 	// Save updated state into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)

@@ -28,6 +28,7 @@ resource "propelauth_organization_configuration" "example" {
 
 ### Optional
 
+- `allow_autojoin_by_domain` (Boolean) If true, users with the requisite permissions will be able to allow or disallow the ability for anyone with a matching email domain to join an organization.The default setting is true.
 - `customer_org_audit_log_settings` (Attributes) Settings for enabling whether and configuring how your customer organizations will have access to their own audit log.
 
 Note: This feature is only available for use by your customer organizations in non-test environments for some pricing plans. (see [below for nested schema](#nestedatt--customer_org_audit_log_settings))
