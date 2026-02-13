@@ -97,6 +97,7 @@ type EnvironmentConfigResponse struct {
 	EnableDarkmodeTheme                 bool            `json:"enable_darkmode_theme"`
 	DarkmodeTheme                       Theme           `json:"darkmode_theme"`
 	DarkmodeLogoUrl                     string          `json:"darkmode_logo_url"`
+	DarkmodeBackgroundUrl               string          `json:"darkmode_background_url"`
 	PersonalApiKeysEnabled              bool            `json:"personal_api_keys_enabled"`
 	PersonalApiKeyRateLimit             RateLimitConfig `json:"personal_api_key_rate_limit"`
 	OrgApiKeysEnabled                   bool            `json:"org_api_keys_enabled"`
