@@ -79,12 +79,12 @@ func (r *environmentLevelAuthConfigurationResource) Schema(ctx context.Context, 
 			},
 			"magic_link_requires_interstitial": schema.BoolAttribute{
 				Optional: true,
-				Description: "If true, the magic link a user receives will expire after the first time it is used. " +
+				Description: "If true, an interstitial page to confirm the user is human when using magic link log in will be shown. " +
 					"We recommend having this setting enabled and is enabled by default for all new projects.",
 			},
 			"magic_link_expire_after_first_use": schema.BoolAttribute{
 				Optional: true,
-				Description: "If true, an interstitial page to confirm the user is human when using magic link log in will be shown. " +
+				Description: "If true, the magic link a user receives will expire after the first time it is used. " +
 					"We recommend having this setting enabled and is enabled by default for all new projects.",
 			},
 		},
