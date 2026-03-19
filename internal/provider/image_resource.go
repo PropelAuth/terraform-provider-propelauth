@@ -52,14 +52,14 @@ func (r *imageResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 			},
 			"version": schema.StringAttribute{
 				Required:    true,
-				Description: "The version of the image. This is track updates to the image at the specified `source`.",
+				Description: "The version of the image. This is used to detect updates to the image at the specified `source`.",
 			},
 			"image_type": schema.StringAttribute{
 				Required: true,
 				Description: "The type of the image. This is used to determine where the image is used in PropelAuth. " +
-					"Accepted values are `logo`, `favicon`, and `background`.",
+					"Accepted values are `logo`, `favicon`, `background`, `darkmode_logo`, or `darkmode_background`.",
 				Validators: []validator.String{
-					stringvalidator.OneOf("logo", "favicon", "background"),
+					stringvalidator.OneOf("logo", "favicon", "background", "darkmode_logo", "darkmode_background"),
 				},
 			},
 			"image_id": schema.StringAttribute{
@@ -121,10 +121,14 @@ func (r *imageResource) Create(ctx context.Context, req resource.CreateRequest, 
 	environmentConfigUpdate := propelauth.EnvironmentConfigUpdate{}
 	if plan.ImageType.ValueString() == "logo" {
 		environmentConfigUpdate.LogoImageId = plan.ImageId.ValueString()
+	} else if plan.ImageType.ValueString() == "darkmode_logo" {
+		environmentConfigUpdate.DarkmodeLogoImageId = plan.ImageId.ValueString()
 	} else if plan.ImageType.ValueString() == "favicon" {
 		environmentConfigUpdate.FaviconImageId = plan.ImageId.ValueString()
 	} else if plan.ImageType.ValueString() == "background" {
 		environmentConfigUpdate.BackgroundImageId = plan.ImageId.ValueString()
+	} else if plan.ImageType.ValueString() == "darkmode_background" {
+		environmentConfigUpdate.DarkmodeBackgroundImageId = plan.ImageId.ValueString()
 	}
 
 	environmentConfigResponse, err := r.client.UpdateEnvironmentConfig(&environmentConfigUpdate)
@@ -139,10 +143,14 @@ func (r *imageResource) Create(ctx context.Context, req resource.CreateRequest, 
 	// Save updated URL into Terraform state
 	if plan.ImageType.ValueString() == "logo" {
 		plan.ImageUrl = types.StringValue(environmentConfigResponse.LogoUrl)
+	} else if plan.ImageType.ValueString() == "darkmode_logo" {
+		plan.ImageUrl = types.StringValue(environmentConfigResponse.DarkmodeLogoUrl)
 	} else if plan.ImageType.ValueString() == "favicon" {
 		plan.ImageUrl = types.StringValue(environmentConfigResponse.FaviconUrl)
 	} else if plan.ImageType.ValueString() == "background" {
 		plan.ImageUrl = types.StringValue(environmentConfigResponse.BackgroundUrl)
+	} else if plan.ImageType.ValueString() == "darkmode_background" {
+		plan.ImageUrl = types.StringValue(environmentConfigResponse.DarkmodeBackgroundUrl)
 	}
 
 	// Write logs using the tflog package
@@ -172,10 +180,14 @@ func (r *imageResource) Read(ctx context.Context, req resource.ReadRequest, resp
 	}
 	if state.ImageType.ValueString() == "logo" {
 		state.ImageUrl = types.StringValue(environmentConfigResponse.LogoUrl)
+	} else if state.ImageType.ValueString() == "darkmode_logo" {
+		state.ImageUrl = types.StringValue(environmentConfigResponse.DarkmodeLogoUrl)
 	} else if state.ImageType.ValueString() == "favicon" {
 		state.ImageUrl = types.StringValue(environmentConfigResponse.FaviconUrl)
 	} else if state.ImageType.ValueString() == "background" {
 		state.ImageUrl = types.StringValue(environmentConfigResponse.BackgroundUrl)
+	} else if state.ImageType.ValueString() == "darkmode_background" {
+		state.ImageUrl = types.StringValue(environmentConfigResponse.DarkmodeBackgroundUrl)
 	}
 
 	// Save updated state into Terraform state
@@ -208,10 +220,14 @@ func (r *imageResource) Update(ctx context.Context, req resource.UpdateRequest, 
 	environmentConfigUpdate := propelauth.EnvironmentConfigUpdate{}
 	if plan.ImageType.ValueString() == "logo" {
 		environmentConfigUpdate.LogoImageId = plan.ImageId.ValueString()
+	} else if plan.ImageType.ValueString() == "darkmode_logo" {
+		environmentConfigUpdate.DarkmodeLogoImageId = plan.ImageId.ValueString()
 	} else if plan.ImageType.ValueString() == "favicon" {
 		environmentConfigUpdate.FaviconImageId = plan.ImageId.ValueString()
 	} else if plan.ImageType.ValueString() == "background" {
 		environmentConfigUpdate.BackgroundImageId = plan.ImageId.ValueString()
+	} else if plan.ImageType.ValueString() == "darkmode_background" {
+		environmentConfigUpdate.DarkmodeBackgroundImageId = plan.ImageId.ValueString()
 	}
 
 	environmentConfigResponse, err := r.client.UpdateEnvironmentConfig(&environmentConfigUpdate)
@@ -226,10 +242,14 @@ func (r *imageResource) Update(ctx context.Context, req resource.UpdateRequest, 
 	// Save updated URL into Terraform state
 	if plan.ImageType.ValueString() == "logo" {
 		plan.ImageUrl = types.StringValue(environmentConfigResponse.LogoUrl)
+	} else if plan.ImageType.ValueString() == "darkmode_logo" {
+		plan.ImageUrl = types.StringValue(environmentConfigResponse.DarkmodeLogoUrl)
 	} else if plan.ImageType.ValueString() == "favicon" {
 		plan.ImageUrl = types.StringValue(environmentConfigResponse.FaviconUrl)
 	} else if plan.ImageType.ValueString() == "background" {
 		plan.ImageUrl = types.StringValue(environmentConfigResponse.BackgroundUrl)
+	} else if plan.ImageType.ValueString() == "darkmode_background" {
+		plan.ImageUrl = types.StringValue(environmentConfigResponse.DarkmodeBackgroundUrl)
 	}
 
 	// Write logs using the tflog package

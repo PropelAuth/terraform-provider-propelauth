@@ -43,6 +43,8 @@ type basicAuthConfigurationResourceModel struct {
 	UsersCanDeleteOwnAccount            types.Bool     `tfsdk:"users_can_delete_own_account"`
 	UsersCanChangeEmail                 types.Bool     `tfsdk:"users_can_change_email"`
 	IncludeLoginMethod                  types.Bool     `tfsdk:"include_login_method"`
+	HasPhoneMfa                         types.Bool     `tfsdk:"has_phone_mfa"`
+	AllUsersMustSetup2fa                types.Bool     `tfsdk:"all_users_must_setup_2fa"`
 }
 
 func (r *basicAuthConfigurationResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -107,6 +109,16 @@ func (r *basicAuthConfigurationResource) Schema(ctx context.Context, req resourc
 				Optional: true,
 				Description: "If true, the login method will be included in the access token. The default setting is false." +
 					"See `https://docs.propelauth.com/overview/user-management/user-properties#login-method-property` for more information.",
+			},
+			"has_phone_mfa": schema.BoolAttribute{
+				Optional: true,
+				Description: "If true, users will be able to set up SMS as a 2FA method." +
+					"See `https://docs.propelauth.com/overview/authentication/mfa#sms-mfa` for more information on setting up SMS MFA.",
+			},
+			"all_users_must_setup_2fa": schema.BoolAttribute{
+				Optional: true,
+				Description: "If true, all users will be required to use multifactor authentication when logging in. " +
+					"Note: This feature is only available on some pricing plans.",
 			},
 		},
 	}
@@ -174,6 +186,8 @@ func (r *basicAuthConfigurationResource) Create(ctx context.Context, req resourc
 		UsersCanDeleteOwnAccount:            plan.UsersCanDeleteOwnAccount.ValueBoolPointer(),
 		UsersCanChangeEmail:                 plan.UsersCanChangeEmail.ValueBoolPointer(),
 		IncludeLoginMethod:                  plan.IncludeLoginMethod.ValueBoolPointer(),
+		HasPhoneMfa:                         plan.HasPhoneMfa.ValueBoolPointer(),
+		AllUsersMustSetup2fa:                plan.AllUsersMustSetup2fa.ValueBoolPointer(),
 	}
 
 	var signupDomainAllowlistEnabled bool
@@ -279,6 +293,22 @@ func (r *basicAuthConfigurationResource) Create(ctx context.Context, req resourc
 		resp.Diagnostics.AddError(
 			"Error updating basic auth configuration",
 			"IncludeLoginMethod failed to update. The `include_login_method` is instead "+fmt.Sprintf("%t", environmentConfigResponse.IncludeLoginMethod),
+		)
+		return
+	}
+	if plan.HasPhoneMfa.ValueBoolPointer() != nil &&
+		plan.HasPhoneMfa.ValueBool() != environmentConfigResponse.HasPhoneMfa {
+		resp.Diagnostics.AddError(
+			"Error updating basic auth configuration",
+			"HasPhoneMfa failed to update. The `has_phone_mfa` is instead "+fmt.Sprintf("%t", environmentConfigResponse.HasPhoneMfa),
+		)
+		return
+	}
+	if plan.AllUsersMustSetup2fa.ValueBoolPointer() != nil &&
+		plan.AllUsersMustSetup2fa.ValueBool() != environmentConfigResponse.AllUsersMustSetup2fa {
+		resp.Diagnostics.AddError(
+			"Error updating basic auth configuration",
+			"AllUsersMustSetup2fa failed to update. The `all_users_must_setup_2fa` is instead "+fmt.Sprintf("%t", environmentConfigResponse.AllUsersMustSetup2fa),
 		)
 		return
 	}
@@ -374,6 +404,12 @@ func (r *basicAuthConfigurationResource) Read(ctx context.Context, req resource.
 	if state.IncludeLoginMethod.ValueBoolPointer() != nil {
 		state.IncludeLoginMethod = types.BoolValue(environmentConfigResponse.IncludeLoginMethod)
 	}
+	if state.HasPhoneMfa.ValueBoolPointer() != nil {
+		state.HasPhoneMfa = types.BoolValue(environmentConfigResponse.HasPhoneMfa)
+	}
+	if state.AllUsersMustSetup2fa.ValueBoolPointer() != nil {
+		state.AllUsersMustSetup2fa = types.BoolValue(environmentConfigResponse.AllUsersMustSetup2fa)
+	}
 
 	// Save updated state into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
@@ -400,6 +436,8 @@ func (r *basicAuthConfigurationResource) Update(ctx context.Context, req resourc
 		UsersCanDeleteOwnAccount:            plan.UsersCanDeleteOwnAccount.ValueBoolPointer(),
 		UsersCanChangeEmail:                 plan.UsersCanChangeEmail.ValueBoolPointer(),
 		IncludeLoginMethod:                  plan.IncludeLoginMethod.ValueBoolPointer(),
+		HasPhoneMfa:                         plan.HasPhoneMfa.ValueBoolPointer(),
+		AllUsersMustSetup2fa:                plan.AllUsersMustSetup2fa.ValueBoolPointer(),
 	}
 
 	var signupDomainAllowlistEnabled bool
@@ -508,6 +546,22 @@ func (r *basicAuthConfigurationResource) Update(ctx context.Context, req resourc
 		)
 		return
 	}
+	if plan.HasPhoneMfa.ValueBoolPointer() != nil &&
+		plan.HasPhoneMfa.ValueBool() != environmentConfigResponse.HasPhoneMfa {
+		resp.Diagnostics.AddError(
+			"Error updating basic auth configuration",
+			"HasPhoneMfa failed to update. The `has_phone_mfa` is instead "+fmt.Sprintf("%t", environmentConfigResponse.HasPhoneMfa),
+		)
+		return
+	}
+	if plan.AllUsersMustSetup2fa.ValueBoolPointer() != nil &&
+		plan.AllUsersMustSetup2fa.ValueBool() != environmentConfigResponse.AllUsersMustSetup2fa {
+		resp.Diagnostics.AddError(
+			"Error updating basic auth configuration",
+			"AllUsersMustSetup2fa failed to update. The `all_users_must_setup_2fa` is instead "+fmt.Sprintf("%t", environmentConfigResponse.AllUsersMustSetup2fa),
+		)
+		return
+	}
 	if plan.SignupDomainAllowlist != nil {
 		if len(plan.SignupDomainAllowlist) != len(environmentConfigResponse.SignupDomainAllowlist) {
 			resp.Diagnostics.AddError(
@@ -580,6 +634,8 @@ func (r *basicAuthConfigurationResource) ImportState(ctx context.Context, req re
 	state.UsersCanDeleteOwnAccount = types.BoolValue(environmentConfigResponse.UsersCanDeleteOwnAccount)
 	state.UsersCanChangeEmail = types.BoolValue(environmentConfigResponse.UsersCanChangeEmail)
 	state.IncludeLoginMethod = types.BoolValue(environmentConfigResponse.IncludeLoginMethod)
+	state.HasPhoneMfa = types.BoolValue(environmentConfigResponse.HasPhoneMfa)
+	state.AllUsersMustSetup2fa = types.BoolValue(environmentConfigResponse.AllUsersMustSetup2fa)
 
 	// Save updated state into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)

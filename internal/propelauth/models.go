@@ -45,6 +45,10 @@ type EnvironmentConfigUpdate struct {
 	LogoImageId                         string           `json:"logo_image_id,omitempty"`
 	FaviconImageId                      string           `json:"favicon_image_id,omitempty"`
 	BackgroundImageId                   string           `json:"background_image_id,omitempty"`
+	EnableDarkmodeTheme                 *bool            `json:"enable_darkmode_theme,omitempty"`
+	DarkmodeTheme                       *Theme           `json:"darkmode_theme,omitempty"`
+	DarkmodeLogoImageId                 string           `json:"darkmode_logo_image_id,omitempty"`
+	DarkmodeBackgroundImageId           string           `json:"darkmode_background_image_id,omitempty"`
 	PersonalApiKeysEnabled              *bool            `json:"personal_api_keys_enabled,omitempty"`
 	PersonalApiKeyRateLimit             *RateLimitConfig `json:"personal_api_key_rate_limit,omitempty"`
 	OrgApiKeysEnabled                   *bool            `json:"org_api_keys_enabled,omitempty"`
@@ -56,6 +60,9 @@ type EnvironmentConfigUpdate struct {
 	OrgAuditLogIncludesImpersonation    *bool            `json:"org_audit_log_includes_impersonation,omitempty"`
 	OrgAuditLogIncludesApiKeys          *bool            `json:"org_audit_log_includes_api_keys,omitempty"`
 	OrgAuditLogIncludesEmployees        *bool            `json:"org_audit_log_includes_employees,omitempty"`
+	HasPhoneMfa                         *bool            `json:"has_phone_mfa,omitempty"`
+	AllUsersMustSetup2fa                *bool            `json:"all_users_must_setup_2fa,omitempty"`
+	AllowAutojoinByDomain               *bool            `json:"allow_autojoin_by_domain,omitempty"`
 }
 
 type EnvironmentConfigResponse struct {
@@ -87,6 +94,10 @@ type EnvironmentConfigResponse struct {
 	LogoUrl                             string          `json:"logo_url"`
 	FaviconUrl                          string          `json:"favicon_url"`
 	BackgroundUrl                       string          `json:"background_url"`
+	EnableDarkmodeTheme                 bool            `json:"enable_darkmode_theme"`
+	DarkmodeTheme                       Theme           `json:"darkmode_theme"`
+	DarkmodeLogoUrl                     string          `json:"darkmode_logo_url"`
+	DarkmodeBackgroundUrl               string          `json:"darkmode_background_url"`
 	PersonalApiKeysEnabled              bool            `json:"personal_api_keys_enabled"`
 	PersonalApiKeyRateLimit             RateLimitConfig `json:"personal_api_key_rate_limit"`
 	OrgApiKeysEnabled                   bool            `json:"org_api_keys_enabled"`
@@ -98,6 +109,9 @@ type EnvironmentConfigResponse struct {
 	OrgAuditLogIncludesImpersonation    bool            `json:"org_audit_log_includes_impersonation"`
 	OrgAuditLogIncludesApiKeys          bool            `json:"org_audit_log_includes_api_keys"`
 	OrgAuditLogIncludesEmployees        bool            `json:"org_audit_log_includes_employees"`
+	HasPhoneMfa                         bool            `json:"has_phone_mfa"`
+	AllUsersMustSetup2fa                bool            `json:"all_users_must_setup_2fa"`
+	AllowAutojoinByDomain               bool            `json:"allow_autojoin_by_domain"`
 }
 
 type Theme struct {
@@ -180,6 +194,8 @@ type RealmConfigUpdate struct {
 	AutoConfirmEmails                     *bool `json:"auto_confirm_emails,omitempty"`
 	AllowPublicSignups                    *bool `json:"allow_public_signups,omitempty"`
 	WaitlistUsersRequireEmailConfirmation *bool `json:"waitlist_users_require_email_confirmation,omitempty"`
+	MagicLinkRequiresInterstitial         *bool `json:"magic_link_requires_interstitial,omitempty"`
+	MagicLinkExpireAfterFirstUse          *bool `json:"magic_link_expire_after_first_use,omitempty"`
 }
 
 type RealmConfigsResponse struct {
@@ -192,6 +208,8 @@ type RealmConfigResponse struct {
 	AutoConfirmEmails                     bool   `json:"auto_confirm_emails"`
 	AllowPublicSignups                    bool   `json:"allow_public_signups"`
 	WaitlistUsersRequireEmailConfirmation bool   `json:"waitlist_users_require_email_confirmation"`
+	MagicLinkRequiresInterstitial         bool   `json:"magic_link_requires_interstitial"`
+	MagicLinkExpireAfterFirstUse          bool   `json:"magic_link_expire_after_first_use"`
 	AuthHostname                          string `json:"auth_hostname"`
 }
 

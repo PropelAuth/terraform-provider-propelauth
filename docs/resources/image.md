@@ -41,9 +41,9 @@ resource "propelauth_image" "background_example" {
 
 ### Required
 
-- `image_type` (String) The type of the image. This is used to determine where the image is used in PropelAuth. Accepted values are `logo`, `favicon`, and `background`.
+- `image_type` (String) The type of the image. This is used to determine where the image is used in PropelAuth. Accepted values are `logo`, `favicon`, `background`, `darkmode_logo`, or `darkmode_background`.
 - `source` (String) The path to a local file of the image.
-- `version` (String) The version of the image. This is track updates to the image at the specified `source`.
+- `version` (String) The version of the image. This is used to detect updates to the image at the specified `source`.
 
 ### Read-Only
 

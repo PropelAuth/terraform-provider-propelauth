@@ -25,9 +25,11 @@ resource "propelauth_basic_auth_configuration" "example" {
 
 ### Optional
 
+- `all_users_must_setup_2fa` (Boolean) If true, all users will be required to use multifactor authentication when logging in. Note: This feature is only available on some pricing plans.
 - `allow_users_to_signup_with_personal_email` (Boolean) If true, your users will be able to sign up using personal email domains (@gmail.com, @yahoo.com, etc.).The default setting is true. This is only enabled if `signup_domain_allowlist` is empty.
 - `has_password_login` (Boolean) If true, your users will be able to log in using their email and password. The default setting is true.
 - `has_passwordless_login` (Boolean) If true, your users will be able to log in using a magic link sent to their email. The default setting is false.
+- `has_phone_mfa` (Boolean) If true, users will be able to set up SMS as a 2FA method.See `https://docs.propelauth.com/overview/authentication/mfa#sms-mfa` for more information on setting up SMS MFA.
 - `include_login_method` (Boolean) If true, the login method will be included in the access token. The default setting is false.See `https://docs.propelauth.com/overview/user-management/user-properties#login-method-property` for more information.
 - `signup_domain_allowlist` (List of String) A list of email domains that are allowed to sign up. Note: This feature is only available on some pricing plans.
 - `signup_domain_blocklist` (List of String) A list of email domains that are blocked from signing up. This is only used if `signup_domain_allowlist` is empty.Note: This feature is only available on some pricing plans.

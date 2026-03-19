@@ -39,6 +39,7 @@ type organizationConfigurationResourceModel struct {
 	OrgsCanSetupSaml            types.Bool                        `tfsdk:"orgs_can_setup_saml"`
 	UseOrgNameForSaml           types.Bool                        `tfsdk:"use_org_name_for_saml"`
 	DefaultToSamlLogin          types.Bool                        `tfsdk:"default_to_saml_login"`
+	AllowAutojoinByDomain       types.Bool                        `tfsdk:"allow_autojoin_by_domain"`
 	SkipSamlRoleMappingStep     types.Bool                        `tfsdk:"skip_saml_role_mapping_step"`
 	OrgsCanRequire2fa           types.Bool                        `tfsdk:"orgs_can_require_2fa"`
 	CustomerOrgAuditLogSettings *CustomerOrgAuditLogSettingsModel `tfsdk:"customer_org_audit_log_settings"`
@@ -118,6 +119,12 @@ func (r *organizationConfigurationResource) Schema(ctx context.Context, req reso
 				Description: "This is an advanced setting that only applies if SAML is enabled. If true, " +
 					"end users setting up SAML for their organization will not see the role-mapping step. " +
 					"The default setting is false.",
+			},
+			"allow_autojoin_by_domain": schema.BoolAttribute{
+				Optional: true,
+				Description: "If true, users with the requisite permissions will be able to allow or disallow " +
+					"the ability for anyone with a matching email domain to join an organization." +
+					"The default setting is true.",
 			},
 			"orgs_can_require_2fa": schema.BoolAttribute{
 				Optional: true,
@@ -202,6 +209,7 @@ func (r *organizationConfigurationResource) Create(ctx context.Context, req reso
 		OrgsCanSetupSaml:            plan.OrgsCanSetupSaml.ValueBoolPointer(),
 		UseOrgNameForSaml:           plan.UseOrgNameForSaml.ValueBoolPointer(),
 		DefaultToSamlLogin:          plan.DefaultToSamlLogin.ValueBoolPointer(),
+		AllowAutojoinByDomain:       plan.AllowAutojoinByDomain.ValueBoolPointer(),
 		SkipSamlRoleMappingStep:     plan.SkipSamlRoleMappingStep.ValueBoolPointer(),
 		OrgsCanRequire2fa:           plan.OrgsCanRequire2fa.ValueBoolPointer(),
 	}
@@ -293,6 +301,14 @@ func (r *organizationConfigurationResource) Create(ctx context.Context, req reso
 		resp.Diagnostics.AddError(
 			"Error updating organization configuration",
 			"DefaultToSamlLogin failed to update. The `default_to_saml_login` is instead "+fmt.Sprintf("%t", environmentConfigResponse.DefaultToSamlLogin),
+		)
+		return
+	}
+	if plan.AllowAutojoinByDomain.ValueBoolPointer() != nil &&
+		plan.AllowAutojoinByDomain.ValueBool() != environmentConfigResponse.AllowAutojoinByDomain {
+		resp.Diagnostics.AddError(
+			"Error updating organization configuration",
+			"AllowAutojoinByDomain failed to update. The `allow_autojoin_by_domain` is instead "+fmt.Sprintf("%t", environmentConfigResponse.AllowAutojoinByDomain),
 		)
 		return
 	}
@@ -405,6 +421,9 @@ func (r *organizationConfigurationResource) Read(ctx context.Context, req resour
 	if state.DefaultToSamlLogin.ValueBoolPointer() != nil {
 		state.DefaultToSamlLogin = types.BoolValue(environmentConfigResponse.DefaultToSamlLogin)
 	}
+	if state.AllowAutojoinByDomain.ValueBoolPointer() != nil {
+		state.AllowAutojoinByDomain = types.BoolValue(environmentConfigResponse.AllowAutojoinByDomain)
+	}
 	if state.SkipSamlRoleMappingStep.ValueBoolPointer() != nil {
 		state.SkipSamlRoleMappingStep = types.BoolValue(environmentConfigResponse.SkipSamlRoleMappingStep)
 	}
@@ -444,6 +463,7 @@ func (r *organizationConfigurationResource) Update(ctx context.Context, req reso
 		OrgsCanSetupSaml:            plan.OrgsCanSetupSaml.ValueBoolPointer(),
 		UseOrgNameForSaml:           plan.UseOrgNameForSaml.ValueBoolPointer(),
 		DefaultToSamlLogin:          plan.DefaultToSamlLogin.ValueBoolPointer(),
+		AllowAutojoinByDomain:       plan.AllowAutojoinByDomain.ValueBoolPointer(),
 		SkipSamlRoleMappingStep:     plan.SkipSamlRoleMappingStep.ValueBoolPointer(),
 		OrgsCanRequire2fa:           plan.OrgsCanRequire2fa.ValueBoolPointer(),
 	}
@@ -538,6 +558,14 @@ func (r *organizationConfigurationResource) Update(ctx context.Context, req reso
 		)
 		return
 	}
+	if plan.AllowAutojoinByDomain.ValueBoolPointer() != nil &&
+		plan.AllowAutojoinByDomain.ValueBool() != environmentConfigResponse.AllowAutojoinByDomain {
+		resp.Diagnostics.AddError(
+			"Error updating organization configuration",
+			"AllowAutojoinByDomain failed to update. The `allow_autojoin_by_domain` is instead "+fmt.Sprintf("%t", environmentConfigResponse.AllowAutojoinByDomain),
+		)
+		return
+	}
 	if plan.SkipSamlRoleMappingStep.ValueBoolPointer() != nil &&
 		plan.SkipSamlRoleMappingStep.ValueBool() != environmentConfigResponse.SkipSamlRoleMappingStep {
 		resp.Diagnostics.AddError(
@@ -627,6 +655,7 @@ func (r *organizationConfigurationResource) ImportState(ctx context.Context, req
 	state.OrgsCanSetupSaml = types.BoolValue(environmentConfigResponse.OrgsCanSetupSaml)
 	state.UseOrgNameForSaml = types.BoolValue(environmentConfigResponse.UseOrgNameForSaml)
 	state.DefaultToSamlLogin = types.BoolValue(environmentConfigResponse.DefaultToSamlLogin)
+	state.AllowAutojoinByDomain = types.BoolValue(environmentConfigResponse.AllowAutojoinByDomain)
 	state.SkipSamlRoleMappingStep = types.BoolValue(environmentConfigResponse.SkipSamlRoleMappingStep)
 	state.OrgsCanRequire2fa = types.BoolValue(environmentConfigResponse.OrgsCanRequire2fa)
 	state.CustomerOrgAuditLogSettings = &CustomerOrgAuditLogSettingsModel{
