@@ -56,7 +56,7 @@ func (c *PropelAuthClient) UploadImage(imageType string, pathToLocalImage string
 	if err != nil {
 		return nil, fmt.Errorf("error making http request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() //nolint:errcheck
 
 	// convert the response body to a stream of bytes
 	buf := new(bytes.Buffer)
