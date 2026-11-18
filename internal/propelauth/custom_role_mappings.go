@@ -11,10 +11,9 @@ import (
 //   DELETE custom_role_mappings/{id} - delete a mapping
 
 type CustomRoleMapping struct {
-	MappingId         string                  `json:"mapping_id,omitempty"`
-	Name              string                  `json:"name"`
-	NumOrgsSubscribed int64                   `json:"num_orgs_subscribed,omitempty"`
-	Roles             []CustomRoleMappingRole `json:"roles"`
+	MappingId string                  `json:"mapping_id,omitempty"`
+	Name      string                  `json:"name"`
+	Roles     []CustomRoleMappingRole `json:"roles"`
 }
 
 type CustomRoleMappingRole struct {

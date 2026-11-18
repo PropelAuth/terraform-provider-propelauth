@@ -87,27 +87,26 @@ resource "propelauth_custom_role_mapping" "example" {
 ### Read-Only
 
 - `id` (String) The mapping ID of the custom role mapping.
-- `num_orgs_subscribed` (Number) The number of organizations subscribed to this mapping.
 
 <a id="nestedatt--roles"></a>
 ### Nested Schema for `roles`
 
 Optional:
 
-- `can_change_roles` (Boolean) If true, users with this role in the org can change the roles of other users in the organization. The default is false.
-- `can_delete_org` (Boolean) If true, users with this role in the org can delete the organization. The default is false.
-- `can_edit_org_access` (Boolean) If true, users with this role in the org can edit the organization's access settings. The default is false.
-- `can_invite` (Boolean) If true, users with this role in the org can invite other users to the organization. The default is false.
-- `can_manage_api_keys` (Boolean) If true, users with this role in the org can manage API keys for the organization. The default is false.
-- `can_manage_mcp_connections` (Boolean) If true, users with this role in the org can manage the organization's MCP connections. The default is false.
-- `can_remove_users` (Boolean) If true, users with this role in the org can remove other users from the organization. The default is false.
-- `can_setup_saml` (Boolean) If true, users with this role in the org can setup enterprise SSO for the organization. The default is false.
-- `can_update_org_metadata` (Boolean) If true, users with this role in the org can update the organization's metadata. The default is false.
-- `can_view_org_audit_log` (Boolean) If true, users with this role in the org can view the organization's audit log. The default is false.
-- `can_view_other_members` (Boolean) If true, users with this role in the org can view other members of the organization. The default is true.
-- `deprecated` (Boolean) If true, this role is deprecated. The default is false.
-- `disabled` (Boolean) If true, this role is disabled and cannot be assigned to users. The default is false.
-- `is_internal` (Boolean) If true, this role is an internal role and cannot be assigned to or viewed by end users. The default is false.
+- `can_change_roles` (Boolean) If true, users with this role in the org can change the roles of other users in the organization.
+- `can_delete_org` (Boolean) If true, users with this role in the org can delete the organization.
+- `can_edit_org_access` (Boolean) If true, users with this role in the org can edit the organization's access settings.
+- `can_invite` (Boolean) If true, users with this role in the org can invite other users to the organization.
+- `can_manage_api_keys` (Boolean) If true, users with this role in the org can manage API keys for the organization.
+- `can_manage_mcp_connections` (Boolean) If true, users with this role in the org can manage the organization's MCP connections.
+- `can_remove_users` (Boolean) If true, users with this role in the org can remove other users from the organization.
+- `can_setup_saml` (Boolean) If true, users with this role in the org can setup enterprise SSO for the organization.
+- `can_update_org_metadata` (Boolean) If true, users with this role in the org can update the organization's metadata.
+- `can_view_org_audit_log` (Boolean) If true, users with this role in the org can view the organization's audit log.
+- `can_view_other_members` (Boolean) If true, users with this role in the org can view other members of the organization.
+- `deprecated` (Boolean) If true, this role is deprecated.
+- `disabled` (Boolean) If true, this role is disabled and cannot be assigned to users.
+- `is_internal` (Boolean) If true, this role is an internal role and cannot be assigned to or viewed by end users.
 - `mcp_org_scopes` (List of String) A list of MCP scopes assigned to this role.
 - `permissions` (List of String) A list of permissions specific to your application that are assigned to this role.
 - `roles_can_manage` (List of String) A list of roles that this role can manage in a multi-role project.

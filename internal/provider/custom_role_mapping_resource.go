@@ -3,13 +3,14 @@ package provider
 import (
 	"context"
 	"fmt"
+	"slices"
+	"sort"
 
 	"terraform-provider-propelauth/internal/propelauth"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -32,10 +33,9 @@ type customRoleMappingResource struct {
 
 // customRoleMappingResourceModel describes the resource data model.
 type customRoleMappingResourceModel struct {
-	Id                types.String                      `tfsdk:"id"`
-	Name              types.String                      `tfsdk:"name"`
-	NumOrgsSubscribed types.Int64                       `tfsdk:"num_orgs_subscribed"`
-	Roles             map[string]customMappingRoleModel `tfsdk:"roles"`
+	Id    types.String                      `tfsdk:"id"`
+	Name  types.String                      `tfsdk:"name"`
+	Roles map[string]customMappingRoleModel `tfsdk:"roles"`
 }
 
 type customMappingRoleModel struct {
@@ -99,40 +99,33 @@ func (r *customRoleMappingResource) Schema(ctx context.Context, req resource.Sch
 				Required:    true,
 				Description: "The name of the custom role mapping.",
 			},
-			"num_orgs_subscribed": schema.Int64Attribute{
-				Computed:    true,
-				Description: "The number of organizations subscribed to this mapping.",
-				PlanModifiers: []planmodifier.Int64{
-					int64planmodifier.UseStateForUnknown(),
-				},
-			},
 			"roles": schema.MapNestedAttribute{
 				Required:    true,
 				Description: "A map of roles that can be assigned to members of an organization subscribed to this mapping.",
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"can_view_other_members": roleBool(
-							"If true, users with this role in the org can view other members of the organization. The default is true."),
+							"If true, users with this role in the org can view other members of the organization."),
 						"can_invite": roleBool(
-							"If true, users with this role in the org can invite other users to the organization. The default is false."),
+							"If true, users with this role in the org can invite other users to the organization."),
 						"can_change_roles": roleBool(
-							"If true, users with this role in the org can change the roles of other users in the organization. The default is false."),
+							"If true, users with this role in the org can change the roles of other users in the organization."),
 						"can_manage_api_keys": roleBool(
-							"If true, users with this role in the org can manage API keys for the organization. The default is false."),
+							"If true, users with this role in the org can manage API keys for the organization."),
 						"can_remove_users": roleBool(
-							"If true, users with this role in the org can remove other users from the organization. The default is false."),
+							"If true, users with this role in the org can remove other users from the organization."),
 						"can_setup_saml": roleBool(
-							"If true, users with this role in the org can setup enterprise SSO for the organization. The default is false."),
+							"If true, users with this role in the org can setup enterprise SSO for the organization."),
 						"can_delete_org": roleBool(
-							"If true, users with this role in the org can delete the organization. The default is false."),
+							"If true, users with this role in the org can delete the organization."),
 						"can_edit_org_access": roleBool(
-							"If true, users with this role in the org can edit the organization's access settings. The default is false."),
+							"If true, users with this role in the org can edit the organization's access settings."),
 						"can_update_org_metadata": roleBool(
-							"If true, users with this role in the org can update the organization's metadata. The default is false."),
+							"If true, users with this role in the org can update the organization's metadata."),
 						"can_view_org_audit_log": roleBool(
-							"If true, users with this role in the org can view the organization's audit log. The default is false."),
+							"If true, users with this role in the org can view the organization's audit log."),
 						"can_manage_mcp_connections": roleBool(
-							"If true, users with this role in the org can manage the organization's MCP connections. The default is false."),
+							"If true, users with this role in the org can manage the organization's MCP connections."),
 						"permissions": stringList(
 							"A list of permissions specific to your application that are assigned to this role."),
 						"roles_can_manage": stringList(
@@ -140,11 +133,11 @@ func (r *customRoleMappingResource) Schema(ctx context.Context, req resource.Sch
 						"mcp_org_scopes": stringList(
 							"A list of MCP scopes assigned to this role."),
 						"is_internal": roleBool(
-							"If true, this role is an internal role and cannot be assigned to or viewed by end users. The default is false."),
+							"If true, this role is an internal role and cannot be assigned to or viewed by end users."),
 						"disabled": roleBool(
-							"If true, this role is disabled and cannot be assigned to users. The default is false."),
+							"If true, this role is disabled and cannot be assigned to users."),
 						"deprecated": roleBool(
-							"If true, this role is deprecated. The default is false."),
+							"If true, this role is deprecated."),
 						"description": schema.StringAttribute{
 							Computed:    true,
 							Description: "A human-readable description of the role, inherited from the project role.",
@@ -200,7 +193,6 @@ func (r *customRoleMappingResource) Create(ctx context.Context, req resource.Cre
 	}
 
 	plan.Id = types.StringValue(mapping.MappingId)
-	plan.NumOrgsSubscribed = types.Int64Value(mapping.NumOrgsSubscribed)
 	plan.Roles = customMappingRolesToState(ctx, plan.Roles, mapping.Roles)
 
 	tflog.Trace(ctx, "created a propelauth_custom_role_mapping resource")
@@ -228,7 +220,6 @@ func (r *customRoleMappingResource) Read(ctx context.Context, req resource.ReadR
 	}
 
 	state.Name = types.StringValue(mapping.Name)
-	state.NumOrgsSubscribed = types.Int64Value(mapping.NumOrgsSubscribed)
 	state.Roles = customMappingRolesToState(ctx, state.Roles, mapping.Roles)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &state)...)
@@ -253,7 +244,6 @@ func (r *customRoleMappingResource) Update(ctx context.Context, req resource.Upd
 		return
 	}
 
-	plan.NumOrgsSubscribed = types.Int64Value(mapping.NumOrgsSubscribed)
 	plan.Roles = customMappingRolesToState(ctx, plan.Roles, mapping.Roles)
 
 	tflog.Trace(ctx, "updated a propelauth_custom_role_mapping resource")
@@ -408,13 +398,8 @@ func listMatchesIgnoreOrder(ctx context.Context, listInPrior types.List, valuesF
 		return false
 	}
 	prior := stringSliceFromList(ctx, listInPrior)
-	if len(prior) != len(valuesFromSource) {
-		return false
-	}
-	for _, value := range prior {
-		if !propelauth.Contains(valuesFromSource, value) {
-			return false
-		}
-	}
-	return true
+	source := append([]string{}, valuesFromSource...)
+	sort.Strings(prior)
+	sort.Strings(source)
+	return slices.Equal(prior, source)
 }
